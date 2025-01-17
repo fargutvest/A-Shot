@@ -7,7 +7,7 @@ namespace CaptureImage.Common.Helpers
     {
         public static Rectangle[] DrawSelectionBorder(Graphics gr, Rectangle rect, int handleSize = 5)
         {
-            Pen pen = new Pen(Color.White)
+            Pen pen = new Pen(Color.Black)
             {
                 Width = 1,
                 DashPattern = new float[] { 3, 3 }

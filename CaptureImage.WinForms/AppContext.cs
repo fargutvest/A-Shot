@@ -112,7 +112,8 @@ namespace CaptureImage.WinForms
                     Application.Exit();
             }
         }
-        private void HideForm()
+
+        public void HideForm()
         {
             freezeScreen.Hide();
             blackoutScreen.Hide();

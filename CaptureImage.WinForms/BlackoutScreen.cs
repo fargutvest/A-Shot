@@ -66,7 +66,7 @@ namespace CaptureImage.WinForms
             {
                 case Thumb.ThumbAction.CopyToClipboard:
                     appContext.MakeScreenshot(selectingTool.selectingRect);
-                    SendKeys.Send("{ESC}");
+                    appContext.HideForm();
                     break;
                 case Thumb.ThumbAction.Undo:
                     appContext.UndoDrawing();

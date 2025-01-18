@@ -84,11 +84,11 @@ namespace CaptureImage.WinForms
                     break;
 
                 case Thumb.ThumbAction.Save:
-                    
+                    appContext.SaveScreenshot(selectingTool.selectingRect);
                     break;
 
                 case Thumb.ThumbAction.Close:
-
+                    appContext.HideForm();
                     break;
             }
         }

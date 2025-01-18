@@ -22,5 +22,17 @@ namespace CaptureImage.WinForms.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastSaveDirectory {
+            get {
+                return ((string)(this["LastSaveDirectory"]));
+            }
+            set {
+                this["LastSaveDirectory"] = value;
+            }
+        }
     }
 }

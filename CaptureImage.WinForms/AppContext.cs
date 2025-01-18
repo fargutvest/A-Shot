@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using CaptureImage.WinForms.Properties;
+using System.IO;
+using CaptureImage.WinForms.Helpers;
 
 namespace CaptureImage.WinForms
 {
@@ -70,10 +72,7 @@ namespace CaptureImage.WinForms
             DrawingContextsKeeper.SaveContext();
         }
 
-        public void MakeScreenshot(Rectangle rect) 
-        {
-            Clipboard.SetImage(BitmapHelper.Crop((Bitmap)canvas.BackgroundImage, rect));
-        }
+ 
 
         public void UndoDrawing()
         {
@@ -123,6 +122,39 @@ namespace CaptureImage.WinForms
             freezeScreen.Show();
             blackoutScreen.Show();
             isHidden = false;
+        }
+
+        private Bitmap GetScreenshot(Rectangle rect)
+        {
+            return BitmapHelper.Crop((Bitmap)canvas.BackgroundImage, rect);
+        }
+        public void MakeScreenshot(Rectangle rect)
+        {
+            Clipboard.SetImage(GetScreenshot(rect));
+        }
+
+        internal void SaveScreenshot(Rectangle rect)
+        {
+            Bitmap bitmap = GetScreenshot(rect);
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "PNG|*.png|JPEG|*.jpeg|BMP|*.bmp";
+
+            string lastDirectory = Properties.Settings.Default.LastSaveDirectory;
+
+
+            if (string.IsNullOrEmpty(lastDirectory) == false)
+            {
+                sfd.InitialDirectory = lastDirectory;
+                sfd.FileName = FileNameHelper.SuggestFileName(lastDirectory);
+            }
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                bitmap.Save(sfd.FileName);
+
+                Properties.Settings.Default.LastSaveDirectory = Path.GetDirectoryName(sfd.FileName);
+                Properties.Settings.Default.Save();
+            }
         }
     }
 }

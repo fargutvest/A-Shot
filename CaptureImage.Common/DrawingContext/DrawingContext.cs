@@ -3,10 +3,12 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace CaptureImage.Common
+namespace CaptureImage.Common.DrawingContext
 {
     public class DrawingContext : ICloneable
     {
+        public event EventHandler DrawingContextChanged;
+
         public static DrawingContext Create(Image[] canvasImages, Control[] canvasControls, bool isClean = false) =>
             new DrawingContext()
             {
@@ -18,7 +20,15 @@ namespace CaptureImage.Common
         public Image[] CanvasImages { get; set; }
         public Control[] CanvasControls { get; set; }
 
+        public Pen DrawingPen { get; set; }
+
         public bool IsClean { get; set; }
+
+        public void SetColorOfPen(Color color)
+        {
+            DrawingPen.Color = color;
+            DrawingContextChanged?.Invoke(this, EventArgs.Empty);
+        }
 
         public object Clone()
         {

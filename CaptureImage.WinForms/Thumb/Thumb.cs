@@ -12,6 +12,8 @@ namespace CaptureImage.WinForms.Thumb
     {
         public Rectangle[] HandleRectangles { get; private set; }
 
+        private AppContext appContext;
+
         private Label displaySizeLabel;
         private Panel panelY;
         private Panel panelX;
@@ -21,6 +23,7 @@ namespace CaptureImage.WinForms.Thumb
         private Button btnLine;
         private Button btnArrow;
         private Button btnRect;
+        private Button btnColor;
 
         private Button btnCpClipboard;
         private Button btnSave;
@@ -36,8 +39,11 @@ namespace CaptureImage.WinForms.Thumb
 
         public event EventHandler<ThumbAction> ActionCalled;
 
-        public Thumb()
+        public Thumb(AppContext appContext)
         {
+            this.appContext = appContext;
+            appContext.DrawingContextsKeeper.DrawingContext.DrawingContextChanged += DrawingContext_DrawingContextChanged;
+
             InitializeComponent();
 
             // displaySizeLabel
@@ -94,6 +100,16 @@ namespace CaptureImage.WinForms.Thumb
             this.btnRect.Location = new Point(3, 75);
             this.btnRect.MouseClick += (sender, e) => SelectState(ThumbState.Rect);
 
+            // btnColor
+            this.btnColor = new Button();
+            this.btnColor.FlatStyle = FlatStyle.Flat;
+            this.btnColor.FlatAppearance.BorderSize = 2;
+            this.btnColor.FlatAppearance.BorderColor = Color.White;
+            this.btnColor.BackColor = appContext.DrawingContextsKeeper.DrawingContext.DrawingPen.Color;
+            this.btnColor.Size = new Size(24, 24);
+            this.btnColor.Location = new Point(3, 147);
+            this.btnColor.MouseClick += (sender, e) => CallAction(ThumbAction.Color);
+
             int xOffset = 13;
             // btnCpClipboard
             this.btnCpClipboard = new Button();
@@ -121,6 +137,7 @@ namespace CaptureImage.WinForms.Thumb
             this.panelY.Controls.Add(this.btnLine);
             this.panelY.Controls.Add(this.btnArrow);
             this.panelY.Controls.Add(this.btnRect);
+            this.panelY.Controls.Add(this.btnColor);
 
             panelX.Controls.Add(this.btnCpClipboard);
             panelX.Controls.Add(this.btnSave);
@@ -135,6 +152,12 @@ namespace CaptureImage.WinForms.Thumb
                 this.panelX,
                 this.panelY,
             };
+        }
+
+        private void DrawingContext_DrawingContextChanged(object sender, EventArgs e)
+        {
+            btnColor.BackColor = appContext.DrawingContextsKeeper.DrawingContext.DrawingPen.Color;
+            btnColor.Invalidate();
         }
 
         private void SelectState(ThumbState state)

@@ -7,10 +7,12 @@ using System.Windows.Forms;
 using CaptureImage.WinForms.Properties;
 using System.IO;
 using CaptureImage.WinForms.Helpers;
+using CaptureImage.Common.Tools.Misc;
+using CaptureImage.Common.DrawingContext;
 
 namespace CaptureImage.WinForms
 {
-    public class AppContext : ApplicationContext
+    public class AppContext : ApplicationContext, IDrawingContextProvider
     {
         private List<Control> controls;
         private Control canvas;
@@ -45,7 +47,6 @@ namespace CaptureImage.WinForms
             };
 
             trayIcon.Visible = true;
-
         }
 
         public void AddControl(Control control, bool isCanvas = false)
@@ -66,6 +67,7 @@ namespace CaptureImage.WinForms
                canvasImages[i] = controls[i].BackgroundImage;
 
             DrawingContext drawingContext = DrawingContext.Create(canvasImages, controls.ToArray(), isClean: true);
+            drawingContext.DrawingPen = new Pen(Color.Yellow, 2);
 
             DrawingContextsKeeper.DrawingContext = drawingContext;
             
@@ -154,6 +156,16 @@ namespace CaptureImage.WinForms
 
                 Properties.Settings.Default.LastSaveDirectory = Path.GetDirectoryName(sfd.FileName);
                 Properties.Settings.Default.Save();
+            }
+        }
+
+        internal void SelectColor()
+        {
+            ColorDialog colorDialog = new ColorDialog();
+            
+            if (colorDialog.ShowDialog() == DialogResult.OK)
+            {
+                DrawingContextsKeeper.DrawingContext.SetColorOfPen(colorDialog.Color);
             }
         }
     }

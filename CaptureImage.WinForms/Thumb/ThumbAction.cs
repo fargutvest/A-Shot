@@ -7,6 +7,7 @@
         Print,
         Undo,
         Close,
-        Cancel
+        Cancel,
+        Color
     }
 }

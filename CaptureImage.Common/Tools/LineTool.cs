@@ -1,4 +1,5 @@
-﻿using CaptureImage.Common.Tools.Misc;
+﻿using CaptureImage.Common.DrawingContext;
+using CaptureImage.Common.Tools.Misc;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -10,27 +11,26 @@ namespace CaptureImage.Common.Tools
         protected DrawingState state;
         protected Point mouseStartPos;
         private Point mousePreviousPos;
-        protected Pen pen;
         protected Pen[] erasePens;
         protected bool isActive;
 
-        protected DrawingContextsKeeper drawingContextsKeeper;
+        protected IDrawingContextProvider drawingContextProvider;
+        private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContextsKeeper.DrawingContext;
         
 
-        public LineTool(DrawingContextsKeeper drawingContextsKeeper)
+        public LineTool(IDrawingContextProvider drawingContextProvider)
         {
-            this.drawingContextsKeeper = drawingContextsKeeper;
+            this.drawingContextProvider = drawingContextProvider;
             this.state = DrawingState.None;
 
             mouseStartPos = new Point(0, 0);
-            pen = new Pen(Color.Yellow) { Width = 2 };
         }
 
         public virtual void MouseDown(Point mousePosition)
         {
             if (isActive)
             {
-                erasePens = drawingContextsKeeper.DrawingContext.CanvasImages.Select(im => new Pen(new TextureBrush(im)) { Width = 2 }).ToArray();
+                erasePens = DrawingContext.CanvasImages.Select(im => new Pen(new TextureBrush(im)) { Width = 2 }).ToArray();
                 mouseStartPos = mousePosition;
                 state = DrawingState.Drawing;
             }
@@ -42,22 +42,22 @@ namespace CaptureImage.Common.Tools
             {
                 if (state == DrawingState.Drawing)
                 {
-                    for (int i = 0; i < drawingContextsKeeper.DrawingContext.CanvasImages.Length; i++)
+                    for (int i = 0; i < DrawingContext.CanvasImages.Length; i++)
                     {
-                        Image im = drawingContextsKeeper.DrawingContext.CanvasImages[i];
-                        Control ct = drawingContextsKeeper.DrawingContext.CanvasControls[i];
+                        Image im = DrawingContext.CanvasImages[i];
+                        Control ct = DrawingContext.CanvasControls[i];
                         Graphics.FromImage(im).DrawLine(erasePens[i], mouseStartPos, mousePreviousPos);
                         ct.CreateGraphics().DrawLine(erasePens[i], mouseStartPos, mousePreviousPos);
                     }
 
-                    for (int i = 0; i < drawingContextsKeeper.DrawingContext.CanvasImages.Length; i++)
+                    for (int i = 0; i < DrawingContext.CanvasImages.Length; i++)
                     {
-                        Image im = drawingContextsKeeper.DrawingContext.CanvasImages[i];
-                        Control ct = drawingContextsKeeper.DrawingContext.CanvasControls[i];
+                        Image im = DrawingContext.CanvasImages[i];
+                        Control ct = DrawingContext.CanvasControls[i];
 
-                        Graphics.FromImage(im).DrawLine(pen, mouseStartPos, mouse);
-                        ct.CreateGraphics().DrawLine(pen, mouseStartPos, mouse);
-                        drawingContextsKeeper.DrawingContext.IsClean = false;
+                        Graphics.FromImage(im).DrawLine(DrawingContext.DrawingPen, mouseStartPos, mouse);
+                        ct.CreateGraphics().DrawLine(DrawingContext.DrawingPen, mouseStartPos, mouse);
+                        DrawingContext.IsClean = false;
                     }
 
                     mousePreviousPos = mouse;
@@ -69,7 +69,7 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                drawingContextsKeeper.SaveContext();
+                drawingContextProvider.DrawingContextsKeeper.SaveContext();
                 state = DrawingState.None;
             }
         }

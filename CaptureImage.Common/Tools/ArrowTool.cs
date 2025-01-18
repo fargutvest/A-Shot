@@ -2,27 +2,30 @@
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Drawing;
+using CaptureImage.Common.DrawingContext;
 
 namespace CaptureImage.Common.Tools
 {
     public class ArrowTool : LineTool
     {
         private CustomLineCap endCap;
+        private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContextsKeeper.DrawingContext;
 
-        public ArrowTool(DrawingContextsKeeper drawingContextsKeeper) : base (drawingContextsKeeper)
+        public ArrowTool(IDrawingContextProvider drawingContextProvider) : base (drawingContextProvider)
         {
+            this.drawingContextProvider = drawingContextProvider;
             endCap = new AdjustableArrowCap(4, 7);
-            pen.CustomEndCap = endCap;
+            //DrawingContext.DrawingPen.CustomEndCap = endCap;
         }
 
         public override void MouseDown(Point mousePosition)
         {
             if (isActive)
             {
-                erasePens = drawingContextsKeeper.DrawingContext.CanvasImages.Select(im => new Pen(new TextureBrush(im))
+                erasePens = DrawingContext.CanvasImages.Select(im => new Pen(new TextureBrush(im))
                 {
                     Width = 2,
-                    CustomEndCap = endCap
+                    //CustomEndCap = endCap
                 }).ToArray();
 
                 mouseStartPos = mousePosition;

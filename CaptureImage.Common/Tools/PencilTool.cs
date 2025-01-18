@@ -1,4 +1,5 @@
-﻿using CaptureImage.Common.Tools.Misc;
+﻿using CaptureImage.Common.DrawingContext;
+using CaptureImage.Common.Tools.Misc;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -9,20 +10,15 @@ namespace CaptureImage.Common.Tools
     {
         private DrawingState state;
         private Point mousePreviousPos;
-        private Pen pen;
         private bool isActive;
-        private DrawingContextsKeeper drawingContextsKeeper;
+        protected IDrawingContextProvider drawingContextProvider;
+        private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContextsKeeper.DrawingContext;
 
-        public PencilTool(DrawingContextsKeeper drawingContextsKeeper)
+        public PencilTool(IDrawingContextProvider drawingContextProvider)
         {
-            this.drawingContextsKeeper = drawingContextsKeeper;
+            this.drawingContextProvider = drawingContextProvider;
             this.state = DrawingState.None;
-
             mousePreviousPos = new Point(0, 0);
-            pen = new Pen(Color.Yellow)
-            {
-                Width = 2,
-            };
         }
 
         public void MouseMove(Point mouse)
@@ -31,14 +27,14 @@ namespace CaptureImage.Common.Tools
             {
                 if (state == DrawingState.Drawing)
                 {
-                    for (int i = 0; i < drawingContextsKeeper.DrawingContext.CanvasImages.Length; i++)
+                    for (int i = 0; i < DrawingContext.CanvasImages.Length; i++)
                     {
-                        Image im = drawingContextsKeeper.DrawingContext.CanvasImages[i];
-                        Control ct = drawingContextsKeeper.DrawingContext.CanvasControls[i];
+                        Image im = DrawingContext.CanvasImages[i];
+                        Control ct = DrawingContext.CanvasControls[i];
 
-                        Graphics.FromImage(im).DrawLine(pen, mousePreviousPos, mouse);
-                        ct.CreateGraphics().DrawLine(pen, mousePreviousPos, mouse);
-                        drawingContextsKeeper.DrawingContext.IsClean = false;
+                        Graphics.FromImage(im).DrawLine(DrawingContext.DrawingPen, mousePreviousPos, mouse);
+                        ct.CreateGraphics().DrawLine(DrawingContext.DrawingPen, mousePreviousPos, mouse);
+                        DrawingContext.IsClean = false;
                     }
 
                     mousePreviousPos = mouse;
@@ -59,7 +55,7 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                drawingContextsKeeper.SaveContext();
+                drawingContextProvider.DrawingContextsKeeper.SaveContext();
                 state = DrawingState.None;
             }
         }

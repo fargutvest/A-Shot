@@ -1,6 +1,6 @@
 ﻿
 
-namespace CaptureImage.Common
+namespace CaptureImage.Common.DrawingContext
 {
     public class DrawingContextsKeeper
     {

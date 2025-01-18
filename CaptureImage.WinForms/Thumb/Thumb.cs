@@ -23,6 +23,8 @@ namespace CaptureImage.WinForms.Thumb
         private Button btnRect;
 
         private Button btnCpClipboard;
+        private Button btnSave;
+        private Button btnClose;
 
         public Control[] Components { get; }
 
@@ -59,9 +61,9 @@ namespace CaptureImage.WinForms.Thumb
 
             // btnRedo
             this.btnUndo = new Button();
+            this.btnUndo.Image = Resources.undo;
             this.btnUndo.Size = new Size(24, 24);
             this.btnUndo.Location = new Point(3, panelY.Location.Y + panelY.Size.Height - btnUndo.Height - 3);
-            this.btnUndo.Text = "U";
             this.btnUndo.MouseClick += (sender, e) => CallAction(ThumbAction.Undo);
 
             // btnPencil
@@ -69,36 +71,50 @@ namespace CaptureImage.WinForms.Thumb
             this.btnPencil.Image = Resources.pencil;
             this.btnPencil.Size = new Size(24, 24);
             this.btnPencil.Location = new Point(3, 3);
-            //this.btnPencil.Text = "P";
             this.btnPencil.MouseClick += (sender, e) => SelectState(ThumbState.Pencil);
 
             // btnLine
             this.btnLine = new Button();
+            this.btnLine.Image = Resources.line;
             this.btnLine.Size = new Size(24, 24);
             this.btnLine.Location = new Point(3, 27);
-            this.btnLine.Text = "L";
             this.btnLine.MouseClick += (sender, e) => SelectState(ThumbState.Line);
 
             // btnArrow
             this.btnArrow = new Button();
+            this.btnArrow.Image = Resources.arrow;
             this.btnArrow.Size = new Size(24, 24);
             this.btnArrow.Location = new Point(3, 51);
-            this.btnArrow.Text = "A";
             this.btnArrow.MouseClick += (sender, e) => SelectState(ThumbState.Arrow);
 
             // btnRect
             this.btnRect = new Button();
+            this.btnRect.Image = Resources.rect;
             this.btnRect.Size = new Size(24, 24);
             this.btnRect.Location = new Point(3, 75);
-            this.btnRect.Text = "R";
             this.btnRect.MouseClick += (sender, e) => SelectState(ThumbState.Rect);
 
+            int xOffset = 13;
             // btnCpClipboard
             this.btnCpClipboard = new Button();
+            this.btnCpClipboard.Image = Resources.copy;
             this.btnCpClipboard.Size = new Size(24, 24);
-            this.btnCpClipboard.Location = new Point(96, 3);
-            this.btnCpClipboard.Text = "C";
+            this.btnCpClipboard.Location = new Point(xOffset + 96, 3);
             this.btnCpClipboard.MouseClick += (sender, e) => CallAction(ThumbAction.CopyToClipboard);
+
+            // btnSave
+            this.btnSave = new Button();
+            this.btnSave.Image = Resources.save;
+            this.btnSave.Size = new Size(24, 24);
+            this.btnSave.Location = new Point(xOffset + 128, 3);
+            this.btnSave.MouseClick += (sender, e) => CallAction(ThumbAction.Save);
+
+            // btnClose
+            this.btnClose = new Button();
+            this.btnClose.Image = Resources.close;
+            this.btnClose.Size = new Size(24, 24);
+            this.btnClose.Location = new Point(xOffset + 160, 3);
+            this.btnClose.MouseClick += (sender, e) => CallAction(ThumbAction.Close);
 
             this.panelY.Controls.Add(this.btnUndo);
             this.panelY.Controls.Add(this.btnPencil);
@@ -107,6 +123,8 @@ namespace CaptureImage.WinForms.Thumb
             this.panelY.Controls.Add(this.btnRect);
 
             panelX.Controls.Add(this.btnCpClipboard);
+            panelX.Controls.Add(this.btnSave);
+            panelX.Controls.Add(this.btnClose);
 
             HandleRectangles = new Rectangle[0];
 

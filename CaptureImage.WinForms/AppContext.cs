@@ -108,8 +108,6 @@ namespace CaptureImage.WinForms
             {
                 if (isHidden == false)
                     HideForm();
-                else
-                    Application.Exit();
             }
         }
 

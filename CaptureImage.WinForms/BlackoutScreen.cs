@@ -68,12 +68,21 @@ namespace CaptureImage.WinForms
                     appContext.MakeScreenshot(selectingTool.selectingRect);
                     appContext.HideForm();
                     break;
+
                 case Thumb.ThumbAction.Undo:
                     appContext.UndoDrawing();
                     if (appContext.DrawingContextsKeeper.DrawingContext.IsClean)
                     {
                         SwitchToSelectingMode();
                     }
+                    break;
+
+                case Thumb.ThumbAction.Save:
+                    
+                    break;
+
+                case Thumb.ThumbAction.Close:
+
                     break;
             }
         }

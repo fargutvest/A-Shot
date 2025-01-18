@@ -33,7 +33,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>ashot.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -128,8 +129,14 @@
     <None Include="icons\pencil.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ashot.ico" />
+    <Content Include="icons\arrow.png" />
     <Content Include="icons\ashot.ico" />
+    <Content Include="icons\close.png" />
+    <Content Include="icons\copy.png" />
+    <Content Include="icons\line.png" />
+    <Content Include="icons\rect.png" />
+    <Content Include="icons\save.png" />
+    <Content Include="icons\undo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

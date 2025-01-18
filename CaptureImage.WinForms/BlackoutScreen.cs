@@ -4,6 +4,7 @@ using CaptureImage.Common.Tools;
 using System.Drawing;
 using System.Windows.Forms;
 using CaptureImage.Common.Extensions;
+using System.Linq;
 
 namespace CaptureImage.WinForms
 {
@@ -49,7 +50,12 @@ namespace CaptureImage.WinForms
             this.thumb.MouseMove += (sender, e) => BlackoutScreen_MouseMove(sender, e.Offset(thumb.Location));
             this.thumb.StateChanged += Thumb_StateChanged;
             this.thumb.ActionCalled += Thumb_ActionCalled;
-            
+
+            foreach (Control control in thumb.Components.Except(new Control[] { this.thumb }))
+            {
+                control.MouseMove += (sender, e) => BlackoutScreen_MouseMove(sender, e);
+            }
+
             this.Controls.AddRange(thumb.Components);
         }
 

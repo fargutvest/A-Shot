@@ -15,17 +15,21 @@ namespace CaptureImage.Common.Tools
         {
             this.drawingContextProvider = drawingContextProvider;
             endCap = new AdjustableArrowCap(4, 7);
-            //DrawingContext.DrawingPen.CustomEndCap = endCap;
         }
 
         public override void MouseDown(Point mousePosition)
         {
             if (isActive)
             {
-                erasePens = DrawingContext.CanvasImages.Select(im => new Pen(new TextureBrush(im))
+                drawingPen = DrawingContext.DrawingPen.Clone() as Pen;
+                drawingPen.CustomEndCap = endCap; 
+
+                erasePens = DrawingContext.CanvasImages.Select(im =>
                 {
-                    Width = 2,
-                    //CustomEndCap = endCap
+                    Pen erasePen = DrawingContext.DrawingPen.Clone() as Pen;
+                    erasePen.Brush = new TextureBrush(im);
+                    erasePen.CustomEndCap = endCap;
+                    return erasePen;
                 }).ToArray();
 
                 mouseStartPos = mousePosition;

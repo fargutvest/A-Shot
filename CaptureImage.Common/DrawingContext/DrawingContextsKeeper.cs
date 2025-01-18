@@ -1,10 +1,15 @@
 ﻿
 
+using System;
+
 namespace CaptureImage.Common.DrawingContext
 {
     public class DrawingContextsKeeper
     {
+        public event EventHandler DrawingContextChanged;
+
         private ChangesHistory changesHistory;
+        
         public DrawingContext DrawingContext { get; set; }
 
         public DrawingContextsKeeper()
@@ -20,7 +25,7 @@ namespace CaptureImage.Common.DrawingContext
         public void RevertToPreviousContext()
         {
             DrawingContext = changesHistory.GetPrevious();
-
+            DrawingContextChanged?.Invoke(this, EventArgs.Empty);
         }
 
     }

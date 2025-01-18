@@ -29,7 +29,12 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                erasePens = DrawingContext.CanvasImages.Select(im => new Pen(new TextureBrush(im)) { Width = 2 }).ToArray();
+                erasePens = DrawingContext.CanvasImages.Select(im =>
+                {
+                    Pen erasePen = DrawingContext.DrawingPen.Clone() as Pen;
+                    erasePen.Brush = new TextureBrush(im);
+                    return erasePen;
+                }).ToArray();
                 mouseStartPos = mousePosition;
                 state = DrawingState.Drawing;
             }

@@ -7,7 +7,7 @@ namespace CaptureImage.Common.DrawingContext
 {
     public class DrawingContext : ICloneable
     {
-        public event EventHandler DrawingContextChanged;
+        public event EventHandler DrawingContextEdited;
 
         public static DrawingContext Create(Image[] canvasImages, Control[] canvasControls, bool isClean = false) =>
             new DrawingContext()
@@ -27,13 +27,14 @@ namespace CaptureImage.Common.DrawingContext
         public void SetColorOfPen(Color color)
         {
             DrawingPen.Color = color;
-            DrawingContextChanged?.Invoke(this, EventArgs.Empty);
+            DrawingContextEdited?.Invoke(this, EventArgs.Empty);
         }
 
         public object Clone()
         {
             DrawingContext clone = new DrawingContext()
             {
+                DrawingPen = DrawingPen,
                 CanvasControls = CanvasControls,
                 CanvasImages = CanvasImages.Select(im => im.Clone() as Image).ToArray(),
                 IsClean = IsClean

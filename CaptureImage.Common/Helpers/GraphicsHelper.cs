@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.Windows.Media.Media3D;
 
 namespace CaptureImage.Common.Helpers
 {
@@ -7,13 +8,12 @@ namespace CaptureImage.Common.Helpers
     {
         public static Rectangle[] DrawSelectionBorder(Graphics gr, Rectangle rect, int handleSize = 5)
         {
-            Pen pen = new Pen(Color.Black)
-            {
-                Width = 1,
-                DashPattern = new float[] { 3, 3 }
-            };
+            Pen solidPen = new Pen(Color.Black, 1);  
+            Pen dashedPen = new Pen(Color.White, 1);  
+            dashedPen.DashPattern = new float[] { 3, 3 };
 
-            gr.DrawRectangle(pen, rect);
+            gr.DrawRectangle(solidPen, rect);  
+            gr.DrawRectangle(dashedPen, rect);
 
             int halfHandleSizeMin = handleSize / 2;
             int halfHandleSizeMax = halfHandleSizeMin + handleSize % 2;

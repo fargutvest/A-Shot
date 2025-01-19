@@ -37,6 +37,10 @@ namespace CaptureImage.WinForms.Helpers
 
                     suggestedFileName = $"{prefix}{numbers.Max() + 1}{extensions[index]}";
                 }
+                else
+                {
+                    suggestedFileName = $"{prefix}1.png";
+                }
             }
 
             return suggestedFileName;

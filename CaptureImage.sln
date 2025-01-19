@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaptureImage.WinForms", "Ca
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaptureImage.WinForms.Experimental", "CaptureImage.WinForms.Experimental\CaptureImage.WinForms.Experimental.csproj", "{0B4551F5-1999-48B4-9A35-FA0F1A843678}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Expirementa", "Expirementa", "{DDF5B1EC-F639-4BC8-A642-923AA18722D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3AAE3CB7-71B8-4BD9-93AC-CD71104C4A5F} = {DDF5B1EC-F639-4BC8-A642-923AA18722D1}
+		{0B4551F5-1999-48B4-9A35-FA0F1A843678} = {DDF5B1EC-F639-4BC8-A642-923AA18722D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ED8AEBB0-02ED-45B2-B86A-F5DCDE4B903C}

@@ -29,7 +29,7 @@ namespace CaptureImage.WPF
 
             RenderOptions.ProcessRenderMode = RenderMode.Default;
 
-            DescktopInfo info = ScreensHelper.GetDesktopInfo();
+            DesktopInfo info = ScreensHelper.GetDesktopInfo();
 
             this.Width = info.ClientSize.Width;
             this.Height = info.ClientSize.Height;

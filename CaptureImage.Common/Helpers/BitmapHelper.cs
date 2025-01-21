@@ -15,8 +15,10 @@ namespace CaptureImage.Common.Helpers
         /// <param name="bitmap"></param>
         /// <param name="factor"></param>
         /// <returns></returns>
-        public static Bitmap DarkenImage(Bitmap bitmap, float factor)
+        public static Bitmap DarkenImage(Bitmap bitmapInput, float factor)
         {
+            Bitmap bitmap = bitmapInput.Clone() as Bitmap;
+
             // Получаем информацию о изображении
             Rectangle rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
 

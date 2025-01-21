@@ -14,7 +14,7 @@ namespace CaptureImage.WinForms
 
         protected override void WndProc(ref Message m)
         {
-            appContext.hotKeysHelper.WndProc(ref m);
+            appContext.WndProc(ref m);
             base.WndProc(ref m);
         }
     }

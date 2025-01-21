@@ -1,90 +1,59 @@
 ﻿using CaptureImage.Common;
 using CaptureImage.Common.Helpers;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using CaptureImage.WinForms.Properties;
 using System.IO;
 using CaptureImage.WinForms.Helpers;
-using CaptureImage.Common.Tools.Misc;
 using CaptureImage.Common.DrawingContext;
+using System.Collections.Generic;
 
 namespace CaptureImage.WinForms
 {
     public class AppContext : ApplicationContext, IDrawingContextProvider
     {
-        private List<Control> controls;
-        private Control canvas;
         private NotifyIcon trayIcon;
-        public HotKeysHelper hotKeysHelper;
+        private HotKeysHelper hotKeysHelper;
         private FreezeScreen freezeScreen;
         private BlackoutScreen blackoutScreen;
         private bool isHidden;
 
-        public DrawingContextsKeeper DrawingContextsKeeper { get; private set; }
+        public DrawingContextKeeper DrawingContextKeeper { get; private set; }
+
+        public event EventHandler Undo;
+
 
         public AppContext()
         {
             isHidden = true;
-            this.controls = new List<Control>();
+            DrawingContextKeeper = new DrawingContextKeeper();
 
             MainForm = new MainForm(this);
 
-            freezeScreen = new FreezeScreen(this);
-            blackoutScreen = new BlackoutScreen(this);
             hotKeysHelper = new HotKeysHelper();
-
             hotKeysHelper.RegisterHotKey(MainForm.Handle, Keys.F6, ShowForm);
             hotKeysHelper.RegisterHotKey(MainForm.Handle, Keys.Escape, OnEscape);
 
             trayIcon = new NotifyIcon()
             {
                 Icon = Resources.ashot,
+                Visible = true,
                 ContextMenu = new ContextMenu(new MenuItem[] {
                     new MenuItem("Сделать скриншот", Show),
-                    new MenuItem("Выход", Exit)})
+                    new MenuItem("Выход", Exit)}),
             };
 
-            trayIcon.Visible = true;
+            freezeScreen = new FreezeScreen(this);
+            blackoutScreen = new BlackoutScreen(this);
+            blackoutScreen.TransparencyKey = Color.Red;
+            blackoutScreen.AllowTransparency = true;
         }
-
-        public void AddControl(Control control, bool isCanvas = false)
-        {
-            if (isCanvas)
-                canvas = control;
-
-            controls.Add(control);
-        }
-
-        public void RefreshDrawingContext()
-        {
-            DrawingContextsKeeper = new DrawingContextsKeeper();
-
-            Image[] canvasImages = new Image[controls.Count];
-
-            for (int i = 0; i < controls.Count; i++)
-               canvasImages[i] = controls[i].BackgroundImage;
-
-            DrawingContext drawingContext = DrawingContext.Create(canvasImages, controls.ToArray(), isClean: true);
-            drawingContext.DrawingPen = new Pen(Color.Yellow, 2);
-
-            DrawingContextsKeeper.DrawingContext = drawingContext;
-            
-            DrawingContextsKeeper.SaveContext();
-        }
-
- 
 
         public void UndoDrawing()
         {
-            DrawingContextsKeeper.RevertToPreviousContext();
-
-            for (int i = 0; i < controls.Count; i++)
-            {
-                controls[i].BackgroundImage = DrawingContextsKeeper.DrawingContext.CanvasImages[i];
-                controls[i].Invalidate();
-            }
+            Undo?.Invoke(this, EventArgs.Empty);
+            //DrawingContextKeeper.RevertToPreviousContext();
         }
 
         private void Exit(object sender, EventArgs e)
@@ -121,15 +90,44 @@ namespace CaptureImage.WinForms
 
         private void ShowForm()
         {
+            DesktopInfo desktopInfo = ScreensHelper.GetDesktopInfo();
+
+            Image[] images = new Image[]
+            {
+                desktopInfo.Background,
+                BitmapHelper.DarkenImage(desktopInfo.Background, 0.5f)
+            };
+
+            Control[] controls = new Control[] 
+            {
+                freezeScreen,
+                blackoutScreen
+            };
+
+         
+
+            DrawingContext drawingContext = DrawingContext.Create(images, controls, isClean: true);
+            DrawingContextKeeper.SetDrawingContext(drawingContext);
+
+            DrawingContextKeeper.SaveContext();
+
+            ConfigureForm(freezeScreen, desktopInfo);
+            ConfigureForm(blackoutScreen, desktopInfo);
+
+            freezeScreen.Invalidate();
             freezeScreen.Show();
+
+            blackoutScreen.Invalidate();
             blackoutScreen.Show();
+
             isHidden = false;
         }
 
         private Bitmap GetScreenshot(Rectangle rect)
         {
-            return BitmapHelper.Crop((Bitmap)canvas.BackgroundImage, rect);
+            return BitmapHelper.Crop((Bitmap)freezeScreen.BackgroundImage, rect);
         }
+
         public void MakeScreenshot(Rectangle rect)
         {
             Clipboard.SetImage(GetScreenshot(rect));
@@ -165,8 +163,20 @@ namespace CaptureImage.WinForms
             
             if (colorDialog.ShowDialog() == DialogResult.OK)
             {
-                DrawingContextsKeeper.DrawingContext.SetColorOfPen(colorDialog.Color);
+                DrawingContextKeeper.DrawingContext.SetColorOfPen(colorDialog.Color);
             }
+        }
+
+        private void ConfigureForm(Form form, DesktopInfo desktopInfo) 
+        {
+            form.ClientSize = desktopInfo.ClientSize;
+            form.Location = desktopInfo.Location;
+            form.Region = new Region(desktopInfo.Path);
+        }
+
+        public void WndProc(ref Message m)
+        {
+            hotKeysHelper.WndProc(ref m);
         }
     }
 }

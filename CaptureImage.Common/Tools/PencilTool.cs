@@ -1,24 +1,49 @@
 ﻿using CaptureImage.Common.DrawingContext;
 using CaptureImage.Common.Tools.Misc;
+using System.Collections.Generic;
 using System.Drawing;
-using System.Windows.Forms;
-
+using System.Linq;
 
 namespace CaptureImage.Common.Tools
 {
     public class PencilTool : ITool
     {
+        private List<Line> lines = new List<Line>();
+        private List<List<Line>> drawings = new List<List<Line>>();
         private DrawingState state;
+        private Point mouseStartPos;
         private Point mousePreviousPos;
         private bool isActive;
         protected IDrawingContextProvider drawingContextProvider;
-        private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContextsKeeper.DrawingContext;
+        private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContextKeeper.DrawingContext;
 
         public PencilTool(IDrawingContextProvider drawingContextProvider)
         {
             this.drawingContextProvider = drawingContextProvider;
+            this.drawingContextProvider.Undo += DrawingContextProvider_Undo;
+
             this.state = DrawingState.None;
             mousePreviousPos = new Point(0, 0);
+            UpdateErasingPens();
+        }
+
+        private void DrawingContextProvider_Undo(object sender, System.EventArgs e)
+        {
+            if (drawings.Count > 0)
+            {
+                List<Line> lastDrawing = drawings[drawings.Count - 1];
+                drawings.RemoveAt(drawings.Count - 1);
+
+                UpdateErasingPens();
+
+                foreach (Line line in lastDrawing)
+                {
+                    DrawingContext.Erase((gr, pen) =>
+                    {
+                        gr.DrawLine(pen, line.Start, line.End);
+                    });
+                }
+            }
         }
 
         public void MouseMove(Point mouse)
@@ -27,35 +52,34 @@ namespace CaptureImage.Common.Tools
             {
                 if (state == DrawingState.Drawing)
                 {
-                    for (int i = 0; i < DrawingContext.CanvasImages.Length; i++)
+                    DrawingContext.Draw((gr, pen) => 
                     {
-                        Image im = DrawingContext.CanvasImages[i];
-                        Control ct = DrawingContext.CanvasControls[i];
+                        gr.DrawLine(pen, mousePreviousPos, mouse);
+                    });
 
-                        Graphics.FromImage(im).DrawLine(DrawingContext.DrawingPen, mousePreviousPos, mouse);
-                        ct.CreateGraphics().DrawLine(DrawingContext.DrawingPen, mousePreviousPos, mouse);
-                        DrawingContext.IsClean = false;
-                    }
-
+                    Line line = new Line(mousePreviousPos, mouse);
+                    drawings.Last().Add(line);
                     mousePreviousPos = mouse;
                 }
             }
         }
 
-        public void MouseDown(Point mousePosition)
+        public void MouseDown(Point mouse)
         {
             if (isActive)
             {
-                mousePreviousPos = mousePosition;
+                drawings.Add(new List<Line>());
+                mouseStartPos = mouse;
+                mousePreviousPos = mouse;
                 state = DrawingState.Drawing;
             }
         }
 
-        public void MouseUp()
+        public void MouseUp(Point mouse)
         {
             if (isActive)
             {
-                drawingContextProvider.DrawingContextsKeeper.SaveContext();
+                UpdateErasingPens();
                 state = DrawingState.None;
             }
         }
@@ -68,6 +92,20 @@ namespace CaptureImage.Common.Tools
         public void Deactivate()
         {
             isActive = false;
+        }
+
+        private void UpdateErasingPens()
+        {
+            DrawingContext.UpdateErasingPens(gr =>
+            {
+                for (int i = 0; i < drawings.Count; i++)
+                {
+                    List<Line> lines = drawings[i];
+
+                    foreach (Line line in lines)
+                        gr.DrawLine(DrawingContext.drawingPen, line.Start, line.End);
+                }
+            });
         }
     }
 }

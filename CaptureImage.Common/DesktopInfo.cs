@@ -5,7 +5,7 @@ using System.Windows.Media;
 
 namespace CaptureImage.Common
 {
-    public class DescktopInfo
+    public class DesktopInfo
     {
         public ScreenInfo[] ScreenInfos { get; set; }
 

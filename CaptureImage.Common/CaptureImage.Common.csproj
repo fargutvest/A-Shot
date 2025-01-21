@@ -48,8 +48,8 @@
     <Compile Include="ChangesHistory.cs" />
     <Compile Include="Converters\BitmapConverter.cs" />
     <Compile Include="Converters\PointConverter.cs" />
-    <Compile Include="DescktopInfo.cs" />
-    <Compile Include="DrawingContext\DrawingContextsKeeper.cs" />
+    <Compile Include="DesktopInfo.cs" />
+    <Compile Include="DrawingContext\DrawingContextKeeper.cs" />
     <Compile Include="DrawingContext\IDrawingContextProvider.cs" />
     <Compile Include="Extensions\ControlExt.cs" />
     <Compile Include="Extensions\GraphicsExt.cs" />
@@ -69,6 +69,7 @@
     <Compile Include="Tools\Misc\DrawingState.cs" />
     <Compile Include="Tools\ITool.cs" />
     <Compile Include="Tools\LineTool.cs" />
+    <Compile Include="Tools\Misc\Line.cs" />
     <Compile Include="Tools\PencilTool.cs" />
     <Compile Include="Tools\RectTool.cs" />
     <Compile Include="Tools\Misc\SelectingState.cs" />

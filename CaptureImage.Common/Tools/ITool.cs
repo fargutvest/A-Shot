@@ -11,7 +11,7 @@ namespace CaptureImage.Common.Tools
 
         void MouseMove(Point mouse);
 
-        void MouseUp();
+        void MouseUp(Point mouse);
 
         void MouseDown(Point mouse);
     }

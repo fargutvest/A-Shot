@@ -10,7 +10,7 @@ namespace CaptureImage.Common.Helpers
     {
         public static ScreenInfo[] GetScreenInfos()
         {
-            Screen[] screens = Screen.AllScreens.Take(2).ToArray();
+            Screen[] screens = Screen.AllScreens.Take(1).ToArray();
 
             ScreenInfo[] infos = new ScreenInfo[screens.Length];
 
@@ -31,7 +31,7 @@ namespace CaptureImage.Common.Helpers
             return orderedInfos;
         }
 
-        public static DescktopInfo GetDesktopInfo()
+        public static DesktopInfo GetDesktopInfo()
         {
             ScreenInfo[] infos = GetScreenInfos();
 
@@ -48,7 +48,7 @@ namespace CaptureImage.Common.Helpers
 
             PathGeometry polygonGeometry = GeometryHelper.GetPathGeometry(path);
 
-            DescktopInfo desktopInfo = new DescktopInfo()
+            DesktopInfo desktopInfo = new DesktopInfo()
             {
                 ScreenInfos = infos,
                 Background = background,

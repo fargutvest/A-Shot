@@ -11,7 +11,7 @@ namespace CaptureImage.WinForms.Experimental
     {
         private bool isInit = true;
 
-        private DescktopInfo desktopInfo;
+        private DesktopInfo desktopInfo;
 
         private HotKeysHelper hotKeysHelper;
 

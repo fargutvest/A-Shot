@@ -1,22 +1,22 @@
-﻿using CaptureImage.Common;
-using CaptureImage.Common.Helpers;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace CaptureImage.WinForms
 {
     public partial class FreezeScreen : ScreenBase
     {
-        private DescktopInfo desktopInfo;
+        private AppContext appContext;
 
         public FreezeScreen(AppContext appContext)
         {
             InitializeComponent();
-            appContext.AddControl(this, isCanvas: true);
-            desktopInfo = ScreensHelper.GetDesktopInfo();
-            ClientSize = desktopInfo.ClientSize;
-            Location = desktopInfo.Location;
-            BackgroundImage = desktopInfo.Background;
-            Region = new Region(desktopInfo.Path);
+
+            this.appContext = appContext;
+            this.appContext.DrawingContextKeeper.DrawingContextChanged += DrawingContextKeeper_DrawingContextChanged;
+        }
+
+        private void DrawingContextKeeper_DrawingContextChanged(object sender, System.EventArgs e)
+        {
+            BackgroundImage = appContext.DrawingContextKeeper.DrawingContext.GetImage(this);
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using CaptureImage.Common;
-using CaptureImage.Common.Helpers;
-using CaptureImage.Common.Tools;
+﻿using CaptureImage.Common.Tools;
 using System.Drawing;
 using System.Windows.Forms;
 using CaptureImage.Common.Extensions;
@@ -12,7 +10,6 @@ namespace CaptureImage.WinForms
     {
         private bool isInit = true;
         private Thumb.Thumb thumb;
-        private DescktopInfo desktopInfo;
         private SelectingTool selectingTool;
         private ITool drawingTool;
 
@@ -25,21 +22,12 @@ namespace CaptureImage.WinForms
             InitializeComponent();
 
             this.appContext = appContext;
-            desktopInfo = ScreensHelper.GetDesktopInfo();
-            ClientSize = desktopInfo.ClientSize;
-            Location = desktopInfo.Location;
-            BackgroundImage = BitmapHelper.DarkenImage(desktopInfo.Background, 0.5f);
-            TransparencyKey = Color.Red;
-            Region = new Region(desktopInfo.Path);
+            this.appContext.DrawingContextKeeper.DrawingContextChanged += DrawingContextKeeper_DrawingContextChanged;
+            
             //TopMost = true;
 
             selectingTool = new SelectingTool();
             selectingTool.Activate();
-
-            appContext.AddControl(this);
-            appContext.RefreshDrawingContext();
-
-            drawingTool = new PencilTool(appContext);
 
             Mode = Mode.Selecting;
 
@@ -57,6 +45,11 @@ namespace CaptureImage.WinForms
             }
 
             this.Controls.AddRange(thumb.Components);
+        }
+
+        private void DrawingContextKeeper_DrawingContextChanged(object sender, System.EventArgs e)
+        {
+            BackgroundImage = appContext.DrawingContextKeeper.DrawingContext.GetImage(this);
         }
 
         public void SwitchToSelectingMode()
@@ -77,7 +70,7 @@ namespace CaptureImage.WinForms
 
                 case Thumb.ThumbAction.Undo:
                     appContext.UndoDrawing();
-                    if (appContext.DrawingContextsKeeper.DrawingContext.IsClean)
+                    if (appContext.DrawingContextKeeper.DrawingContext.IsClean)
                     {
                         SwitchToSelectingMode();
                     }
@@ -138,7 +131,7 @@ namespace CaptureImage.WinForms
         {
             selectingTool.MouseMove(e.Location, this);
             selectingTool.Paint(this.thumb);
-            drawingTool.MouseMove(e.Location);
+            drawingTool?.MouseMove(e.Location);
         }
 
         private void BlackoutScreen_MouseUp(object sender, MouseEventArgs e)
@@ -146,7 +139,7 @@ namespace CaptureImage.WinForms
             if (e.Button == MouseButtons.Left)
             {
                 selectingTool.MouseUp(e.Location);
-                drawingTool.MouseUp();
+                drawingTool?.MouseUp(e.Location);
             }
         }
 
@@ -155,16 +148,13 @@ namespace CaptureImage.WinForms
             if (e.Button == MouseButtons.Left)
             {
                 selectingTool.MouseDown(e.Location);
-                drawingTool.MouseDown(e.Location);
+                drawingTool?.MouseDown(e.Location);
             }
         }
 
         private void BlackoutScreen_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.A && e.Modifiers == Keys.Control)
-            {
-                selectingTool.Select(desktopInfo.BackgroundRect);
-            }
+           
         }
     }
 }

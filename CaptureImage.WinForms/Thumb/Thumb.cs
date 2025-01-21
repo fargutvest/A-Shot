@@ -5,6 +5,7 @@ using CaptureImage.Common;
 using CaptureImage.Common.Extensions;
 using System;
 using CaptureImage.WinForms.Properties;
+using CaptureImage.Common.DrawingContext;
 
 namespace CaptureImage.WinForms.Thumb
 {
@@ -42,8 +43,7 @@ namespace CaptureImage.WinForms.Thumb
         public Thumb(AppContext appContext)
         {
             this.appContext = appContext;
-            appContext.DrawingContextsKeeper.DrawingContext.DrawingContextEdited += DrawingContext_DrawingContextEdited;
-            appContext.DrawingContextsKeeper.DrawingContextChanged += DrawingContextsKeeper_DrawingContextChanged;
+            appContext.DrawingContextKeeper.DrawingContextChanged += DrawingContextsKeeper_DrawingContextChanged;
 
             InitializeComponent();
 
@@ -106,7 +106,7 @@ namespace CaptureImage.WinForms.Thumb
             this.btnColor.FlatStyle = FlatStyle.Flat;
             this.btnColor.FlatAppearance.BorderSize = 2;
             this.btnColor.FlatAppearance.BorderColor = Color.White;
-            this.btnColor.BackColor = appContext.DrawingContextsKeeper.DrawingContext.DrawingPen.Color;
+            this.btnColor.BackColor = DrawingContext.DefaultDrawingPen.Color;
             this.btnColor.Size = new Size(24, 24);
             this.btnColor.Location = new Point(3, 147);
             this.btnColor.MouseClick += (sender, e) => CallAction(ThumbAction.Color);
@@ -157,12 +157,12 @@ namespace CaptureImage.WinForms.Thumb
 
         private void DrawingContextsKeeper_DrawingContextChanged(object sender, EventArgs e)
         {
-            appContext.DrawingContextsKeeper.DrawingContext.DrawingContextEdited += DrawingContext_DrawingContextEdited;
+            appContext.DrawingContextKeeper.DrawingContext.DrawingContextEdited += DrawingContext_DrawingContextEdited;
         }
 
         private void DrawingContext_DrawingContextEdited(object sender, EventArgs e)
         {
-            btnColor.BackColor = appContext.DrawingContextsKeeper.DrawingContext.DrawingPen.Color;
+            btnColor.BackColor = appContext.DrawingContextKeeper.DrawingContext.drawingPen.Color;
             btnColor.Invalidate();
         }
 

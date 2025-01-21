@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CaptureImage.Common.Drawings;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -27,10 +28,13 @@ namespace CaptureImage.Common.DrawingContext
 
         public bool IsClean { get; set; }
 
+        public List<IDrawing> Drawings { get; set; }    
+
 
         public DrawingContext()
         {
             drawingPen = DefaultDrawingPen;
+            Drawings = new List<IDrawing>();
         }
 
         public static DrawingContext Create(Image[] canvasImages, Control[] canvasControls, bool isClean = false)
@@ -168,6 +172,35 @@ namespace CaptureImage.Common.DrawingContext
             catch (Exception ex)
             {
 
+            }
+        }
+
+        public void UpdateErasingPens()
+        {
+            UpdateErasingPens(gr =>
+            {
+                for (int i = 0; i < Drawings.Count; i++)
+                {
+                    IDrawing drawing = Drawings[i];
+                    drawing.Paint(gr, drawingPen);
+                }
+            });
+        }
+
+        public void UndoDrawing()
+        {
+            if (Drawings.Count > 0)
+            {
+                IDrawing lastDrawing = Drawings[Drawings.Count - 1];
+
+                Drawings.RemoveAt(Drawings.Count - 1);
+
+                UpdateErasingPens();
+
+                Erase((gr, pen) =>
+                {
+                    lastDrawing.Paint(gr, pen);
+                });
             }
         }
     }

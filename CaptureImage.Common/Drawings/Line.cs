@@ -1,8 +1,8 @@
 ﻿using System.Drawing;
 
-namespace CaptureImage.Common.Tools.Misc
+namespace CaptureImage.Common.Drawings
 {
-    public class Line
+    public class Line : IDrawing
     {
         public Point Start { get; }
         public Point End { get; }
@@ -11,6 +11,11 @@ namespace CaptureImage.Common.Tools.Misc
         {
             Start = start;
             End = end;
+        }
+
+        public void Paint(Graphics gr, Pen pen)
+        {
+            gr.DrawLine(pen, Start, End);
         }
 
         public override string ToString()

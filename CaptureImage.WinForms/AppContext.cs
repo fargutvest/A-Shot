@@ -21,9 +21,6 @@ namespace CaptureImage.WinForms
 
         public DrawingContextKeeper DrawingContextKeeper { get; private set; }
 
-        public event EventHandler Undo;
-
-
         public AppContext()
         {
             isHidden = true;
@@ -52,7 +49,7 @@ namespace CaptureImage.WinForms
 
         public void UndoDrawing()
         {
-            Undo?.Invoke(this, EventArgs.Empty);
+            DrawingContextKeeper.DrawingContext.UndoDrawing();
             //DrawingContextKeeper.RevertToPreviousContext();
         }
 

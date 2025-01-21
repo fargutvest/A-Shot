@@ -1,4 +1,5 @@
 ﻿using CaptureImage.Common.DrawingContext;
+using CaptureImage.Common.Drawings;
 using CaptureImage.Common.Tools.Misc;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,8 +9,7 @@ namespace CaptureImage.Common.Tools
 {
     public class PencilTool : ITool
     {
-        private List<Line> lines = new List<Line>();
-        private List<List<Line>> drawings = new List<List<Line>>();
+        private List<Curve> drawings;
         private DrawingState state;
         private Point mouseStartPos;
         private Point mousePreviousPos;
@@ -20,30 +20,12 @@ namespace CaptureImage.Common.Tools
         public PencilTool(IDrawingContextProvider drawingContextProvider)
         {
             this.drawingContextProvider = drawingContextProvider;
-            this.drawingContextProvider.Undo += DrawingContextProvider_Undo;
 
             this.state = DrawingState.None;
             mousePreviousPos = new Point(0, 0);
-            UpdateErasingPens();
-        }
 
-        private void DrawingContextProvider_Undo(object sender, System.EventArgs e)
-        {
-            if (drawings.Count > 0)
-            {
-                List<Line> lastDrawing = drawings[drawings.Count - 1];
-                drawings.RemoveAt(drawings.Count - 1);
-
-                UpdateErasingPens();
-
-                foreach (Line line in lastDrawing)
-                {
-                    DrawingContext.Erase((gr, pen) =>
-                    {
-                        gr.DrawLine(pen, line.Start, line.End);
-                    });
-                }
-            }
+            this.drawings = new List<Curve>();
+            DrawingContext.UpdateErasingPens();
         }
 
         public void MouseMove(Point mouse)
@@ -58,7 +40,7 @@ namespace CaptureImage.Common.Tools
                     });
 
                     Line line = new Line(mousePreviousPos, mouse);
-                    drawings.Last().Add(line);
+                    drawings.Last().Lines.Add(line);
                     mousePreviousPos = mouse;
                 }
             }
@@ -68,7 +50,9 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                drawings.Add(new List<Line>());
+                Curve drawing = new Curve();
+                DrawingContext.Drawings.Add(drawing);
+                drawings.Add(drawing);
                 mouseStartPos = mouse;
                 mousePreviousPos = mouse;
                 state = DrawingState.Drawing;
@@ -79,7 +63,7 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                UpdateErasingPens();
+                DrawingContext.UpdateErasingPens();
                 state = DrawingState.None;
             }
         }
@@ -92,20 +76,6 @@ namespace CaptureImage.Common.Tools
         public void Deactivate()
         {
             isActive = false;
-        }
-
-        private void UpdateErasingPens()
-        {
-            DrawingContext.UpdateErasingPens(gr =>
-            {
-                for (int i = 0; i < drawings.Count; i++)
-                {
-                    List<Line> lines = drawings[i];
-
-                    foreach (Line line in lines)
-                        gr.DrawLine(DrawingContext.drawingPen, line.Start, line.End);
-                }
-            });
         }
     }
 }

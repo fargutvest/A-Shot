@@ -2,7 +2,6 @@
 using System.Drawing.Drawing2D;
 using System.Drawing;
 using CaptureImage.Common.DrawingContext;
-using static System.Windows.Forms.LinkLabel;
 
 namespace CaptureImage.Common.Tools
 {

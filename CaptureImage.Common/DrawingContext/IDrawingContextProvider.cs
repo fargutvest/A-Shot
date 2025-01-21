@@ -6,7 +6,5 @@ namespace CaptureImage.Common.DrawingContext
     public interface IDrawingContextProvider
     {
         DrawingContextKeeper DrawingContextKeeper { get; }
-
-        event EventHandler Undo;
     }
 }

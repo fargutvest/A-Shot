@@ -10,7 +10,7 @@ namespace CaptureImage.Common
         Point Location { get; set; }
         void Refresh();
 
-        void HideExtra();
-        void ShowExtra();
+        void HidePanels();
+        void ShowPanels();
     }
 }

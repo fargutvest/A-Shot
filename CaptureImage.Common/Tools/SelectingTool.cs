@@ -89,10 +89,13 @@ namespace CaptureImage.Common.Tools
                     case SelectingState.Selecting:
                     case SelectingState.Moving:
                     case SelectingState.Resizing:
-                        selector.HideExtra();
+                        selector.HidePanels();
                         break;
                     case SelectingState.None:
-                        selector.ShowExtra();
+                        if (selectingRect.Width > 0 && selectingRect.Height > 0)
+                            selector.ShowPanels();
+                        else
+                            selector.HidePanels();
                         break;
                 }
 

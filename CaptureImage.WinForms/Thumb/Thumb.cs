@@ -34,8 +34,6 @@ namespace CaptureImage.WinForms.Thumb
 
         private ThumbState state;
 
-        public bool IsMouseOver;
-
         public event EventHandler<ThumbState> StateChanged;
 
         public event EventHandler<ThumbAction> ActionCalled;
@@ -205,26 +203,16 @@ namespace CaptureImage.WinForms.Thumb
 
         }
 
-        public void HideExtra()
+        public void HidePanels()
         {
             this.panelX.Visible = false;
             this.panelY.Visible = false;
         }
 
-        public void ShowExtra()
+        public void ShowPanels()
         {
             this.panelX.Visible = true;
             this.panelY.Visible = true;
-        }
-
-        public void MouseHover(Point point)
-        {
-            IsMouseOver = true; 
-        }
-
-        public void MouseLeave(Point point)
-        {
-            IsMouseOver = false;
         }
     }
 }

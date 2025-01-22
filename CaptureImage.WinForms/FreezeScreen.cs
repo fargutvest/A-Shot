@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace CaptureImage.WinForms
+﻿namespace CaptureImage.WinForms
 {
     public partial class FreezeScreen : ScreenBase
     {

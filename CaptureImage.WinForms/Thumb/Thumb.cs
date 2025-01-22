@@ -203,16 +203,22 @@ namespace CaptureImage.WinForms.Thumb
 
         }
 
-        public void HidePanels()
+        public void SetSize(Size size)
         {
-            this.panelX.Visible = false;
-            this.panelY.Visible = false;
+            this.Size = size;
+            this.displaySizeLabel.Visible = size.Width > 0 && size.Height > 0;
         }
 
         public void ShowPanels()
         {
             this.panelX.Visible = true;
             this.panelY.Visible = true;
+        }
+
+        public void HidePanels()
+        {
+            this.panelX.Visible = false;
+            this.panelY.Visible = false;
         }
     }
 }

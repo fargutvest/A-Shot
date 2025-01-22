@@ -6,8 +6,9 @@ namespace CaptureImage.Common
     {
         Rectangle[] HandleRectangles { get; }
         bool Visible { get; set; }
-        Size Size { get; set; }
+        
         Point Location { get; set; }
+        void SetSize(Size size);
         void Refresh();
 
         void HidePanels();

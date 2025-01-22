@@ -59,13 +59,18 @@ namespace CaptureImage.WinForms
             Mode = Mode.Selecting;
         }
 
+        public void ResetSelection()
+        {
+            selectingTool.Select(Rectangle.Empty);
+        }
+
         private void Thumb_ActionCalled(object sender, Thumb.ThumbAction e)
         {
             switch (e)
             {
                 case Thumb.ThumbAction.CopyToClipboard:
                     appContext.MakeScreenshot(selectingTool.selectingRect);
-                    appContext.HideForm();
+                    appContext.EndSession();
                     break;
 
                 case Thumb.ThumbAction.Undo:
@@ -81,7 +86,7 @@ namespace CaptureImage.WinForms
                     break;
 
                 case Thumb.ThumbAction.Close:
-                    appContext.HideForm();
+                    appContext.EndSession();
                     break;
 
                 case Thumb.ThumbAction.Color:

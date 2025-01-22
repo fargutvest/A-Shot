@@ -41,7 +41,7 @@ namespace CaptureImage.WinForms
             MainForm = new MainForm(this);
 
             hotKeysHelper = new HotKeysHelper();
-            hotKeysHelper.RegisterHotKey(MainForm.Handle, Keys.F6, ShowForm);
+            hotKeysHelper.RegisterHotKey(MainForm.Handle, Keys.F6, StartSession);
             hotKeysHelper.RegisterHotKey(MainForm.Handle, Keys.Escape, OnEscape);
 
             trayIcon = new NotifyIcon()
@@ -49,7 +49,7 @@ namespace CaptureImage.WinForms
                 Icon = Resources.ashot,
                 Visible = true,
                 ContextMenu = new ContextMenu(new MenuItem[] {
-                    new MenuItem("Сделать скриншот", Show),
+                    new MenuItem("Сделать скриншот", (sender, e) => StartSession()),
                     new MenuItem("Выход", Exit)}),
             };
 
@@ -70,11 +70,6 @@ namespace CaptureImage.WinForms
             Application.Exit();
         }
 
-        private void Show(object sender, EventArgs e)
-        {
-            ShowForm();
-        }
-
         private void OnEscape()
         {
             if (blackoutScreen.Mode == Mode.Drawing)
@@ -85,18 +80,19 @@ namespace CaptureImage.WinForms
             else if (blackoutScreen.Mode == Mode.Selecting)
             {
                 if (isHidden == false)
-                    HideForm();
+                    EndSession();
             }
         }
 
-        public void HideForm()
+        public void EndSession()
         {
             freezeScreen.Hide();
             blackoutScreen.Hide();
+            blackoutScreen.ResetSelection();
             isHidden = true;
         }
 
-        private void ShowForm()
+        private void StartSession()
         {
             DesktopInfo desktopInfo = ScreensHelper.GetDesktopInfo();
 

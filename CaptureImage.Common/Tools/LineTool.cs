@@ -1,14 +1,12 @@
 ﻿using CaptureImage.Common.DrawingContext;
 using CaptureImage.Common.Drawings;
 using CaptureImage.Common.Tools.Misc;
-using System.Collections.Generic;
 using System.Drawing;
 
 namespace CaptureImage.Common.Tools
 {
     public class LineTool : ITool
     {
-        private List<Line> lines = new List<Line>();
         protected DrawingState state;
         protected Point mouseStartPos;
         protected Point mousePreviousPos;
@@ -46,12 +44,14 @@ namespace CaptureImage.Common.Tools
                 {
                     DrawingContext.Erase((gr, pen) =>
                     {
-                        gr.DrawLine(pen, mouseStartPos, mousePreviousPos);
+                        Line line = new Line(mouseStartPos, mousePreviousPos);
+                        line.Paint(gr, pen);
                     });
 
                     DrawingContext.Draw((gr, pen) => 
                     {
-                        gr.DrawLine(pen, mouseStartPos, mouse);
+                        Line line = new Line(mouseStartPos, mouse);
+                        line.Paint(gr, pen);
                     });
 
                     mousePreviousPos = mouse;
@@ -59,12 +59,11 @@ namespace CaptureImage.Common.Tools
             }
         }
 
-        public void MouseUp(Point mouse)
+        public virtual void MouseUp(Point mouse)
         {
             if (isActive)
             {
                 Line line = new Line(mouseStartPos, mousePreviousPos);
-                lines.Add(line);
                 DrawingContext.Drawings.Add(line);
                 DrawingContext.UpdateErasingPens();
                 state = DrawingState.None;

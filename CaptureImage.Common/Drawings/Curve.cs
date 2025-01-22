@@ -5,16 +5,21 @@ namespace CaptureImage.Common.Drawings
 {
     public class Curve : IDrawing
     {
-        public List<Line> Lines;
+        private List<Line> lines;
 
         public Curve()
         {
-            Lines = new List<Line>();
+            lines = new List<Line>();
+        }
+
+        public void AddLine(Line line)
+        {
+            lines.Add(line);
         }
 
         public void Paint(Graphics gr, Pen pen)
         {
-            foreach (Line line in Lines)
+            foreach (Line line in lines)
                 line.Paint(gr, pen);   
         }
     }

@@ -4,23 +4,23 @@ namespace CaptureImage.Common.Drawings
 {
     public class Line : IDrawing
     {
-        public Point Start { get; }
-        public Point End { get; }
+        private Point start;
+        private Point end;
 
         public Line(Point start, Point end)
         {
-            Start = start;
-            End = end;
+            this.start = start;
+            this.end = end;
         }
 
         public void Paint(Graphics gr, Pen pen)
         {
-            gr.DrawLine(pen, Start, End);
+            gr.DrawLine(pen, start, end);
         }
 
         public override string ToString()
         {
-            return $"{Start} - {End}";
+            return $"{start} - {end}";
         }
     }
 }

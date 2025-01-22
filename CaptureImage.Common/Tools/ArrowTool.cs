@@ -2,6 +2,7 @@
 using System.Drawing.Drawing2D;
 using System.Drawing;
 using CaptureImage.Common.DrawingContext;
+using CaptureImage.Common.Drawings;
 
 namespace CaptureImage.Common.Tools
 {
@@ -12,8 +13,8 @@ namespace CaptureImage.Common.Tools
 
         public ArrowTool(IDrawingContextProvider drawingContextProvider) : base (drawingContextProvider)
         {
-            this.drawingContextProvider = drawingContextProvider;
             endCap = new AdjustableArrowCap(4, 7);
+            DrawingContext.UpdateErasingPens();
         }
 
         public override void MouseDown(Point mousePosition)
@@ -24,6 +25,7 @@ namespace CaptureImage.Common.Tools
                 state = DrawingState.Drawing;
             }
         }
+
         public override void MouseMove(Point mouse)
         {
             if (isActive)
@@ -32,20 +34,28 @@ namespace CaptureImage.Common.Tools
                 {
                     DrawingContext.Erase((gr, pen) =>
                     {
-                        Pen erasePen = pen.Clone() as Pen;
-                        erasePen.CustomEndCap = endCap;
-                        gr.DrawLine(erasePen, mouseStartPos, mousePreviousPos);
+                        Arrow arrow = new Arrow(mouseStartPos, mousePreviousPos, endCap);
+                        arrow.Paint(gr, pen);
                     });
 
                     DrawingContext.Draw((gr, pen) =>
                     {
-                        Pen drawingPen = pen.Clone() as Pen;
-                        drawingPen.CustomEndCap = endCap;
-                        gr.DrawLine(drawingPen, mouseStartPos, mouse);
+                        Arrow arrow = new Arrow(mouseStartPos, mouse, endCap);
+                        arrow.Paint(gr, pen);
                     });
 
                     mousePreviousPos = mouse;
                 }
+            }
+        }
+        public override void MouseUp(Point mouse)
+        {
+            if (isActive)
+            {
+                Arrow arrow = new Arrow(mouseStartPos, mousePreviousPos, endCap);
+                DrawingContext.Drawings.Add(arrow);
+                DrawingContext.UpdateErasingPens();
+                state = DrawingState.None;
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using CaptureImage.Common.DrawingContext;
+using CaptureImage.Common.Drawings;
 using CaptureImage.Common.Tools.Misc;
 using System;
 using System.Drawing;
@@ -20,13 +21,14 @@ namespace CaptureImage.Common.Tools
             this.drawingContextProvider = drawingContextProvider;
             this.state = DrawingState.None;
             mouseStartPos = new Point(0, 0);
+            DrawingContext.UpdateErasingPens();
         }
 
-        public void MouseDown(Point mousePosition)
+        public void MouseDown(Point mouse)
         {
             if (isActive)
             {
-                mouseStartPos = mousePosition;
+                mouseStartPos = mouse;
                 state = DrawingState.Drawing;
             }
         }
@@ -37,26 +39,16 @@ namespace CaptureImage.Common.Tools
             {
                 if (state == DrawingState.Drawing)
                 {
-                    var rect = Rectangle.FromLTRB(
-                            Math.Min(mouseStartPos.X, mousePreviousPos.X),
-                            Math.Min(mouseStartPos.Y, mousePreviousPos.Y),
-                            Math.Max(mouseStartPos.X, mousePreviousPos.X),
-                            Math.Max(mouseStartPos.Y, mousePreviousPos.Y));
-
                     DrawingContext.Erase((gr, pen) =>
                     {
-                        gr.DrawRectangle(pen, rect);
+                        Rect rect = new Rect(GetRectangle(mouseStartPos, mousePreviousPos));
+                        rect.Paint(gr, pen);
                     });
-
-                   rect = Rectangle.FromLTRB(
-                            Math.Min(mouseStartPos.X, mouse.X),
-                            Math.Min(mouseStartPos.Y, mouse.Y),
-                            Math.Max(mouseStartPos.X, mouse.X),
-                            Math.Max(mouseStartPos.Y, mouse.Y));
 
                     DrawingContext.Draw((gr, pen) =>
                     {
-                        gr.DrawRectangle(pen, rect);
+                        Rect rect = new Rect(GetRectangle(mouseStartPos, mouse));
+                        rect.Paint(gr, pen);
                     });
 
                     mousePreviousPos = mouse;
@@ -68,7 +60,9 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                drawingContextProvider.DrawingContextKeeper.SaveContext();
+                Rect rect = new Rect(GetRectangle(mouseStartPos, mouse));
+                DrawingContext.Drawings.Add(rect);
+                DrawingContext.UpdateErasingPens();
                 state = DrawingState.None;
             }
         }
@@ -82,5 +76,11 @@ namespace CaptureImage.Common.Tools
         {
             isActive = false;
         }
+
+        private Rectangle GetRectangle(Point start, Point end) => Rectangle.FromLTRB(
+            Math.Min(start.X, end.X),
+            Math.Min(start.Y, end.Y),
+            Math.Max(start.X, end.X),
+            Math.Max(start.Y, end.Y));
     }
 }

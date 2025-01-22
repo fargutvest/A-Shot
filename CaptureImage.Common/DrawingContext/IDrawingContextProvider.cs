@@ -1,7 +1,4 @@
-﻿
-using System;
-
-namespace CaptureImage.Common.DrawingContext
+﻿namespace CaptureImage.Common.DrawingContext
 {
     public interface IDrawingContextProvider
     {

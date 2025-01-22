@@ -7,7 +7,6 @@ using CaptureImage.WinForms.Properties;
 using System.IO;
 using CaptureImage.WinForms.Helpers;
 using CaptureImage.Common.DrawingContext;
-using System.Collections.Generic;
 
 namespace CaptureImage.WinForms
 {
@@ -105,8 +104,6 @@ namespace CaptureImage.WinForms
 
             DrawingContext drawingContext = DrawingContext.Create(images, controls, isClean: true);
             DrawingContextKeeper.SetDrawingContext(drawingContext);
-
-            DrawingContextKeeper.SaveContext();
 
             ConfigureForm(freezeScreen, desktopInfo);
             ConfigureForm(blackoutScreen, desktopInfo);

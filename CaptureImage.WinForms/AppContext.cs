@@ -18,12 +18,25 @@ namespace CaptureImage.WinForms
         private BlackoutScreen blackoutScreen;
         private bool isHidden;
 
-        public DrawingContextKeeper DrawingContextKeeper { get; private set; }
+        private DrawingContext drawingContext;
+        public DrawingContext DrawingContext
+        {
+            get
+            {
+                return drawingContext;
+            }
+            private set
+            {
+                drawingContext = value;
+                DrawingContextChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        public event EventHandler DrawingContextChanged;
 
         public AppContext()
         {
             isHidden = true;
-            DrawingContextKeeper = new DrawingContextKeeper();
 
             MainForm = new MainForm(this);
 
@@ -48,8 +61,7 @@ namespace CaptureImage.WinForms
 
         public void UndoDrawing()
         {
-            DrawingContextKeeper.DrawingContext.UndoDrawing();
-            //DrawingContextKeeper.RevertToPreviousContext();
+            DrawingContext.UndoDrawing();
         }
 
         private void Exit(object sender, EventArgs e)
@@ -100,10 +112,7 @@ namespace CaptureImage.WinForms
                 blackoutScreen
             };
 
-         
-
-            DrawingContext drawingContext = DrawingContext.Create(images, controls, isClean: true);
-            DrawingContextKeeper.SetDrawingContext(drawingContext);
+            DrawingContext = DrawingContext.Create(images, controls, isClean: true);
 
             ConfigureForm(freezeScreen, desktopInfo);
             ConfigureForm(blackoutScreen, desktopInfo);
@@ -156,9 +165,7 @@ namespace CaptureImage.WinForms
             ColorDialog colorDialog = new ColorDialog();
             
             if (colorDialog.ShowDialog() == DialogResult.OK)
-            {
-                DrawingContextKeeper.DrawingContext.SetColorOfPen(colorDialog.Color);
-            }
+                DrawingContext.SetColorOfPen(colorDialog.Color);
         }
 
         private void ConfigureForm(Form form, DesktopInfo desktopInfo) 

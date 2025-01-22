@@ -9,7 +9,7 @@ namespace CaptureImage.Common.Tools
     public class ArrowTool : LineTool
     {
         private CustomLineCap endCap;
-        private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContextKeeper.DrawingContext;
+        private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContext;
 
         public ArrowTool(IDrawingContextProvider drawingContextProvider) : base (drawingContextProvider)
         {

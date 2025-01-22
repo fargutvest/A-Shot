@@ -43,7 +43,7 @@ namespace CaptureImage.WinForms.Thumb
         public Thumb(AppContext appContext)
         {
             this.appContext = appContext;
-            appContext.DrawingContextKeeper.DrawingContextChanged += DrawingContextsKeeper_DrawingContextChanged;
+            appContext.DrawingContextChanged += DrawingContextsKeeper_DrawingContextChanged;
 
             InitializeComponent();
 
@@ -157,12 +157,12 @@ namespace CaptureImage.WinForms.Thumb
 
         private void DrawingContextsKeeper_DrawingContextChanged(object sender, EventArgs e)
         {
-            appContext.DrawingContextKeeper.DrawingContext.DrawingContextEdited += DrawingContext_DrawingContextEdited;
+            appContext.DrawingContext.DrawingContextEdited += DrawingContext_DrawingContextEdited;
         }
 
         private void DrawingContext_DrawingContextEdited(object sender, EventArgs e)
         {
-            btnColor.BackColor = appContext.DrawingContextKeeper.DrawingContext.drawingPen.Color;
+            btnColor.BackColor = appContext.DrawingContext.drawingPen.Color;
             btnColor.Invalidate();
         }
 

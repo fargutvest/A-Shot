@@ -11,12 +11,12 @@ namespace CaptureImage.WinForms
             InitializeComponent();
 
             this.appContext = appContext;
-            this.appContext.DrawingContextKeeper.DrawingContextChanged += DrawingContextKeeper_DrawingContextChanged;
+            this.appContext.DrawingContextChanged += AppContext_DrawingContextChanged;
         }
 
-        private void DrawingContextKeeper_DrawingContextChanged(object sender, System.EventArgs e)
+        private void AppContext_DrawingContextChanged(object sender, System.EventArgs e)
         {
-            BackgroundImage = appContext.DrawingContextKeeper.DrawingContext.GetImage(this);
+            BackgroundImage = appContext.DrawingContext.GetImage(this);
         }
     }
 }

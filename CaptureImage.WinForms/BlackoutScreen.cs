@@ -22,7 +22,7 @@ namespace CaptureImage.WinForms
             InitializeComponent();
 
             this.appContext = appContext;
-            this.appContext.DrawingContextKeeper.DrawingContextChanged += DrawingContextKeeper_DrawingContextChanged;
+            this.appContext.DrawingContextChanged += AppContext_DrawingContextChanged;
             
             //TopMost = true;
 
@@ -47,9 +47,9 @@ namespace CaptureImage.WinForms
             this.Controls.AddRange(thumb.Components);
         }
 
-        private void DrawingContextKeeper_DrawingContextChanged(object sender, System.EventArgs e)
+        private void AppContext_DrawingContextChanged(object sender, System.EventArgs e)
         {
-            BackgroundImage = appContext.DrawingContextKeeper.DrawingContext.GetImage(this);
+            BackgroundImage = appContext.DrawingContext.GetImage(this);
         }
 
         public void SwitchToSelectingMode()
@@ -70,7 +70,7 @@ namespace CaptureImage.WinForms
 
                 case Thumb.ThumbAction.Undo:
                     appContext.UndoDrawing();
-                    if (appContext.DrawingContextKeeper.DrawingContext.IsClean)
+                    if (appContext.DrawingContext.IsClean)
                     {
                         SwitchToSelectingMode();
                     }

@@ -13,7 +13,7 @@ namespace CaptureImage.Common.Tools
         private Point mousePreviousPos;
         private bool isActive;
         private IDrawingContextProvider drawingContextProvider;
-        private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContextKeeper.DrawingContext;
+        private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContext;
 
         public PencilTool(IDrawingContextProvider drawingContextProvider)
         {

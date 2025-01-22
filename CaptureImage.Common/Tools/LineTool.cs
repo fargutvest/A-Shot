@@ -14,7 +14,7 @@ namespace CaptureImage.Common.Tools
 
 
         protected IDrawingContextProvider drawingContextProvider;
-        private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContextKeeper.DrawingContext;
+        private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContext;
         
 
         public LineTool(IDrawingContextProvider drawingContextProvider)

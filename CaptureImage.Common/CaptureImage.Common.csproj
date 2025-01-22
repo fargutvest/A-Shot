@@ -48,7 +48,6 @@
     <Compile Include="Converters\BitmapConverter.cs" />
     <Compile Include="Converters\PointConverter.cs" />
     <Compile Include="DesktopInfo.cs" />
-    <Compile Include="DrawingContext\DrawingContextKeeper.cs" />
     <Compile Include="DrawingContext\IDrawingContextProvider.cs" />
     <Compile Include="Drawings\Arrow.cs" />
     <Compile Include="Drawings\Rect.cs" />

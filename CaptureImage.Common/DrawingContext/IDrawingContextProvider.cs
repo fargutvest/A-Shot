@@ -1,7 +1,10 @@
-﻿namespace CaptureImage.Common.DrawingContext
+﻿using System;
+
+namespace CaptureImage.Common.DrawingContext
 {
     public interface IDrawingContextProvider
     {
-        DrawingContextKeeper DrawingContextKeeper { get; }
+        DrawingContext DrawingContext { get; }
+        event EventHandler DrawingContextChanged;
     }
 }

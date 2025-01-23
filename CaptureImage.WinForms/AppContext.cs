@@ -16,7 +16,7 @@ namespace CaptureImage.WinForms
         private HotKeysHelper hotKeysHelper;
         private FreezeScreen freezeScreen;
         private BlackoutScreen blackoutScreen;
-        private bool isHidden;
+        private bool isSessionOn;
 
         private DrawingContext drawingContext;
         public DrawingContext DrawingContext
@@ -36,7 +36,7 @@ namespace CaptureImage.WinForms
 
         public AppContext()
         {
-            isHidden = true;
+            isSessionOn = false;
 
             MainForm = new MainForm(this);
 
@@ -79,7 +79,7 @@ namespace CaptureImage.WinForms
             }
             else if (blackoutScreen.Mode == Mode.Selecting)
             {
-                if (isHidden == false)
+                if (isSessionOn)
                     EndSession();
             }
         }
@@ -89,11 +89,14 @@ namespace CaptureImage.WinForms
             freezeScreen.Hide();
             blackoutScreen.Hide();
             blackoutScreen.ResetSelection();
-            isHidden = true;
+            isSessionOn = false;
         }
 
         private void StartSession()
         {
+            if (isSessionOn)
+                return;
+
             DesktopInfo desktopInfo = ScreensHelper.GetDesktopInfo();
 
             Image[] images = new Image[]
@@ -119,7 +122,7 @@ namespace CaptureImage.WinForms
             blackoutScreen.Invalidate();
             blackoutScreen.Show();
 
-            isHidden = false;
+            isSessionOn = true;
         }
 
         private Bitmap GetScreenshot(Rectangle rect)

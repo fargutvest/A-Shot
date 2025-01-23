@@ -10,7 +10,7 @@ namespace CaptureImage.WinForms
     {
         private bool isInit = true;
         private Thumb.Thumb thumb;
-        private SelectingTool selectingTool;
+        public SelectingTool selectingTool;
         private ITool drawingTool;
 
         private AppContext appContext;

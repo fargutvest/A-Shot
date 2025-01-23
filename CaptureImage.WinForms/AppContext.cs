@@ -42,6 +42,7 @@ namespace CaptureImage.WinForms
             hotKeysHelper = new HotKeysHelper();
             hotKeysHelper.RegisterHotKey(Keys.Control, Keys.P, StartSession);
             hotKeysHelper.RegisterHotKey(Keys.Control, Keys.Z, UndoDrawing);
+            hotKeysHelper.RegisterHotKey(Keys.Control, Keys.C, MakeScreenshot);
             hotKeysHelper.RegisterHotKey(Keys.Escape, OnEscape);
 
             trayIcon = new NotifyIcon()
@@ -128,6 +129,12 @@ namespace CaptureImage.WinForms
         private Bitmap GetScreenshot(Rectangle rect)
         {
             return BitmapHelper.Crop((Bitmap)freezeScreen.BackgroundImage, rect);
+        }
+
+        public void MakeScreenshot()
+        {
+            MakeScreenshot(blackoutScreen.selectingTool.selectingRect);
+            EndSession();
         }
 
         public void MakeScreenshot(Rectangle rect)

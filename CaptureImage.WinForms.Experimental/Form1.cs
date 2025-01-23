@@ -4,6 +4,7 @@ using System;
 using System.Windows.Forms;
 using CaptureImage.Common.Extensions;
 using CaptureImage.Common.Tools;
+using CaptureImage.Common.Helpers.HotKeys;
 
 namespace CaptureImage.WinForms.Experimental
 {
@@ -29,8 +30,8 @@ namespace CaptureImage.WinForms.Experimental
             desktopInfo = ScreensHelper.GetDesktopInfo();
             selectingTool = new SelectingTool();
             hotKeysHelper = new HotKeysHelper();
-            hotKeysHelper.RegisterHotKey(Handle, Keys.F6, ShowForm);
-            hotKeysHelper.RegisterHotKey(Handle, Keys.Escape, HideForm);
+            hotKeysHelper.RegisterHotKey(Keys.F6, ShowForm);
+            hotKeysHelper.RegisterHotKey(Keys.Escape, HideForm);
 
             // TODO: Что быстрее работает ? Задать поместить скриншот фоном формы один раз в конструкторе, или каждый раз рисовать скриншот при перерисовке формы в методе Paint ?
             //BackgroundImage = desktopInfo.Background;
@@ -38,7 +39,6 @@ namespace CaptureImage.WinForms.Experimental
 
         protected override void WndProc(ref Message m)
         {
-            hotKeysHelper.WndProc(ref m);
             base.WndProc(ref m);
         }
 

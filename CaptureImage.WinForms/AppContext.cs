@@ -7,6 +7,7 @@ using CaptureImage.WinForms.Properties;
 using System.IO;
 using CaptureImage.WinForms.Helpers;
 using CaptureImage.Common.DrawingContext;
+using CaptureImage.Common.Helpers.HotKeys;
 
 namespace CaptureImage.WinForms
 {
@@ -38,11 +39,10 @@ namespace CaptureImage.WinForms
         {
             isSessionOn = false;
 
-            MainForm = new MainForm(this);
-
             hotKeysHelper = new HotKeysHelper();
-            hotKeysHelper.RegisterHotKey(MainForm.Handle, Keys.F6, StartSession);
-            hotKeysHelper.RegisterHotKey(MainForm.Handle, Keys.Escape, OnEscape);
+            hotKeysHelper.RegisterHotKey(Keys.Control, Keys.P, StartSession);
+            hotKeysHelper.RegisterHotKey(Keys.Control, Keys.Z, UndoDrawing);
+            hotKeysHelper.RegisterHotKey(Keys.Escape, OnEscape);
 
             trayIcon = new NotifyIcon()
             {
@@ -174,10 +174,13 @@ namespace CaptureImage.WinForms
             form.Region = new Region(desktopInfo.Path);
         }
 
-        public void WndProc(ref Message m)
+
+        protected override void ExitThreadCore()
         {
-            hotKeysHelper.WndProc(ref m);
+            this.hotKeysHelper.Dispose();
+            base.ExitThreadCore();
         }
+
     }
 }
     

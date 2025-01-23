@@ -59,7 +59,8 @@
     <Compile Include="Helpers\CaptureImageHelper.cs" />
     <Compile Include="Helpers\GeometryHelper.cs" />
     <Compile Include="Helpers\GraphicsHelper.cs" />
-    <Compile Include="Helpers\HotKeysHelper.cs" />
+    <Compile Include="Helpers\HotKeys\HotKey.cs" />
+    <Compile Include="Helpers\HotKeys\HotKeysHelper.cs" />
     <Compile Include="Helpers\ScreensHelper.cs" />
     <Compile Include="IThumb.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -76,7 +77,9 @@
     <Compile Include="Tools\RectTool.cs" />
     <Compile Include="Tools\Misc\SelectingState.cs" />
     <Compile Include="Tools\SelectingTool.cs" />
+    <Compile Include="Helpers\HotKeys\WinApi\KBDLLHOOKSTRUCT.cs" />
     <Compile Include="WinAPi.cs" />
+    <Compile Include="Helpers\HotKeys\WinApi\WinAPI.Hook.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

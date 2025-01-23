@@ -33,8 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>ashot.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -131,6 +130,7 @@
     <None Include="icons\pencil.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ashot.ico" />
     <Content Include="icons\arrow.png" />
     <Content Include="icons\ashot.ico" />
     <Content Include="icons\close.png" />

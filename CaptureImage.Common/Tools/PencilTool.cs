@@ -1,5 +1,6 @@
 ﻿using CaptureImage.Common.DrawingContext;
 using CaptureImage.Common.Drawings;
+using CaptureImage.Common.Helpers;
 using CaptureImage.Common.Tools.Misc;
 using System.Drawing;
 
@@ -27,17 +28,18 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
+                MarkerDrawingHelper.EraseMarker(DrawingContext, mousePreviousPos);
+
+                Line line = null;
                 if (state == DrawingState.Drawing)
                 {
-                    DrawingContext.Draw((gr, pen) => 
-                    {
-                        Line line = new Line(mousePreviousPos, mouse);
-                        line.Paint(gr, pen);
-                        curve.AddLine(line);
-                    });
-
-                    mousePreviousPos = mouse;
+                    line = new Line(mousePreviousPos, mouse);
+                    curve.AddLine(line);
+                    DrawingContext.Draw(line.Paint);
                 }
+
+                MarkerDrawingHelper.DrawMarker(DrawingContext, line, mouse);
+                mousePreviousPos = mouse;
             }
         }
 

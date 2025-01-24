@@ -63,7 +63,6 @@ namespace CaptureImage.Common.DrawingContext
         {
             return dict[control];
         }
-           
 
         public void Draw(Action<Graphics, Pen> action)
         {
@@ -108,7 +107,12 @@ namespace CaptureImage.Common.DrawingContext
             }
         }
 
-        public void UpdateErasingPens(Action<Graphics> action)
+        public void DrawOverErasingPens(Action<Graphics, Pen> action) 
+        {
+            UpdateErasingPens(gr => action?.Invoke(gr, drawingPen), needClean: true);
+        }
+
+        public void UpdateErasingPens(Action<Graphics> action, bool needClean = true)
         {
             if (erasePens == null)
                 erasePens = new Pen[canvasImages.Length];
@@ -120,7 +124,8 @@ namespace CaptureImage.Common.DrawingContext
 
                 using (Graphics gr = Graphics.FromImage(canvasImage))
                 {
-                    gr.DrawImage(cleanImages[i], new PointF(0, 0));
+                    if (needClean)
+                        gr.DrawImage(cleanImages[i], new PointF(0, 0));
 
                     action?.Invoke(gr);
                 }
@@ -134,7 +139,6 @@ namespace CaptureImage.Common.DrawingContext
 
             }
         }
-
 
         public void SetColorOfPen(Color color)
         {

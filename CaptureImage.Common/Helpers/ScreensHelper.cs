@@ -10,7 +10,10 @@ namespace CaptureImage.Common.Helpers
     {
         public static ScreenInfo[] GetScreenInfos()
         {
-            Screen[] screens = Screen.AllScreens.Take(1).ToArray();
+            Screen[] screens = Screen.AllScreens.ToArray();
+#if DEBUG
+            screens = screens.Take(1).ToArray();
+#endif
 
             ScreenInfo[] infos = new ScreenInfo[screens.Length];
 

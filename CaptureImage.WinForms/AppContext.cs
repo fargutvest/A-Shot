@@ -15,6 +15,7 @@ namespace CaptureImage.WinForms
     {
         private NotifyIcon trayIcon;
         private HotKeysHelper hotKeysHelper;
+        private MouseHookHelper mouseHookHelper;
         private FreezeScreen freezeScreen;
         private BlackoutScreen blackoutScreen;
         private bool isSessionOn;
@@ -44,6 +45,8 @@ namespace CaptureImage.WinForms
             hotKeysHelper.RegisterHotKey(Keys.Control, Keys.Z, UndoDrawing);
             hotKeysHelper.RegisterHotKey(Keys.Control, Keys.C, MakeScreenshot);
             hotKeysHelper.RegisterHotKey(Keys.Escape, OnEscape);
+
+            mouseHookHelper = new MouseHookHelper();
 
             trayIcon = new NotifyIcon()
             {

@@ -109,7 +109,7 @@ namespace CaptureImage.Common.DrawingContext
 
         public void DrawOverErasingPens(Action<Graphics, Pen> action) 
         {
-            UpdateErasingPens(gr => action?.Invoke(gr, drawingPen), needClean: true);
+            UpdateErasingPens(gr => action?.Invoke(gr, drawingPen), needClean: false);
         }
 
         public void UpdateErasingPens(Action<Graphics> action, bool needClean = true)
@@ -205,6 +205,30 @@ namespace CaptureImage.Common.DrawingContext
                 {
                     lastDrawing.Paint(gr, pen);
                 });
+            }
+        }
+
+        public void IncreaseWidthOfPen()
+        {
+            if (drawingPen.Width < 20)
+                drawingPen.Width = drawingPen.Width + 1;
+
+            for (int i = 0;i < erasePens.Length; i++)
+            {
+                if (erasePens[i].Width < 20)
+                    erasePens[i].Width = erasePens[i].Width + 1;
+            }
+        }
+
+        public void DecreaseWidthOfPen()
+        {
+            if (drawingPen.Width > 5)
+                drawingPen.Width = drawingPen.Width - 1;
+
+            for (int i = 0; i < erasePens.Length; i++)
+            {
+                if (erasePens[i].Width > 5)
+                    erasePens[i].Width = erasePens[i].Width - 1;
             }
         }
     }

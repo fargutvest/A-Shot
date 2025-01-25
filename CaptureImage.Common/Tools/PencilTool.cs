@@ -36,6 +36,7 @@ namespace CaptureImage.Common.Tools
                     line = new Line(mousePreviousPos, mouse);
                     curve.AddLine(line);
                     DrawingContext.Draw(line.Paint);
+                    DrawingContext.DrawOverErasingPens(line.Paint);
                 }
 
                 MarkerDrawingHelper.DrawMarker(DrawingContext, line, mouse);

@@ -38,12 +38,12 @@ namespace CaptureImage.Common.Helpers
                 location: new Point(location.X - offset, location.Y - offset));
         
 
-        internal static void EraseMarker(DrawingContext.DrawingContext drawingContext, Point location)
+        public static void EraseMarker(DrawingContext.DrawingContext drawingContext, Point location)
         {
             drawingContext.Erase(GetMarker(location).Paint);
         }
 
-        internal static void DrawMarker(DrawingContext.DrawingContext drawingContext, IDrawing latestDrawing, Point location)
+        public static void DrawMarker(DrawingContext.DrawingContext drawingContext, IDrawing latestDrawing, Point location)
         {
             if (latestDrawing != null)
                 drawingContext.DrawOverErasingPens(latestDrawing.Paint);

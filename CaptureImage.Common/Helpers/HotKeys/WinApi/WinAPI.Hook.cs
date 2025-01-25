@@ -26,10 +26,16 @@ namespace CaptureImage.Common.Helpers.HotKeys.WinApi
         public static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr SetWindowsHookEx(int idHook, LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
+
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern bool UnhookWindowsHookEx(IntPtr hHook);
+
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
+
 
         #endregion
 
@@ -40,7 +46,7 @@ namespace CaptureImage.Common.Helpers.HotKeys.WinApi
         /// <param name="wParam"></param>
         /// <param name="lParam"></param>
         /// <returns></returns>
-        public delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
+        public delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, ref KBDLLHOOKSTRUCT lParam);
 
        
         /// <summary>
@@ -50,6 +56,6 @@ namespace CaptureImage.Common.Helpers.HotKeys.WinApi
         /// <param name="wParam"></param>
         /// <param name="lParam"></param>
         /// <returns></returns>
-        public delegate IntPtr HookProc(int nCode, IntPtr wParam, ref MSLLHOOKSTRUCT lParam);
+        public delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, ref MSLLHOOKSTRUCT lParam);
     }
 }

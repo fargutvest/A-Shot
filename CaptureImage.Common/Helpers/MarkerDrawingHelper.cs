@@ -1,21 +1,37 @@
 ﻿using CaptureImage.Common.Drawings;
-using System;
 using System.Drawing;
 
 namespace CaptureImage.Common.Helpers
 {
-    internal static class MarkerDrawingHelper
+    public static class MarkerDrawingHelper
     {
         private static Pen markerPen = new Pen(Color.Black);
 
-        private static IDrawing GetMarker(Point location)
-        {
-            int diameter = 5;
-            int offset = 5;
+        private static int diameter = 5;
 
-            return new Circle(diameter,
-                location: new Point(location.X - offset, location.Y - offset));
+        private static int offset = 5;
+
+        public static void IncreaseMarkerDiameter()
+        {
+            if (diameter < 20)
+            {
+                diameter = diameter + 1;
+                offset = offset + 1;
+            }
         }
+
+        public static void DecreaseMarkerDiameter()
+        {
+            if (diameter > 5)
+            {
+                diameter = diameter - 1;
+                offset = offset - 1;
+            }
+        }
+
+        private static IDrawing GetMarker(Point location) => new Circle(diameter,
+                location: new Point(location.X - offset, location.Y - offset));
+        
 
         internal static void EraseMarker(DrawingContext.DrawingContext drawingContext, Point location)
         {

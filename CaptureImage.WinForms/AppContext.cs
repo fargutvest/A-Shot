@@ -47,6 +47,7 @@ namespace CaptureImage.WinForms
             hotKeysHelper.RegisterHotKey(Keys.Escape, OnEscape);
 
             mouseHookHelper = new MouseHookHelper();
+            mouseHookHelper.MouseWheel += MouseHookHelper_MouseWheel;
 
             trayIcon = new NotifyIcon()
             {
@@ -61,6 +62,18 @@ namespace CaptureImage.WinForms
             blackoutScreen = new BlackoutScreen(this);
             blackoutScreen.TransparencyKey = Color.Red;
             blackoutScreen.AllowTransparency = true;
+        }
+
+        private void MouseHookHelper_MouseWheel(object sender, int e)
+        {
+            if (e > 0)
+            {
+                MarkerDrawingHelper.IncreaseMarkerDiameter();
+            }
+            else if (e < 0)
+            {
+                MarkerDrawingHelper.DecreaseMarkerDiameter();
+            }
         }
 
         public void UndoDrawing()

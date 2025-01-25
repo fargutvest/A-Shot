@@ -47,12 +47,11 @@ namespace CaptureImage.Common.Helpers.HotKeys
             hotKeyDict.Add(hotKey, action);
         }
 
-        private IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        private IntPtr HookCallback(int nCode, IntPtr wParam, ref KBDLLHOOKSTRUCT lParam)
         {
             if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
             {
-                KBDLLHOOKSTRUCT hookStruct = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
-                Keys key = (Keys)hookStruct.vkCode;
+                Keys key = (Keys)lParam.vkCode;
 
                 HotKey pressedHotKey = new HotKey()
                 {
@@ -64,7 +63,10 @@ namespace CaptureImage.Common.Helpers.HotKeys
                     hotKeyDict[pressedHotKey]?.Invoke();
             }
 
-            return CallNextHookEx(_hookID, nCode, wParam, lParam);
+            IntPtr pnt = Marshal.AllocHGlobal(Marshal.SizeOf(lParam));
+            Marshal.StructureToPtr(lParam, pnt, false);
+
+            return CallNextHookEx(_hookID, nCode, wParam, pnt);
         }
 
       

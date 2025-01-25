@@ -68,13 +68,13 @@ namespace CaptureImage.WinForms
         {
             if (e > 0)
             {
-                MarkerDrawingHelper.IncreaseMarkerDiameter();
-                drawingContext.IncreaseWidthOfPen();
+                MarkerDrawingHelper.DecreaseMarkerDiameter();
+                drawingContext.DecreaseWidthOfPen();
             }
             else if (e < 0)
             {
-                MarkerDrawingHelper.DecreaseMarkerDiameter();
-                drawingContext.DecreaseWidthOfPen();
+                MarkerDrawingHelper.IncreaseMarkerDiameter();
+                drawingContext.IncreaseWidthOfPen();
             }
         }
 

@@ -69,10 +69,12 @@ namespace CaptureImage.WinForms
             if (e > 0)
             {
                 MarkerDrawingHelper.IncreaseMarkerDiameter();
+                drawingContext.drawingPen.Width = MarkerDrawingHelper.GetPenDiameter();
             }
             else if (e < 0)
             {
                 MarkerDrawingHelper.DecreaseMarkerDiameter();
+                drawingContext.drawingPen.Width = MarkerDrawingHelper.GetPenDiameter();
             }
         }
 

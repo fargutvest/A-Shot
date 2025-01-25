@@ -5,11 +5,16 @@ namespace CaptureImage.Common.Helpers
 {
     public static class MarkerDrawingHelper
     {
-        private static Pen markerPen = new Pen(Color.Black);
+        private static Pen markerPen = new Pen(Color.Violet, 2);
 
         private static int diameter = 5;
 
         private static int offset = 5;
+
+        public static int GetPenDiameter()
+        {
+            return diameter;
+        }
 
         public static void IncreaseMarkerDiameter()
         {

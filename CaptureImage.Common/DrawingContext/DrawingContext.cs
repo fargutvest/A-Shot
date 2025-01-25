@@ -64,16 +64,19 @@ namespace CaptureImage.Common.DrawingContext
             return dict[control];
         }
 
-        public void Draw(Action<Graphics, Pen> action)
+        public void Draw(Action<Graphics, Pen> action, bool onlyOnCanvas = false)
         {
             for (int i = 0; i < canvasImages.Length; i++)
             {
                 Image im = canvasImages[i];
                 Control ct = canvasControls[i];
 
-                using (Graphics gr = Graphics.FromImage(im))
+                if (onlyOnCanvas == false)
                 {
-                    OnSafe(() => action?.Invoke(gr, drawingPen));
+                    using (Graphics gr = Graphics.FromImage(im))
+                    {
+                        OnSafe(() => action?.Invoke(gr, drawingPen));
+                    }
                 }
 
                 using (Graphics gr = ct.CreateGraphics())
@@ -85,7 +88,7 @@ namespace CaptureImage.Common.DrawingContext
             }
         }
 
-        public void Erase(Action<Graphics, Pen> action)
+        public void Erase(Action<Graphics, Pen> action, bool onlyOnCanvas = false)
         {
             for (int i = 0; i < canvasImages.Length; i++)
             {
@@ -93,9 +96,12 @@ namespace CaptureImage.Common.DrawingContext
                 Control ct = canvasControls[i];
                 Pen erasePen = erasePens[i];
 
-                using (Graphics gr = Graphics.FromImage(im))
+                if (onlyOnCanvas == false)
                 {
-                    OnSafe(() => action?.Invoke(gr, erasePen));
+                    using (Graphics gr = Graphics.FromImage(im))
+                    {
+                        OnSafe(() => action?.Invoke(gr, erasePen));
+                    }
                 }
 
                 using (Graphics gr = ct.CreateGraphics())
@@ -186,7 +192,7 @@ namespace CaptureImage.Common.DrawingContext
                 for (int i = 0; i < Drawings.Count; i++)
                 {
                     IDrawing drawing = Drawings[i];
-                    drawing.Paint(gr, drawingPen);
+                    drawing.Repaint(gr);
                 }
             });
         }

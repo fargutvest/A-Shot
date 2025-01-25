@@ -11,6 +11,8 @@ namespace CaptureImage.Common.Helpers
 
         private static int offset = 5;
 
+        private static IDrawing marker;
+
         public static int GetPenDiameter()
         {
             return diameter;
@@ -40,7 +42,14 @@ namespace CaptureImage.Common.Helpers
 
         public static void EraseMarker(DrawingContext.DrawingContext drawingContext, Point location)
         {
-            drawingContext.Erase(GetMarker(location).Paint);
+            IDrawing marker = GetMarker(location);
+            drawingContext.Erase(marker.Erase, onlyOnCanvas: true);
+        }
+
+        public static void EraseMarker(DrawingContext.DrawingContext drawingContext)
+        {
+            if (marker != null)
+                drawingContext.Erase(marker.Erase, onlyOnCanvas: true);
         }
 
         public static void DrawMarker(DrawingContext.DrawingContext drawingContext, IDrawing latestDrawing, Point location)
@@ -50,8 +59,9 @@ namespace CaptureImage.Common.Helpers
 
             drawingContext.Draw((gr, pen) =>
             {
-                GetMarker(location).Paint(gr, markerPen);
-            });
+                marker = GetMarker(location);
+                marker.Paint(gr, markerPen);
+            }, onlyOnCanvas: true);
         }
     }
 }

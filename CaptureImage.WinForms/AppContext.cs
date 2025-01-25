@@ -71,7 +71,7 @@ namespace CaptureImage.WinForms
                 MarkerDrawingHelper.DecreaseMarkerDiameter();
                 drawingContext.DecreaseWidthOfPen();
 
-                MarkerDrawingHelper.EraseMarker(DrawingContext, Cursor.Position);
+                MarkerDrawingHelper.EraseMarker(DrawingContext);
                 MarkerDrawingHelper.DrawMarker(DrawingContext, latestDrawing: null, Cursor.Position);
             }
             else if (e < 0)
@@ -79,7 +79,7 @@ namespace CaptureImage.WinForms
                 MarkerDrawingHelper.IncreaseMarkerDiameter();
                 drawingContext.IncreaseWidthOfPen();
 
-                MarkerDrawingHelper.EraseMarker(DrawingContext, Cursor.Position);
+                MarkerDrawingHelper.EraseMarker(DrawingContext);
                 MarkerDrawingHelper.DrawMarker(DrawingContext, latestDrawing: null, Cursor.Position);
             }
         }

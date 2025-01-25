@@ -22,5 +22,16 @@ namespace CaptureImage.Common.Drawings
             foreach (Line line in lines)
                 line.Paint(gr, pen);   
         }
+
+        public void Repaint(Graphics gr)
+        {
+            foreach (Line line in lines)
+                line.Repaint(gr);
+        }
+
+        public void Erase(Graphics gr, Pen erasePen)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

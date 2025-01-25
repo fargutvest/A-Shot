@@ -28,7 +28,7 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                MarkerDrawingHelper.EraseMarker(DrawingContext, mousePreviousPos);
+                MarkerDrawingHelper.EraseMarker(DrawingContext);
 
                 Line line = null;
                 if (state == DrawingState.Drawing)

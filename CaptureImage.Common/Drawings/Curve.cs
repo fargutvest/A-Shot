@@ -31,7 +31,17 @@ namespace CaptureImage.Common.Drawings
 
         public void Erase(Graphics gr, Pen erasePen)
         {
-            throw new System.NotImplementedException();
+            foreach (Line line in lines)
+                line.Erase(gr, erasePen);
         }
+
+        #region override
+
+        public override string ToString()
+        {
+            return $"lines:{lines.Count}";
+        }
+
+        #endregion
     }
 }

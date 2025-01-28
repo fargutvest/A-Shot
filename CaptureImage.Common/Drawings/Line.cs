@@ -6,7 +6,9 @@ namespace CaptureImage.Common.Drawings
     {
         private Point start;
         private Point end;
-        private Pen drawedByPen;
+        private Color drawedPenColor;
+        private float drawedPenWidth;
+        private bool isDrawed;
 
         public Line(Point start, Point end)
         {
@@ -17,13 +19,18 @@ namespace CaptureImage.Common.Drawings
         public void Paint(Graphics gr, Pen pen)
         {
             PaintInternal(gr, pen);
-            drawedByPen = pen.Clone() as Pen;
+            isDrawed = true;
+            drawedPenColor = pen.Color;
+            drawedPenWidth = pen.Width;
         }
 
         public void Repaint(Graphics gr)
         {
-            if (drawedByPen != null)
-                PaintInternal(gr, drawedByPen);
+            if (isDrawed)
+            {
+                using (Pen pen = new Pen(drawedPenColor, drawedPenWidth))
+                    PaintInternal(gr, pen);
+            }
         }
 
         private void PaintInternal(Graphics gr, Pen pen)
@@ -35,7 +42,11 @@ namespace CaptureImage.Common.Drawings
 
         public void Erase(Graphics gr, Pen erasePen)
         {
-            throw new System.NotImplementedException();
+            if (isDrawed)
+            {
+                erasePen.Width = drawedPenWidth;
+                PaintInternal(gr, erasePen);
+            }
         }
 
         public override string ToString()

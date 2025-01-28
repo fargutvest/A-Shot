@@ -3,18 +3,20 @@ using System.Drawing.Drawing2D;
 using System.Drawing;
 using CaptureImage.Common.DrawingContext;
 using CaptureImage.Common.Drawings;
+using CaptureImage.Common.Helpers;
 
 namespace CaptureImage.Common.Tools
 {
     public class ArrowTool : LineTool
     {
+        private Arrow arrow;
         private CustomLineCap endCap;
         private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContext;
 
         public ArrowTool(IDrawingContextProvider drawingContextProvider) : base (drawingContextProvider)
         {
             endCap = new AdjustableArrowCap(4, 7);
-            DrawingContext.UpdateErasingPens();
+            DrawingContext.ReRenderDrawings();
         }
 
         public override void MouseDown(Point mousePosition)
@@ -30,31 +32,24 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
+                MarkerDrawingHelper.EraseMarker(DrawingContext);
                 if (state == DrawingState.Drawing)
                 {
-                    DrawingContext.Erase((gr, pen) =>
-                    {
-                        Arrow arrow = new Arrow(mouseStartPos, mousePreviousPos, endCap);
-                        arrow.Paint(gr, pen);
-                    });
-
-                    DrawingContext.Draw((gr, pen) =>
-                    {
-                        Arrow arrow = new Arrow(mouseStartPos, mouse, endCap);
-                        arrow.Paint(gr, pen);
-                    });
-
-                    mousePreviousPos = mouse;
+                    DrawingContext.ReRenderDrawings(canvasImagesOnly: true);
+                    DrawingContext.Erase(arrow);
+                    arrow = new Arrow(mouseStartPos, mouse, endCap);
+                    DrawingContext.Draw(arrow.Paint);
                 }
+                MarkerDrawingHelper.DrawMarker(DrawingContext, arrow, mouse);
+                mousePreviousPos = mouse;
             }
         }
+
         public override void MouseUp(Point mouse)
         {
             if (isActive)
             {
-                Arrow arrow = new Arrow(mouseStartPos, mousePreviousPos, endCap);
                 DrawingContext.Drawings.Add(arrow);
-                DrawingContext.UpdateErasingPens();
                 state = DrawingState.None;
             }
         }

@@ -1,5 +1,6 @@
 ﻿using CaptureImage.Common.DrawingContext;
 using CaptureImage.Common.Drawings;
+using CaptureImage.Common.Helpers;
 using CaptureImage.Common.Tools.Misc;
 using System;
 using System.Drawing;
@@ -8,6 +9,7 @@ namespace CaptureImage.Common.Tools
 {
     public class RectTool : ITool
     {
+        private Rect rect;
         private DrawingState state;
         private Point mouseStartPos;
         private Point mousePreviousPos;
@@ -21,7 +23,6 @@ namespace CaptureImage.Common.Tools
             this.drawingContextProvider = drawingContextProvider;
             this.state = DrawingState.None;
             mouseStartPos = new Point(0, 0);
-            DrawingContext.UpdateErasingPens();
         }
 
         public void MouseDown(Point mouse)
@@ -37,22 +38,16 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
+                MarkerDrawingHelper.EraseMarker(DrawingContext);
                 if (state == DrawingState.Drawing)
                 {
-                    DrawingContext.Erase((gr, pen) =>
-                    {
-                        Rect rect = new Rect(GetRectangle(mouseStartPos, mousePreviousPos));
-                        rect.Paint(gr, pen);
-                    });
-
-                    DrawingContext.Draw((gr, pen) =>
-                    {
-                        Rect rect = new Rect(GetRectangle(mouseStartPos, mouse));
-                        rect.Paint(gr, pen);
-                    });
-
-                    mousePreviousPos = mouse;
+                    DrawingContext.ReRenderDrawings(canvasImagesOnly: true);
+                    DrawingContext.Erase(rect, onlyOnCanvas: true);
+                    rect = new Rect(GetRectangle(mouseStartPos, mouse));
+                    DrawingContext.Draw(rect.Paint);
                 }
+                MarkerDrawingHelper.DrawMarker(DrawingContext, rect, mouse);
+                mousePreviousPos = mouse;
             }
         }
 
@@ -60,9 +55,7 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                Rect rect = new Rect(GetRectangle(mouseStartPos, mouse));
                 DrawingContext.Drawings.Add(rect);
-                DrawingContext.UpdateErasingPens();
                 state = DrawingState.None;
             }
         }

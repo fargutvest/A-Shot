@@ -1,4 +1,6 @@
-﻿namespace CaptureImage.WinForms
+﻿using System.Windows.Forms;
+
+namespace CaptureImage.WinForms
 {
     public partial class FreezeScreen : ScreenBase
     {
@@ -7,6 +9,11 @@
         public FreezeScreen(AppContext appContext)
         {
             InitializeComponent();
+
+            SetStyle(ControlStyles.AllPaintingInWmPaint |
+            ControlStyles.UserPaint |
+            ControlStyles.OptimizedDoubleBuffer, true);
+            UpdateStyles();
 
             this.appContext = appContext;
             this.appContext.DrawingContextChanged += AppContext_DrawingContextChanged;

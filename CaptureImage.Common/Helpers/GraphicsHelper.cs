@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace CaptureImage.Common.Helpers
@@ -42,6 +43,14 @@ namespace CaptureImage.Common.Helpers
             gr.DrawRectangles(Pens.White, rectangles.ToArray());
 
             return rectangles.ToArray();
+        }
+
+        public static void OnBufferedGraphics(Graphics gr, Rectangle bounds, Action<Graphics> action)
+        {
+            BufferedGraphicsContext currentContext = BufferedGraphicsManager.Current;
+            BufferedGraphics bufferedGraphics = currentContext.Allocate(gr, bounds);
+            action?.Invoke(bufferedGraphics.Graphics);
+            bufferedGraphics.Render(gr);
         }
     }
 }

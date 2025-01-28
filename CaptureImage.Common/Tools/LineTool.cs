@@ -8,6 +8,7 @@ namespace CaptureImage.Common.Tools
 {
     public class LineTool : ITool
     {
+        private Line line = null;
         protected DrawingState state;
         protected Point mouseStartPos;
         protected Point mousePreviousPos;
@@ -25,7 +26,7 @@ namespace CaptureImage.Common.Tools
             this.state = DrawingState.None;
 
             mouseStartPos = new Point(0, 0);
-            DrawingContext.UpdateErasingPens();
+            DrawingContext.ReRenderDrawings();
         }
 
         public virtual void MouseDown(Point mousePosition)
@@ -41,17 +42,17 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-               // MarkerDrawingHelper.EraseMarker(DrawingContext, mousePreviousPos);
+                MarkerDrawingHelper.EraseMarker(DrawingContext);
 
-                Line line = null;
                 if (state == DrawingState.Drawing)
                 {
-                    DrawingContext.Erase(new Line(mouseStartPos, mousePreviousPos).Paint);
+                    DrawingContext.ReRenderDrawings(canvasImagesOnly: true);
+                    DrawingContext.Erase(line, onlyOnCanvas:true);
                     line = new Line(mouseStartPos, mouse);
                     DrawingContext.Draw(line.Paint);
                 }
 
-               // MarkerDrawingHelper.DrawMarker(DrawingContext, line, mouse);
+                MarkerDrawingHelper.DrawMarker(DrawingContext, line, mouse);
                 mousePreviousPos = mouse;
             }
         }
@@ -60,9 +61,7 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                Line line = new Line(mouseStartPos, mousePreviousPos);
                 DrawingContext.Drawings.Add(line);
-                DrawingContext.UpdateErasingPens();
                 state = DrawingState.None;
             }
         }

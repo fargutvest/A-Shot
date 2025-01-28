@@ -1,33 +1,25 @@
 ﻿using CaptureImage.Common.Drawings;
+using CaptureImage.Common.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
 namespace CaptureImage.Common.DrawingContext
 {
-    public class DrawingContext : ICloneable
+    public class DrawingContext
     {
-        public static readonly Pen DefaultDrawingPen = new Pen(Color.Yellow, 2);
-
+        public static readonly Pen DefaultDrawingPen = new Pen(Color.Yellow, MarkerDrawingHelper.GetPenDiameter());
         public event EventHandler DrawingContextEdited;
-
         public Image[] canvasImages;
-
         public Image[] cleanImages;
-
         private Control[] canvasControls;
-
         private Dictionary<Control, Image> dict { get; set; }
-
         public Pen drawingPen;
-        
-        public Pen[] erasePens;
-
 
         public bool IsClean { get; set; }
-
         public List<IDrawing> Drawings { get; set; }    
 
 
@@ -41,15 +33,13 @@ namespace CaptureImage.Common.DrawingContext
         {
             Dictionary<Control, Image> dict = new Dictionary<Control, Image>();
 
-            for(int i = 0; i< canvasImages.Length; i++)
-            {
+            for (int i = 0; i< canvasImages.Length; i++)
                 dict[canvasControls[i]] = canvasImages[i];
-            }
-
+            
             DrawingContext drawingContext = new DrawingContext()
             {
                 canvasImages = canvasImages,
-                canvasControls = canvasControls,
+                canvasControls = canvasControls,             
                 IsClean = isClean,
                 dict = dict
             };
@@ -63,114 +53,10 @@ namespace CaptureImage.Common.DrawingContext
         {
             return dict[control];
         }
-
-        public void Draw(Action<Graphics, Pen> action, bool onlyOnCanvas = false)
-        {
-            for (int i = 0; i < canvasImages.Length; i++)
-            {
-                Image im = canvasImages[i];
-                Control ct = canvasControls[i];
-
-                if (onlyOnCanvas == false)
-                {
-                    using (Graphics gr = Graphics.FromImage(im))
-                    {
-                        OnSafe(() => action?.Invoke(gr, drawingPen));
-                    }
-                }
-
-                using (Graphics gr = ct.CreateGraphics())
-                {
-                    OnSafe(() => action?.Invoke(gr, drawingPen));
-                }
-
-                IsClean = false;
-            }
-        }
-
-        public void Erase(Action<Graphics, Pen> action, bool onlyOnCanvas = false)
-        {
-            for (int i = 0; i < canvasImages.Length; i++)
-            {
-                Image im = canvasImages[i];
-                Control ct = canvasControls[i];
-                Pen erasePen = erasePens[i];
-
-                if (onlyOnCanvas == false)
-                {
-                    using (Graphics gr = Graphics.FromImage(im))
-                    {
-                        OnSafe(() => action?.Invoke(gr, erasePen));
-                    }
-                }
-
-                using (Graphics gr = ct.CreateGraphics())
-                {
-                    OnSafe(() => action?.Invoke(gr, erasePen));
-                }
-
-                IsClean = false;
-            }
-        }
-
-        public void DrawOverErasingPens(Action<Graphics, Pen> action) 
-        {
-            UpdateErasingPens(gr => action?.Invoke(gr, drawingPen), needClean: false);
-        }
-
-        public void UpdateErasingPens(Action<Graphics> action, bool needClean = true)
-        {
-            if (erasePens == null)
-                erasePens = new Pen[canvasImages.Length];
-            
-
-            for (int i = 0; i < canvasImages.Length; i++)
-            {
-                Image canvasImage = canvasImages[i];
-
-                using (Graphics gr = Graphics.FromImage(canvasImage))
-                {
-                    if (needClean)
-                        gr.DrawImage(cleanImages[i], new PointF(0, 0));
-
-                    action?.Invoke(gr);
-                }
-
-                if (erasePens[i] == null)
-                    erasePens[i] = drawingPen.Clone() as Pen;
-
-                erasePens[i]?.Brush.Dispose();
-                GC.Collect();
-                erasePens[i].Brush = new TextureBrush(canvasImage);
-
-            }
-        }
-
         public void SetColorOfPen(Color color)
         {
             drawingPen.Color = color;
             DrawingContextEdited?.Invoke(this, EventArgs.Empty);
-        }
-
-        public object Clone()
-        {
-            Dictionary<Control, Image> dictClone = new Dictionary<Control, Image>();
-
-            for (int i = 0; i < canvasImages.Length; i++)
-            {
-                dictClone[canvasControls[i]] = canvasImages[i];
-            }
-
-            DrawingContext clone = new DrawingContext()
-            {
-                drawingPen = drawingPen,
-                canvasControls = canvasControls,
-                canvasImages = canvasImages.Select(im => im.Clone() as Image).ToArray(),
-                dict = dictClone,
-                IsClean = IsClean
-            };
-
-            return clone;
         }
 
         private void OnSafe(Action action)
@@ -181,20 +67,86 @@ namespace CaptureImage.Common.DrawingContext
             }
             catch (Exception ex)
             {
-
+                Debug.WriteLine(ex.ToString());
             }
         }
 
-        public void UpdateErasingPens()
+
+
+        public void Draw(Action<Graphics, Pen> action, bool onlyOnCanvas = false)
         {
-            UpdateErasingPens(gr =>
+            drawingPen.Width = MarkerDrawingHelper.GetPenDiameter();
+            for (int i = 0; i < canvasImages.Length; i++)
+            {
+                Image im = canvasImages[i];
+                Control ct = canvasControls[i];
+
+                if (onlyOnCanvas == false)
+                    using (Graphics gr = Graphics.FromImage(im)) { OnSafe(() => action?.Invoke(gr, drawingPen)); }
+
+                using (Graphics gr = ct.CreateGraphics()) { OnSafe(() => action?.Invoke(gr, drawingPen)); }
+
+                IsClean = false;
+            }
+        }
+
+        public void Erase(IDrawing drawing, bool onlyOnCanvas = false)
+        {
+            for (int i = 0; i < canvasImages.Length; i++)
+            {
+                Image im = canvasImages[i];
+                Control ct = canvasControls[i];
+
+                using (TextureBrush texture = new TextureBrush(im))
+                {
+                    using (Pen erasePen = new Pen(texture, drawingPen.Width))
+                    {
+                        if (onlyOnCanvas == false)
+                            using (Graphics gr = Graphics.FromImage(im)) { OnSafe(() => drawing.Erase(gr, erasePen)); }
+
+                        using (Graphics gr = ct.CreateGraphics()) { OnSafe(() => drawing.Erase(gr, erasePen)); }
+                    }
+                }
+
+                ct.Invalidate();
+                GC.Collect();
+
+                IsClean = false;
+            }
+        }
+
+        public void ReRenderDrawings(bool canvasImagesOnly = false)
+        {
+            ReRenderDrawings(gr =>
             {
                 for (int i = 0; i < Drawings.Count; i++)
                 {
                     IDrawing drawing = Drawings[i];
                     drawing.Repaint(gr);
                 }
-            });
+            }, canvasImagesOnly: canvasImagesOnly);
+        }
+
+        public void ReRenderDrawings(Action<Graphics> action, bool needClean = true, bool canvasImagesOnly = false)
+        {
+            for (int i = 0; i < canvasImages.Length; i++)
+            {
+                Image im = canvasImages[i];
+                Control ct = canvasControls[i];
+
+                void ReRender(Graphics gr)
+                {
+                    if (needClean)
+                        gr.DrawImage(cleanImages[i], new PointF(0, 0));
+
+                    action?.Invoke(gr);
+                }
+
+                using (Graphics gr = Graphics.FromImage(im)) { ReRender(gr); }
+
+                if (canvasImagesOnly == false)
+                    using (Graphics gr = ct.CreateGraphics()) { ReRender(gr); }
+            }
         }
 
         public void UndoDrawing()
@@ -202,39 +154,8 @@ namespace CaptureImage.Common.DrawingContext
             if (Drawings.Count > 0)
             {
                 IDrawing lastDrawing = Drawings[Drawings.Count - 1];
-
                 Drawings.RemoveAt(Drawings.Count - 1);
-
-                UpdateErasingPens();
-
-                Erase((gr, pen) =>
-                {
-                    lastDrawing.Paint(gr, pen);
-                });
-            }
-        }
-
-        public void IncreaseWidthOfPen()
-        {
-            if (drawingPen.Width < 20)
-                drawingPen.Width = drawingPen.Width + 1;
-
-            for (int i = 0;i < erasePens.Length; i++)
-            {
-                if (erasePens[i].Width < 20)
-                    erasePens[i].Width = erasePens[i].Width + 1;
-            }
-        }
-
-        public void DecreaseWidthOfPen()
-        {
-            if (drawingPen.Width > 5)
-                drawingPen.Width = drawingPen.Width - 1;
-
-            for (int i = 0; i < erasePens.Length; i++)
-            {
-                if (erasePens[i].Width > 5)
-                    erasePens[i].Width = erasePens[i].Width - 1;
+                ReRenderDrawings();
             }
         }
     }

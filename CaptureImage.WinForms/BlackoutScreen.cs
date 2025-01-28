@@ -21,6 +21,11 @@ namespace CaptureImage.WinForms
         {
             InitializeComponent();
 
+            SetStyle(ControlStyles.AllPaintingInWmPaint |
+            ControlStyles.UserPaint |
+            ControlStyles.OptimizedDoubleBuffer, true);
+            UpdateStyles();
+
             this.appContext = appContext;
             this.appContext.DrawingContextChanged += AppContext_DrawingContextChanged;
             
@@ -54,8 +59,8 @@ namespace CaptureImage.WinForms
 
         public void SwitchToSelectingMode()
         {
-            selectingTool.Activate();
-            drawingTool.Deactivate();
+            selectingTool?.Activate();
+            drawingTool?.Deactivate();
             Mode = Mode.Selecting;
         }
 

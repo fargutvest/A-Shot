@@ -21,7 +21,6 @@ namespace CaptureImage.Common.Tools
             this.drawingContextProvider = drawingContextProvider;
             this.state = DrawingState.None;
             mousePreviousPos = new Point(0, 0);
-            DrawingContext.UpdateErasingPens();
         }
 
         public void MouseMove(Point mouse)
@@ -36,7 +35,6 @@ namespace CaptureImage.Common.Tools
                     line = new Line(mousePreviousPos, mouse);
                     curve.AddLine(line);
                     DrawingContext.Draw(line.Paint);
-                    DrawingContext.DrawOverErasingPens(line.Paint);
                 }
 
                 MarkerDrawingHelper.DrawMarker(DrawingContext, line, mouse);
@@ -60,7 +58,6 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 DrawingContext.Drawings.Add(curve);
-                DrawingContext.UpdateErasingPens();
                 state = DrawingState.None;
             }
         }

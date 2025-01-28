@@ -5,7 +5,9 @@ namespace CaptureImage.Common.Drawings
     public class Rect : IDrawing
     {
         private Rectangle rectangle;
-        private Pen drawedByPen;
+        private Color drawedPenColor;
+        private float drawedPenWidth;
+        private bool isDrawed;
 
         public Rect(Rectangle rectangle)
         {
@@ -15,13 +17,18 @@ namespace CaptureImage.Common.Drawings
         public void Paint(Graphics gr, Pen pen)
         {
             PaintInternal(gr, pen);
-            drawedByPen = pen.Clone() as Pen;
+            isDrawed = true;
+            drawedPenColor = pen.Color;
+            drawedPenWidth = pen.Width;
         }
 
         public void Repaint(Graphics gr)
         {
-            if (drawedByPen != null)
-                PaintInternal(gr, drawedByPen);
+            if(isDrawed)
+            {
+                using (Pen pen = new Pen(drawedPenColor, drawedPenWidth))
+                    PaintInternal(gr, pen);
+            }
         }
 
         private void PaintInternal(Graphics gr, Pen pen)
@@ -31,7 +38,11 @@ namespace CaptureImage.Common.Drawings
 
         public void Erase(Graphics gr, Pen erasePen)
         {
-            throw new System.NotImplementedException();
+            if (isDrawed)
+            {
+                erasePen.Width = drawedPenWidth;
+                PaintInternal(gr, erasePen);
+            }
         }
 
     }

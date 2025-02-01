@@ -14,8 +14,9 @@ namespace CaptureImage.Common.DrawingContext
         public static readonly Pen DefaultDrawingPen = new Pen(Color.Yellow, MarkerDrawingHelper.GetPenDiameter());
         public event EventHandler DrawingContextEdited;
         public Image[] canvasImages;
+        public Image[] eraseImages;
         public Image[] cleanImages;
-        private Control[] canvasControls;
+        public Control[] canvasControls;
         private Dictionary<Control, Image> dict { get; set; }
         public Pen drawingPen;
 
@@ -45,6 +46,7 @@ namespace CaptureImage.Common.DrawingContext
             };
 
             drawingContext.cleanImages = canvasImages.Select(img => img.Clone() as Image).ToArray();
+            drawingContext.eraseImages = canvasImages.Select(img => img.Clone() as Image).ToArray();
 
             return drawingContext;
         }
@@ -146,6 +148,25 @@ namespace CaptureImage.Common.DrawingContext
 
                 if (canvasImagesOnly == false)
                     using (Graphics gr = ct.CreateGraphics()) { ReRender(gr); }
+            }
+        }
+
+        public void ReRenderDrawings()
+        {
+            for (int i = 0; i < canvasImages.Length; i++)
+            {
+                Image im = canvasImages[i];
+                Control ct = canvasControls[i];
+                using (Graphics gr = ct.CreateGraphics()) { gr.DrawImage(canvasImages[i], new PointF(0, 0)); }
+            }
+        }
+
+        public void UpdateEraseImages()
+        {
+            for (int i = 0; i < canvasImages.Length; i++)
+            {
+                eraseImages[i].Dispose();
+                eraseImages[i] = canvasImages[i].Clone() as Image;
             }
         }
 

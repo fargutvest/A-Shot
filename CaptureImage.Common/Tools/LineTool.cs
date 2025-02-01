@@ -26,7 +26,6 @@ namespace CaptureImage.Common.Tools
             this.state = DrawingState.None;
 
             mouseStartPos = new Point(0, 0);
-            DrawingContext.ReRenderDrawings();
         }
 
         public virtual void MouseDown(Point mousePosition)
@@ -62,6 +61,7 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 DrawingContext.Drawings.Add(line);
+                line = null;
                 state = DrawingState.None;
             }
         }

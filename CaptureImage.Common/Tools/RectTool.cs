@@ -56,6 +56,7 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 DrawingContext.Drawings.Add(rect);
+                rect = null;
                 state = DrawingState.None;
             }
         }

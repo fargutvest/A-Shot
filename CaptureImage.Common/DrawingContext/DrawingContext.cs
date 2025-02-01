@@ -180,7 +180,7 @@ namespace CaptureImage.Common.DrawingContext
             {
                 IDrawing lastDrawing = Drawings[Drawings.Count - 1];
                 Drawings.RemoveAt(Drawings.Count - 1);
-                ReRenderDrawings();
+                ReRenderDrawings(DrawingTarget.CanvasAndImage);
             }
         }
     }

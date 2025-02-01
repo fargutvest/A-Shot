@@ -16,7 +16,6 @@ namespace CaptureImage.Common.Tools
         public ArrowTool(IDrawingContextProvider drawingContextProvider) : base (drawingContextProvider)
         {
             endCap = new AdjustableArrowCap(4, 7);
-            DrawingContext.ReRenderDrawings();
         }
 
         public override void MouseDown(Point mousePosition)
@@ -50,6 +49,7 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 DrawingContext.Drawings.Add(arrow);
+                arrow = null;
                 state = DrawingState.None;
             }
         }

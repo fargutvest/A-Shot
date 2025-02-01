@@ -1,4 +1,5 @@
-﻿using CaptureImage.Common.Drawings;
+﻿using CaptureImage.Common.DrawingContext;
+using CaptureImage.Common.Drawings;
 using System.Drawing;
 
 namespace CaptureImage.Common.Helpers
@@ -32,7 +33,7 @@ namespace CaptureImage.Common.Helpers
         public static void EraseMarker(DrawingContext.DrawingContext drawingContext)
         {
             if (marker != null)
-                drawingContext.Erase(marker, onlyOnCanvas: true);
+                drawingContext.Erase(marker, DrawingTarget.CanvasOnly);
         }
 
         public static void DrawMarker(DrawingContext.DrawingContext drawingContext, IDrawing latestDrawing, Point location)
@@ -44,7 +45,7 @@ namespace CaptureImage.Common.Helpers
             {
                 marker = GetMarker(location);
                 marker.Paint(gr, markerPen);
-            }, onlyOnCanvas: true);
+            }, DrawingTarget.CanvasOnly);
         }
     }
 }

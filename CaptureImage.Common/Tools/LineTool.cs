@@ -46,8 +46,8 @@ namespace CaptureImage.Common.Tools
 
                 if (state == DrawingState.Drawing)
                 {
-                    DrawingContext.ReRenderDrawings(canvasImagesOnly: true);
-                    DrawingContext.Erase(line, onlyOnCanvas:true);
+                    DrawingContext.ReRenderDrawings(DrawingTarget.ImageOnly);
+                    DrawingContext.Erase(line, DrawingTarget.CanvasOnly);
                     line = new Line(mouseStartPos, mouse);
                     DrawingContext.Draw(line.Paint);
                 }

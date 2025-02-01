@@ -75,7 +75,7 @@ namespace CaptureImage.Common.DrawingContext
 
 
 
-        public void Draw(Action<Graphics, Pen> action, bool onlyOnCanvas = false)
+        public void Draw(Action<Graphics, Pen> action, DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
         {
             drawingPen.Width = MarkerDrawingHelper.GetPenDiameter();
             for (int i = 0; i < canvasImages.Length; i++)
@@ -83,16 +83,17 @@ namespace CaptureImage.Common.DrawingContext
                 Image im = canvasImages[i];
                 Control ct = canvasControls[i];
 
-                if (onlyOnCanvas == false)
-                    using (Graphics gr = Graphics.FromImage(im)) { OnSafe(() => action?.Invoke(gr, drawingPen)); }
+                if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
+                    using (Graphics gr = ct.CreateGraphics()) { OnSafe(() => action?.Invoke(gr, drawingPen)); }
 
-                using (Graphics gr = ct.CreateGraphics()) { OnSafe(() => action?.Invoke(gr, drawingPen)); }
+                if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
+                    using (Graphics gr = Graphics.FromImage(im)) { OnSafe(() => action?.Invoke(gr, drawingPen)); }
 
                 IsClean = false;
             }
         }
 
-        public void Erase(IDrawing drawing, bool onlyOnCanvas = false)
+        public void Erase(IDrawing drawing, DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
         {
             for (int i = 0; i < canvasImages.Length; i++)
             {
@@ -103,10 +104,11 @@ namespace CaptureImage.Common.DrawingContext
                 {
                     using (Pen erasePen = new Pen(texture, drawingPen.Width))
                     {
-                        if (onlyOnCanvas == false)
-                            using (Graphics gr = Graphics.FromImage(im)) { OnSafe(() => drawing.Erase(gr, erasePen)); }
+                        if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
+                            using (Graphics gr = ct.CreateGraphics()) { OnSafe(() => drawing.Erase(gr, erasePen)); }
 
-                        using (Graphics gr = ct.CreateGraphics()) { OnSafe(() => drawing.Erase(gr, erasePen)); }
+                        if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
+                            using (Graphics gr = Graphics.FromImage(im)) { OnSafe(() => drawing.Erase(gr, erasePen)); }
                     }
                 }
 
@@ -117,7 +119,7 @@ namespace CaptureImage.Common.DrawingContext
             }
         }
 
-        public void ReRenderDrawings(bool canvasImagesOnly = false)
+        public void ReRenderDrawings(DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
         {
             ReRenderDrawings(gr =>
             {
@@ -126,10 +128,11 @@ namespace CaptureImage.Common.DrawingContext
                     IDrawing drawing = Drawings[i];
                     drawing.Repaint(gr);
                 }
-            }, canvasImagesOnly: canvasImagesOnly);
+            }, needClean: true, drawingTarget);
         }
 
-        public void ReRenderDrawings(Action<Graphics> action, bool needClean = true, bool canvasImagesOnly = false)
+        public void ReRenderDrawings(Action<Graphics> action, bool needClean = true,
+            DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
         {
             for (int i = 0; i < canvasImages.Length; i++)
             {
@@ -144,10 +147,11 @@ namespace CaptureImage.Common.DrawingContext
                     action?.Invoke(gr);
                 }
 
-                using (Graphics gr = Graphics.FromImage(im)) { ReRender(gr); }
-
-                if (canvasImagesOnly == false)
+                if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
                     using (Graphics gr = ct.CreateGraphics()) { ReRender(gr); }
+
+                if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
+                    using (Graphics gr = Graphics.FromImage(im)) { ReRender(gr); }
             }
         }
 

@@ -35,7 +35,7 @@ namespace CaptureImage.Common.Tools
                 MarkerDrawingHelper.EraseMarker(DrawingContext);
                 if (state == DrawingState.Drawing)
                 {
-                    DrawingContext.ReRenderDrawings(canvasImagesOnly: true);
+                    DrawingContext.ReRenderDrawings(DrawingTarget.ImageOnly);
                     DrawingContext.Erase(arrow);
                     arrow = new Arrow(mouseStartPos, mouse, endCap);
                     DrawingContext.Draw(arrow.Paint);

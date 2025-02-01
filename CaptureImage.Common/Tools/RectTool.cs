@@ -41,8 +41,8 @@ namespace CaptureImage.Common.Tools
                 MarkerDrawingHelper.EraseMarker(DrawingContext);
                 if (state == DrawingState.Drawing)
                 {
-                    DrawingContext.ReRenderDrawings(canvasImagesOnly: true);
-                    DrawingContext.Erase(rect, onlyOnCanvas: true);
+                    DrawingContext.ReRenderDrawings(DrawingTarget.CanvasOnly);
+                    DrawingContext.Erase(rect, DrawingTarget.CanvasOnly);
                     rect = new Rect(GetRectangle(mouseStartPos, mouse));
                     DrawingContext.Draw(rect.Paint);
                 }

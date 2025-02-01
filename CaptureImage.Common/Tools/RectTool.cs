@@ -46,7 +46,7 @@ namespace CaptureImage.Common.Tools
                     rect = new Rect(GetRectangle(mouseStartPos, mouse));
                     DrawingContext.Draw(rect.Paint);
                 }
-                MarkerDrawingHelper.DrawMarker(DrawingContext, rect, mouse);
+                MarkerDrawingHelper.DrawMarker(DrawingContext, mouse);
                 mousePreviousPos = mouse;
             }
         }
@@ -56,7 +56,6 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 DrawingContext.Drawings.Add(rect);
-                rect = null;
                 state = DrawingState.None;
             }
         }

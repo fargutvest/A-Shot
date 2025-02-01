@@ -39,7 +39,7 @@ namespace CaptureImage.Common.Tools
                     arrow = new Arrow(mouseStartPos, mouse, endCap);
                     DrawingContext.Draw(arrow.Paint);
                 }
-                MarkerDrawingHelper.DrawMarker(DrawingContext, arrow, mouse);
+                MarkerDrawingHelper.DrawMarker(DrawingContext, mouse);
                 mousePreviousPos = mouse;
             }
         }
@@ -49,7 +49,6 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 DrawingContext.Drawings.Add(arrow);
-                arrow = null;
                 state = DrawingState.None;
             }
         }

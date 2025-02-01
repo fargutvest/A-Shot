@@ -51,7 +51,7 @@ namespace CaptureImage.Common.Tools
                     DrawingContext.Draw(line.Paint);
                 }
 
-                MarkerDrawingHelper.DrawMarker(DrawingContext, line, mouse);
+                MarkerDrawingHelper.DrawMarker(DrawingContext, mouse);
                 mousePreviousPos = mouse;
             }
         }
@@ -61,7 +61,6 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 DrawingContext.Drawings.Add(line);
-                line = null;
                 state = DrawingState.None;
             }
         }

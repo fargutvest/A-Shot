@@ -36,6 +36,11 @@ namespace CaptureImage.Common.Helpers
                 drawingContext.Erase(marker, DrawingTarget.CanvasOnly);
         }
 
+        public static void DrawMarker(DrawingContext.DrawingContext drawingContext, Point location) 
+        {
+            DrawMarker(drawingContext, latestDrawing: null, location);
+        }
+
         public static void DrawMarker(DrawingContext.DrawingContext drawingContext, IDrawing latestDrawing, Point location)
         {
             if (latestDrawing != null)

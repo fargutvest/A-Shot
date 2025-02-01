@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace CaptureImage.Common.DrawingContext
 {
@@ -13,11 +11,11 @@ namespace CaptureImage.Common.DrawingContext
     {
         public static readonly Pen DefaultDrawingPen = new Pen(Color.Yellow, MarkerDrawingHelper.GetPenDiameter());
         public event EventHandler DrawingContextEdited;
-        public Image[] canvasImages;
-        public Image[] eraseImages;
-        public Image[] cleanImages;
-        public Control[] canvasControls;
-        private Dictionary<Control, Image> dict { get; set; }
+        public Image canvasImage;
+        public Image eraseImage;
+        public Image cleanImage;
+        public ICanvas canvasControl;
+
         public Pen drawingPen;
 
         public bool IsClean { get; set; }
@@ -30,31 +28,26 @@ namespace CaptureImage.Common.DrawingContext
             Drawings = new List<IDrawing>();
         }
 
-        public static DrawingContext Create(Image[] canvasImages, Control[] canvasControls, bool isClean = false)
+        public static DrawingContext Create(Image canvasImage, ICanvas canvasControl, bool isClean = false)
         {
-            Dictionary<Control, Image> dict = new Dictionary<Control, Image>();
-
-            for (int i = 0; i< canvasImages.Length; i++)
-                dict[canvasControls[i]] = canvasImages[i];
-            
             DrawingContext drawingContext = new DrawingContext()
             {
-                canvasImages = canvasImages,
-                canvasControls = canvasControls,             
+                canvasImage = canvasImage,
+                canvasControl = canvasControl,             
                 IsClean = isClean,
-                dict = dict
             };
 
-            drawingContext.cleanImages = canvasImages.Select(img => img.Clone() as Image).ToArray();
-            drawingContext.eraseImages = canvasImages.Select(img => img.Clone() as Image).ToArray();
+            drawingContext.cleanImage = canvasImage.Clone() as Image;
+            drawingContext.eraseImage = canvasImage.Clone() as Image;
 
             return drawingContext;
         }
 
-        public Image GetImage(Control control)
+        public Image GetImage()
         {
-            return dict[control];
+            return canvasImage;
         }
+
         public void SetColorOfPen(Color color)
         {
             drawingPen.Color = color;
@@ -78,45 +71,34 @@ namespace CaptureImage.Common.DrawingContext
         public void Draw(Action<Graphics, Pen> action, DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
         {
             drawingPen.Width = MarkerDrawingHelper.GetPenDiameter();
-            for (int i = 0; i < canvasImages.Length; i++)
-            {
-                Image im = canvasImages[i];
-                Control ct = canvasControls[i];
 
-                if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
-                    using (Graphics gr = ct.CreateGraphics()) { OnSafe(() => action?.Invoke(gr, drawingPen)); }
+            if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
+                canvasControl.OnGraphics(gr => OnSafe(() => action?.Invoke(gr, drawingPen)));
 
-                if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
-                    using (Graphics gr = Graphics.FromImage(im)) { OnSafe(() => action?.Invoke(gr, drawingPen)); }
+            if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
+                using (Graphics gr = Graphics.FromImage(canvasImage)) { OnSafe(() => action?.Invoke(gr, drawingPen)); }
 
-                IsClean = false;
-            }
+            IsClean = false;
         }
 
         public void Erase(IDrawing drawing, DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
         {
-            for (int i = 0; i < canvasImages.Length; i++)
+            using (TextureBrush texture = new TextureBrush(canvasImage))
             {
-                Image im = canvasImages[i];
-                Control ct = canvasControls[i];
-
-                using (TextureBrush texture = new TextureBrush(im))
+                using (Pen erasePen = new Pen(texture, drawingPen.Width))
                 {
-                    using (Pen erasePen = new Pen(texture, drawingPen.Width))
-                    {
-                        if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
-                            using (Graphics gr = ct.CreateGraphics()) { OnSafe(() => drawing.Erase(gr, erasePen)); }
+                    if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
+                        canvasControl.OnGraphics(gr => OnSafe(() => drawing.Erase(gr, erasePen)));
 
-                        if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
-                            using (Graphics gr = Graphics.FromImage(im)) { OnSafe(() => drawing.Erase(gr, erasePen)); }
-                    }
+                    if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
+                        using (Graphics gr = Graphics.FromImage(canvasImage)) { OnSafe(() => drawing.Erase(gr, erasePen)); }
                 }
-
-                ct.Invalidate();
-                GC.Collect();
-
-                IsClean = false;
             }
+
+            canvasControl.Refresh();
+            GC.Collect();
+
+            IsClean = false;
         }
 
         public void ReRenderDrawings(DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
@@ -134,44 +116,30 @@ namespace CaptureImage.Common.DrawingContext
         public void ReRenderDrawings(Action<Graphics> action, bool needClean = true,
             DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
         {
-            for (int i = 0; i < canvasImages.Length; i++)
+            void ReRender(Graphics gr)
             {
-                Image im = canvasImages[i];
-                Control ct = canvasControls[i];
+                if (needClean)
+                    gr.DrawImage(cleanImage, new PointF(0, 0));
 
-                void ReRender(Graphics gr)
-                {
-                    if (needClean)
-                        gr.DrawImage(cleanImages[i], new PointF(0, 0));
-
-                    action?.Invoke(gr);
-                }
-
-                if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
-                    using (Graphics gr = ct.CreateGraphics()) { ReRender(gr); }
-
-                if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
-                    using (Graphics gr = Graphics.FromImage(im)) { ReRender(gr); }
+                action?.Invoke(gr);
             }
+
+            if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
+                canvasControl.OnGraphics(gr => ReRender(gr));
+
+            if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
+                using (Graphics gr = Graphics.FromImage(canvasImage)) { ReRender(gr); }
         }
 
         public void ReRenderDrawings()
         {
-            for (int i = 0; i < canvasImages.Length; i++)
-            {
-                Image im = canvasImages[i];
-                Control ct = canvasControls[i];
-                using (Graphics gr = ct.CreateGraphics()) { gr.DrawImage(canvasImages[i], new PointF(0, 0)); }
-            }
+            canvasControl.OnGraphics(gr => gr.DrawImage(canvasImage, new PointF(0, 0)));
         }
 
         public void UpdateEraseImages()
         {
-            for (int i = 0; i < canvasImages.Length; i++)
-            {
-                eraseImages[i].Dispose();
-                eraseImages[i] = canvasImages[i].Clone() as Image;
-            }
+            eraseImage.Dispose();
+            eraseImage = canvasImage.Clone() as Image;
         }
 
         public void UndoDrawing()

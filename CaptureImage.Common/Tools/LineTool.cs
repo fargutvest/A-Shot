@@ -22,9 +22,7 @@ namespace CaptureImage.Common.Tools
         public LineTool(IDrawingContextProvider drawingContextProvider)
         {
             this.drawingContextProvider = drawingContextProvider;
-
             this.state = DrawingState.None;
-
             mouseStartPos = new Point(0, 0);
         }
 
@@ -61,6 +59,7 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 DrawingContext.Drawings.Add(line);
+                line = null;
                 state = DrawingState.None;
             }
         }

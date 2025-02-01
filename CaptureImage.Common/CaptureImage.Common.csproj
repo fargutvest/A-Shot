@@ -68,6 +68,7 @@
     <Compile Include="Helpers\HotKeys\WinApi\POINT.cs" />
     <Compile Include="Helpers\MarkerDrawingHelper.cs" />
     <Compile Include="Helpers\ScreensHelper.cs" />
+    <Compile Include="ICanvas.cs" />
     <Compile Include="IThumb.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScreenInfo.cs" />

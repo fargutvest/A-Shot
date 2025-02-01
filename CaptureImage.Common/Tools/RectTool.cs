@@ -39,13 +39,15 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 MarkerDrawingHelper.EraseMarker(DrawingContext);
+
                 if (state == DrawingState.Drawing)
                 {
-                    DrawingContext.ReRenderDrawings(DrawingTarget.CanvasOnly);
+                    DrawingContext.ReRenderDrawings(DrawingTarget.ImageOnly);
                     DrawingContext.Erase(rect, DrawingTarget.CanvasOnly);
                     rect = new Rect(GetRectangle(mouseStartPos, mouse));
                     DrawingContext.Draw(rect.Paint);
                 }
+
                 MarkerDrawingHelper.DrawMarker(DrawingContext, mouse);
                 mousePreviousPos = mouse;
             }

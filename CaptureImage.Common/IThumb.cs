@@ -8,9 +8,8 @@ namespace CaptureImage.Common
         bool Visible { get; set; }
         
         Point Location { get; set; }
-        void SetSize(Size size);
+        void SetSize(Size size, Rectangle rect);
         void Refresh();
-
         void HidePanels();
         void ShowPanels();
     }

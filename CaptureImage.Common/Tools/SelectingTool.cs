@@ -79,7 +79,7 @@ namespace CaptureImage.Common.Tools
             {
                 handleRectangles = selector.HandleRectangles;
                 selector.Visible = false;
-                selector.SetSize(selectingRect.Size);
+                selector.SetSize(selectingRect.Size, selectingRect);
                 selector.Location = selectingRect.Location;
                 selector.Visible = true;
 

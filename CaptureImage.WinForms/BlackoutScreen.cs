@@ -4,13 +4,14 @@ using System.Windows.Forms;
 using CaptureImage.Common.Extensions;
 using System.Linq;
 using System;
+using CaptureImage.Common;
 
 namespace CaptureImage.WinForms
 {
-    public partial class BlackoutScreen : Form
+    public partial class BlackoutScreen : Form, ICanvas
     {
         private bool isInit = true;
-        private Thumb.Thumb thumb;
+        public Thumb.Thumb thumb;
         public SelectingTool selectingTool;
         private ITool drawingTool;
 
@@ -58,7 +59,7 @@ namespace CaptureImage.WinForms
 
         private void AppContext_DrawingContextChanged(object sender, System.EventArgs e)
         {
-            BackgroundImage = appContext.DrawingContext.GetImage(this);
+            BackgroundImage = appContext.DrawingContext.GetImage();
         }
 
         public void SwitchToSelectingMode()
@@ -174,6 +175,12 @@ namespace CaptureImage.WinForms
         private void BlackoutScreen_KeyDown(object sender, KeyEventArgs e)
         {
            
+        }
+
+        public void OnGraphics(Action<Graphics> action)
+        {
+            using (Graphics gr = this.CreateGraphics()) { action?.Invoke(gr); }
+            thumb.Refresh();
         }
     }
 }

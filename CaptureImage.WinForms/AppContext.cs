@@ -16,9 +16,9 @@ namespace CaptureImage.WinForms
         private NotifyIcon trayIcon;
         private HotKeysHelper hotKeysHelper;
         private MouseHookHelper mouseHookHelper;
-        private FreezeScreen freezeScreen;
         private BlackoutScreen blackoutScreen;
         private bool isSessionOn;
+        private Bitmap screenShot;
 
         private DrawingContext drawingContext;
         public DrawingContext DrawingContext
@@ -58,10 +58,7 @@ namespace CaptureImage.WinForms
                     new MenuItem("Выход", Exit)}),
             };
 
-            freezeScreen = new FreezeScreen(this);
             blackoutScreen = new BlackoutScreen(this);
-            blackoutScreen.TransparencyKey = Color.Red;
-            blackoutScreen.AllowTransparency = true;
         }
 
         private void MouseHookHelper_MouseWheel(object sender, int e)
@@ -107,7 +104,6 @@ namespace CaptureImage.WinForms
 
         public void EndSession()
         {
-            freezeScreen.Hide();
             blackoutScreen.Hide();
             blackoutScreen.ResetSelection();
             isSessionOn = false;
@@ -120,25 +116,12 @@ namespace CaptureImage.WinForms
 
             DesktopInfo desktopInfo = ScreensHelper.GetDesktopInfo();
 
-            Image[] images = new Image[]
-            {
-                desktopInfo.Background,
-                BitmapHelper.DarkenImage(desktopInfo.Background, 0.5f)
-            };
+            screenShot = desktopInfo.Background;
 
-            Control[] controls = new Control[] 
-            {
-                freezeScreen,
-                blackoutScreen
-            };
+            DrawingContext = DrawingContext.Create(BitmapHelper.DarkenImage(desktopInfo.Background, 0.5f), 
+                blackoutScreen, isClean: true);
 
-            DrawingContext = DrawingContext.Create(images, controls, isClean: true);
-
-            ConfigureForm(freezeScreen, desktopInfo);
             ConfigureForm(blackoutScreen, desktopInfo);
-
-            freezeScreen.Invalidate();
-            freezeScreen.Show();
 
             blackoutScreen.Invalidate();
             blackoutScreen.Show();
@@ -148,7 +131,10 @@ namespace CaptureImage.WinForms
 
         private Bitmap GetScreenshot(Rectangle rect)
         {
-            return BitmapHelper.Crop((Bitmap)freezeScreen.BackgroundImage, rect);
+            if (screenShot != null)
+                return BitmapHelper.Crop((Bitmap)screenShot, rect);
+
+            return null;
         }
 
         public void MakeScreenshot()

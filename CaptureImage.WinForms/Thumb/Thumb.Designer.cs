@@ -35,7 +35,6 @@ namespace CaptureImage.WinForms.Thumb
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.Red;
             this.Name = "Thumb";
             this.Padding = new System.Windows.Forms.Padding(10);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Thumb_Paint);

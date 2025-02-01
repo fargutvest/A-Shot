@@ -45,6 +45,12 @@ namespace CaptureImage.WinForms.Thumb
 
             InitializeComponent();
 
+            this.DoubleBuffered = true;
+            SetStyle(ControlStyles.AllPaintingInWmPaint |
+            ControlStyles.UserPaint |
+            ControlStyles.OptimizedDoubleBuffer, true);
+            UpdateStyles();
+
             // displaySizeLabel
             this.displaySizeLabel = new Label();
             this.displaySizeLabel.AutoSize = true;

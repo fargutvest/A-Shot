@@ -2,7 +2,7 @@
 
 namespace CaptureImage.WinForms
 {
-    public partial class FreezeScreen : ScreenBase
+    public partial class FreezeScreen : Form
     {
         private AppContext appContext;
 
@@ -10,6 +10,9 @@ namespace CaptureImage.WinForms
         {
             InitializeComponent();
 
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.StartPosition = FormStartPosition.Manual;
+            this.DoubleBuffered = true;
             SetStyle(ControlStyles.AllPaintingInWmPaint |
             ControlStyles.UserPaint |
             ControlStyles.OptimizedDoubleBuffer, true);

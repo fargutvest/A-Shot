@@ -3,10 +3,11 @@ using System.Drawing;
 using System.Windows.Forms;
 using CaptureImage.Common.Extensions;
 using System.Linq;
+using System;
 
 namespace CaptureImage.WinForms
 {
-    public partial class BlackoutScreen : ScreenBase
+    public partial class BlackoutScreen : Form
     {
         private bool isInit = true;
         private Thumb.Thumb thumb;
@@ -21,6 +22,9 @@ namespace CaptureImage.WinForms
         {
             InitializeComponent();
 
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.StartPosition = FormStartPosition.Manual;
+            this.DoubleBuffered = true;
             SetStyle(ControlStyles.AllPaintingInWmPaint |
             ControlStyles.UserPaint |
             ControlStyles.OptimizedDoubleBuffer, true);
@@ -139,9 +143,14 @@ namespace CaptureImage.WinForms
 
         private void BlackoutScreen_MouseMove(object sender, MouseEventArgs e)
         {
-            selectingTool.MouseMove(e.Location, this);
+            MouseMoveEvent(e.Location);
+        }
+
+        private void MouseMoveEvent(Point mouse)
+        {
+            selectingTool.MouseMove(mouse, this);
             selectingTool.Paint(this.thumb);
-            drawingTool?.MouseMove(e.Location);
+            drawingTool?.MouseMove(mouse);
         }
 
         private void BlackoutScreen_MouseUp(object sender, MouseEventArgs e)

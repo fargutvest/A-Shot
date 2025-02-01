@@ -67,12 +67,6 @@
     <Compile Include="BlackoutScreen.Designer.cs">
       <DependentUpon>BlackoutScreen.cs</DependentUpon>
     </Compile>
-    <Compile Include="ScreenBase.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ScreenBase.Designer.cs">
-      <DependentUpon>ScreenBase.cs</DependentUpon>
-    </Compile>
     <Compile Include="Thumb\Thumb.cs">
       <SubType>UserControl</SubType>
     </Compile>

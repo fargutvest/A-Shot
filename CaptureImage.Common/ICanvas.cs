@@ -9,6 +9,8 @@ namespace CaptureImage.Common
 
         Rectangle ClientRectangle { get; }
 
+        IThumb GetThumb { get; }
+
         Image BackgroundImage { get; set; }
 
         void Refresh();

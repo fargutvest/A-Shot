@@ -189,5 +189,7 @@ namespace CaptureImage.WinForms
                 });
             }
         }
+
+        public IThumb GetThumb => thumb;
     }
 }

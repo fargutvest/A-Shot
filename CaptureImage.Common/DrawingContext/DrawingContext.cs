@@ -90,9 +90,23 @@ namespace CaptureImage.Common.DrawingContext
         {
             canvasControl.OnGraphics((gr, callBack) =>
             {
-                GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, bufferedGr =>
+                Rectangle destRectangleThumb = new Rectangle(0, 0, canvasControl.GetThumb.SelectionRectangle.Width, canvasControl.GetThumb.SelectionRectangle.Height);
+
+                GraphicsHelper.OnBufferedGraphics(gr, callBack!= null? destRectangleThumb : canvasControl.ClientRectangle, bufferedGr =>
                 {
-                    bufferedGr.DrawImage(canvasImage, new Point(0, 0));
+                    if (callBack != null)
+                    {
+                        
+                        bufferedGr.DrawImage(canvasImage, destRectangleThumb, canvasControl.GetThumb.SelectionRectangle, GraphicsUnit.Pixel);
+                    }
+                    else
+                    {
+                        Rectangle destRectangle = new Rectangle(0, 0, canvasControl.ClientRectangle.Width, canvasControl.ClientRectangle.Height);
+                        bufferedGr.DrawImage(canvasImage, destRectangle, destRectangle, GraphicsUnit.Pixel);
+                    }
+                   
+
+
                     drawingPen.Width = MarkerDrawingHelper.GetPenDiameter();
                     SafeHelper.OnSafe(() => drawing.Paint(bufferedGr, drawingPen));
                     callBack?.Invoke(bufferedGr);
@@ -103,9 +117,21 @@ namespace CaptureImage.Common.DrawingContext
 
         public void ReRenderDrawings()
         {
-            void ReRender(Graphics gr)
+            Rectangle destRectangleThumb = new Rectangle(0, 0, canvasControl.GetThumb.SelectionRectangle.Width, canvasControl.GetThumb.SelectionRectangle.Height);
+
+            void ReRender(Graphics gr, bool forThumb)
             {
-                gr.DrawImage(cleanImage, new PointF(0, 0));
+                if (forThumb)
+                {
+                   
+                    gr.DrawImage(cleanImage, destRectangleThumb, canvasControl.GetThumb.SelectionRectangle, GraphicsUnit.Pixel);
+                }
+                else
+                {
+                    Rectangle destRectangle = new Rectangle(0, 0, canvasControl.ClientRectangle.Width, canvasControl.ClientRectangle.Height);
+                    gr.DrawImage(cleanImage, destRectangle, destRectangle, GraphicsUnit.Pixel);
+                }
+
 
                 foreach (IDrawing drawing in Drawings)
                     drawing.Repaint(gr);
@@ -113,16 +139,16 @@ namespace CaptureImage.Common.DrawingContext
 
             canvasControl.OnGraphics((gr, callBack) =>
             {
-                GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, bufferedGr =>
+                GraphicsHelper.OnBufferedGraphics(gr, callBack!= null ? destRectangleThumb : canvasControl.ClientRectangle, bufferedGr =>
                 {
-                    ReRender(bufferedGr);
+                    ReRender(bufferedGr, forThumb: callBack != null);
                     callBack?.Invoke(bufferedGr);
                 });
             });
 
             using (Graphics gr = Graphics.FromImage(canvasImage))
             {
-                GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, ReRender);
+                GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, bufferedGr=> ReRender(bufferedGr, forThumb: false));
             }
         }
 

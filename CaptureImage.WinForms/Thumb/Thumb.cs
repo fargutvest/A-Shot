@@ -183,10 +183,10 @@ namespace CaptureImage.WinForms.Thumb
 
         private void Thumb_Paint(object sender, PaintEventArgs e)
         {
-            if (selectionRectangle.Width > 0 && selectionRectangle.Height > 0)
+            if (SelectionRectangle.Width > 0 && SelectionRectangle.Height > 0)
             {
                 Rectangle thumbRect = new Rectangle(0, 0, Width, Height);
-                e.Graphics.DrawImage(appContext.DrawingContext.canvasImage, thumbRect, selectionRectangle, GraphicsUnit.Pixel);
+                e.Graphics.DrawImage(appContext.DrawingContext.canvasImage, thumbRect, SelectionRectangle, GraphicsUnit.Pixel);
             }
 
             DrawBorder(e.Graphics);
@@ -219,12 +219,13 @@ namespace CaptureImage.WinForms.Thumb
             }
         }
 
-        private Rectangle selectionRectangle;
+        public Rectangle SelectionRectangle { get; private set; }
+
         public void SetSize(Size size, Rectangle rect)
         {
             this.Size = size;
             this.displaySizeLabel.Visible = size.Width > 0 && size.Height > 0;
-            selectionRectangle = rect;  
+            SelectionRectangle = rect;  
         }
 
         public void ShowPanels()

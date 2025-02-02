@@ -67,6 +67,7 @@
     <Compile Include="Helpers\HotKeys\WinApi\MSLLHOOKSTRUCT.cs" />
     <Compile Include="Helpers\HotKeys\WinApi\POINT.cs" />
     <Compile Include="Helpers\MarkerDrawingHelper.cs" />
+    <Compile Include="Helpers\SafeHelper.cs" />
     <Compile Include="Helpers\ScreensHelper.cs" />
     <Compile Include="ICanvas.cs" />
     <Compile Include="IThumb.cs" />

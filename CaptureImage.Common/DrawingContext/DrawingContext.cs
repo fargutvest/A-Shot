@@ -52,29 +52,15 @@ namespace CaptureImage.Common.DrawingContext
             DrawingContextEdited?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnSafe(Action action)
-        {
-            try
-            {
-                action?.Invoke();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.ToString());
-            }
-        }
-
-
-
         public void Draw(Action<Graphics, Pen> action, DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
         {
             drawingPen.Width = MarkerDrawingHelper.GetPenDiameter();
 
             if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
-                canvasControl.OnGraphics(gr => OnSafe(() => action?.Invoke(gr, drawingPen)));
+                canvasControl.OnGraphics(gr => SafeHelper.OnSafe(() => action?.Invoke(gr, drawingPen)));
 
             if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
-                using (Graphics gr = Graphics.FromImage(canvasImage)) { OnSafe(() => action?.Invoke(gr, drawingPen)); }
+                using (Graphics gr = Graphics.FromImage(canvasImage)) { SafeHelper.OnSafe(() => action?.Invoke(gr, drawingPen)); }
 
             IsClean = false;
         }
@@ -86,10 +72,10 @@ namespace CaptureImage.Common.DrawingContext
                 using (Pen erasePen = new Pen(texture, drawingPen.Width))
                 {
                     if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
-                        canvasControl.OnGraphics(gr => OnSafe(() => drawing.Erase(gr, erasePen)));
+                        canvasControl.OnGraphics(gr => SafeHelper.OnSafe(() => drawing.Erase(gr, erasePen)));
 
                     if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
-                        using (Graphics gr = Graphics.FromImage(canvasImage)) { OnSafe(() => drawing.Erase(gr, erasePen)); }
+                        using (Graphics gr = Graphics.FromImage(canvasImage)) { SafeHelper.OnSafe(() => drawing.Erase(gr, erasePen)); }
                 }
             }
 
@@ -104,7 +90,7 @@ namespace CaptureImage.Common.DrawingContext
             {
                 gr.DrawImage(canvasImage, new Point(0, 0));
                 drawingPen.Width = MarkerDrawingHelper.GetPenDiameter();
-                OnSafe(() => drawing.Paint(gr, drawingPen));
+                SafeHelper.OnSafe(() => drawing.Paint(gr, drawingPen));
             }
 
             if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)

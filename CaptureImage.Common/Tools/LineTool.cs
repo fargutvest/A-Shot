@@ -59,7 +59,7 @@ namespace CaptureImage.Common.Tools
                 if (line != null)
                     DrawingContext.Drawings.Add(line);
 
-                DrawingContext.ReRenderDrawings(DrawingTarget.ImageOnly);
+                DrawingContext.ReRenderDrawings();
                 state = DrawingState.None;
             }
         }

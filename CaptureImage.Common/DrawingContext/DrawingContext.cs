@@ -12,7 +12,6 @@ namespace CaptureImage.Common.DrawingContext
         public static readonly Pen DefaultDrawingPen = new Pen(Color.Yellow, MarkerDrawingHelper.GetPenDiameter());
         public event EventHandler DrawingContextEdited;
         public Image canvasImage;
-        public Image eraseImage;
         public Image cleanImage;
         public ICanvas canvasControl;
 
@@ -38,7 +37,6 @@ namespace CaptureImage.Common.DrawingContext
             };
 
             drawingContext.cleanImage = canvasImage.Clone() as Image;
-            drawingContext.eraseImage = canvasImage.Clone() as Image;
 
             return drawingContext;
         }
@@ -128,52 +126,37 @@ namespace CaptureImage.Common.DrawingContext
 
         public void ReRenderDrawings(DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
         {
-            ReRenderDrawings(gr =>
-            {
-                for (int i = 0; i < Drawings.Count; i++)
-                {
-                    IDrawing drawing = Drawings[i];
-                    drawing.Repaint(gr);
-                }
-            }, needClean: true, drawingTarget);
-        }
-
-        public void ReRenderDrawings(Action<Graphics> action, bool needClean = true,
-            DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
-        {
             void ReRender(Graphics gr)
             {
-                if (needClean)
-                    gr.DrawImage(cleanImage, new PointF(0, 0));
+                gr.DrawImage(cleanImage, new PointF(0, 0));
 
-                action?.Invoke(gr);
+                foreach (IDrawing drawing in Drawings)
+                    drawing.Repaint(gr);
             }
 
             if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
-                canvasControl.OnGraphics(gr => ReRender(gr));
+            {
+                canvasControl.OnGraphics(gr =>
+                {
+                    GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, ReRender);
+                });
+            }
 
             if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
-                using (Graphics gr = Graphics.FromImage(canvasImage)) { ReRender(gr); }
-        }
-
-        public void ReRenderDrawings()
-        {
-            canvasControl.OnGraphics(gr => gr.DrawImage(canvasImage, new PointF(0, 0)));
-        }
-
-        public void UpdateEraseImages()
-        {
-            eraseImage.Dispose();
-            eraseImage = canvasImage.Clone() as Image;
+            {
+                using (Graphics gr = Graphics.FromImage(canvasImage))
+                {
+                    GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, ReRender);
+                }
+            }
         }
 
         public void UndoDrawing()
         {
             if (Drawings.Count > 0)
             {
-                IDrawing lastDrawing = Drawings[Drawings.Count - 1];
                 Drawings.RemoveAt(Drawings.Count - 1);
-                ReRenderDrawings(DrawingTarget.CanvasAndImage);
+                ReRenderDrawings();
             }
         }
     }

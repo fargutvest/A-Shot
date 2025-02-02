@@ -7,6 +7,8 @@ namespace CaptureImage.Common
     {
         void OnGraphics(Action<Graphics> action);
 
+        Rectangle ClientRectangle { get; }
+
         void Refresh();
     }
 }

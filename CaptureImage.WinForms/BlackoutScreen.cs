@@ -180,7 +180,6 @@ namespace CaptureImage.WinForms
         public void OnGraphics(Action<Graphics> action)
         {
             using (Graphics gr = this.CreateGraphics()) { action?.Invoke(gr); }
-            thumb.Refresh();
         }
     }
 }

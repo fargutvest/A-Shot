@@ -95,9 +95,6 @@ namespace CaptureImage.Common.DrawingContext
                 }
             }
 
-            canvasControl.Refresh();
-            GC.Collect();
-
             IsClean = false;
         }
 

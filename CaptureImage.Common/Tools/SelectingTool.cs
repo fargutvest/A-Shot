@@ -98,8 +98,6 @@ namespace CaptureImage.Common.Tools
                             selector.HidePanels();
                         break;
                 }
-
-                selector.Refresh();
             }
         }
 

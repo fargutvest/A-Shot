@@ -34,10 +34,9 @@ namespace CaptureImage.Common.Tools
                 MarkerDrawingHelper.EraseMarker(DrawingContext);
                 if (state == DrawingState.Drawing)
                 {
-                    DrawingContext.ReRenderDrawings(DrawingTarget.ImageOnly);
-                    DrawingContext.Erase(arrow);
+                    DrawingContext.Erase(arrow, DrawingTarget.CanvasOnly);
                     arrow = new Arrow(mouseStartPos, mouse, endCap);
-                    DrawingContext.Draw(arrow.Paint);
+                    DrawingContext.Draw(arrow.Paint, DrawingTarget.CanvasOnly);
                 }
                 MarkerDrawingHelper.DrawMarker(DrawingContext, mouse);
                 mousePreviousPos = mouse;
@@ -49,6 +48,7 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 DrawingContext.Drawings.Add(arrow);
+                DrawingContext.ReRenderDrawings(DrawingTarget.ImageOnly);
                 state = DrawingState.None;
             }
         }

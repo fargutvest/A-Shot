@@ -42,10 +42,9 @@ namespace CaptureImage.Common.Tools
 
                 if (state == DrawingState.Drawing)
                 {
-                    DrawingContext.ReRenderDrawings(DrawingTarget.ImageOnly);
                     DrawingContext.Erase(rect, DrawingTarget.CanvasOnly);
                     rect = new Rect(GetRectangle(mouseStartPos, mouse));
-                    DrawingContext.Draw(rect.Paint);
+                    DrawingContext.Draw(rect.Paint, DrawingTarget.CanvasOnly);
                 }
 
                 MarkerDrawingHelper.DrawMarker(DrawingContext, mouse);
@@ -58,6 +57,7 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 DrawingContext.Drawings.Add(rect);
+                DrawingContext.ReRenderDrawings(DrawingTarget.ImageOnly);
                 state = DrawingState.None;
             }
         }

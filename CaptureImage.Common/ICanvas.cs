@@ -5,7 +5,7 @@ namespace CaptureImage.Common
 {
     public interface ICanvas
     {
-        void OnGraphics(Action<Graphics> action);
+        void OnGraphics(Action<Graphics, Action<Graphics>> action);
 
         Rectangle ClientRectangle { get; }
 

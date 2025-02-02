@@ -177,9 +177,17 @@ namespace CaptureImage.WinForms
            
         }
 
-        public void OnGraphics(Action<Graphics> action)
+        public void OnGraphics(Action<Graphics, Action<Graphics>> action)
         {
-            using (Graphics gr = this.CreateGraphics()) { action?.Invoke(gr); }
+            using (Graphics gr = this.CreateGraphics()) { action?.Invoke(gr, null); }
+
+            using (Graphics gr = this.thumb.CreateGraphics())
+            {
+                action?.Invoke(gr, bufferedGr =>
+                {
+                    thumb.DrawBorder(bufferedGr);
+                });
+            }
         }
     }
 }

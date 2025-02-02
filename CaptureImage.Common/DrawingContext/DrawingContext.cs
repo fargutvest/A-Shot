@@ -51,7 +51,11 @@ namespace CaptureImage.Common.DrawingContext
             drawingPen.Width = MarkerDrawingHelper.GetPenDiameter();
 
             if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
-                canvasControl.OnGraphics(gr => SafeHelper.OnSafe(() => action?.Invoke(gr, drawingPen)));
+                canvasControl.OnGraphics((gr, callBack) =>
+                {
+                    SafeHelper.OnSafe(() => action?.Invoke(gr, drawingPen));
+                    //callBack?.Invoke(gr);
+                });
 
             if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
                 using (Graphics gr = Graphics.FromImage(canvasImage)) { SafeHelper.OnSafe(() => action?.Invoke(gr, drawingPen)); }
@@ -66,7 +70,11 @@ namespace CaptureImage.Common.DrawingContext
                 using (Pen erasePen = new Pen(texture, drawingPen.Width))
                 {
                     if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
-                        canvasControl.OnGraphics(gr => SafeHelper.OnSafe(() => drawing.Erase(gr, erasePen)));
+                        canvasControl.OnGraphics((gr, callBack) =>
+                        {
+                            SafeHelper.OnSafe(() => drawing.Erase(gr, erasePen));
+                            //callBack?.Invoke(gr);
+                        });
 
                     if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
                         using (Graphics gr = Graphics.FromImage(canvasImage)) { SafeHelper.OnSafe(() => drawing.Erase(gr, erasePen)); }
@@ -80,13 +88,14 @@ namespace CaptureImage.Common.DrawingContext
 
         public void ReRenderDrawingOnCanvas(IDrawing drawing)
         {
-            canvasControl.OnGraphics(gr =>
+            canvasControl.OnGraphics((gr, callBack) =>
             {
                 GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, bufferedGr =>
                 {
                     bufferedGr.DrawImage(canvasImage, new Point(0, 0));
                     drawingPen.Width = MarkerDrawingHelper.GetPenDiameter();
                     SafeHelper.OnSafe(() => drawing.Paint(bufferedGr, drawingPen));
+                    callBack?.Invoke(bufferedGr);
                 });
             });
 
@@ -102,9 +111,13 @@ namespace CaptureImage.Common.DrawingContext
                     drawing.Repaint(gr);
             }
 
-            canvasControl.OnGraphics(gr =>
+            canvasControl.OnGraphics((gr, callBack) =>
             {
-                GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, ReRender);
+                GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, bufferedGr =>
+                {
+                    ReRender(bufferedGr);
+                    callBack?.Invoke(bufferedGr);
+                });
             });
 
             using (Graphics gr = Graphics.FromImage(canvasImage))

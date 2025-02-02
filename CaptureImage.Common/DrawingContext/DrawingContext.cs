@@ -2,7 +2,6 @@
 using CaptureImage.Common.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 
 namespace CaptureImage.Common.DrawingContext
@@ -27,19 +26,14 @@ namespace CaptureImage.Common.DrawingContext
             Drawings = new List<IDrawing>();
         }
 
-        public static DrawingContext Create(Image canvasImage, ICanvas canvasControl, bool isClean = false)
+        public static DrawingContext Create(Image canvasImage, ICanvas canvasControl, bool isClean = false) => new DrawingContext
         {
-            DrawingContext drawingContext = new DrawingContext()
-            {
-                canvasImage = canvasImage,
-                canvasControl = canvasControl,             
-                IsClean = isClean,
-            };
+            canvasImage = canvasImage,
+            canvasControl = canvasControl,
+            IsClean = isClean,
+            cleanImage = canvasImage.Clone() as Image
+        };
 
-            drawingContext.cleanImage = canvasImage.Clone() as Image;
-
-            return drawingContext;
-        }
 
         public Image GetImage()
         {
@@ -84,33 +78,21 @@ namespace CaptureImage.Common.DrawingContext
             IsClean = false;
         }
 
-        public void ReRenderDrawing(IDrawing drawing, DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
+        public void ReRenderDrawingOnCanvas(IDrawing drawing)
         {
-            void ReRender(Graphics gr)
+            canvasControl.OnGraphics(gr =>
             {
-                gr.DrawImage(canvasImage, new Point(0, 0));
-                drawingPen.Width = MarkerDrawingHelper.GetPenDiameter();
-                SafeHelper.OnSafe(() => drawing.Paint(gr, drawingPen));
-            }
-
-            if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
-            {
-                canvasControl.OnGraphics(gr =>
+                GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, bufferedGr =>
                 {
-                    GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, ReRender);
+                    bufferedGr.DrawImage(canvasImage, new Point(0, 0));
+                    drawingPen.Width = MarkerDrawingHelper.GetPenDiameter();
+                    SafeHelper.OnSafe(() => drawing.Paint(bufferedGr, drawingPen));
                 });
-            }
+            });
 
-            if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
-            {
-                using (Graphics gr = Graphics.FromImage(canvasImage))
-                {
-                    GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, ReRender);
-                }
-            }
         }
 
-        public void ReRenderDrawings(DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
+        public void ReRenderDrawings()
         {
             void ReRender(Graphics gr)
             {
@@ -120,20 +102,14 @@ namespace CaptureImage.Common.DrawingContext
                     drawing.Repaint(gr);
             }
 
-            if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
+            canvasControl.OnGraphics(gr =>
             {
-                canvasControl.OnGraphics(gr =>
-                {
-                    GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, ReRender);
-                });
-            }
+                GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, ReRender);
+            });
 
-            if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
+            using (Graphics gr = Graphics.FromImage(canvasImage))
             {
-                using (Graphics gr = Graphics.FromImage(canvasImage))
-                {
-                    GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, ReRender);
-                }
+                GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, ReRender);
             }
         }
 

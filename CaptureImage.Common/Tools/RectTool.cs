@@ -43,7 +43,7 @@ namespace CaptureImage.Common.Tools
                 if (state == DrawingState.Drawing)
                 {
                     rect = new Rect(GetRectangle(mouseStartPos, mouse));
-                    DrawingContext.ReRenderDrawing(rect, DrawingTarget.CanvasOnly);
+                    DrawingContext.ReRenderDrawingOnCanvas(rect);
                 }
 
                 MarkerDrawingHelper.DrawMarker(DrawingContext, mouse);

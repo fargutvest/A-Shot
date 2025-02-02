@@ -44,7 +44,7 @@ namespace CaptureImage.Common.Tools
                 if (state == DrawingState.Drawing)
                 {
                     line = new Line(mouseStartPos, mouse);
-                    DrawingContext.ReRenderDrawing(line, DrawingTarget.CanvasOnly);
+                    DrawingContext.ReRenderDrawingOnCanvas(line);
                 }
 
                 MarkerDrawingHelper.DrawMarker(DrawingContext, mouse);

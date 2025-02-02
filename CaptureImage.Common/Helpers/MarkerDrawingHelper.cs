@@ -44,7 +44,7 @@ namespace CaptureImage.Common.Helpers
         public static void DrawMarker(DrawingContext.DrawingContext drawingContext, IDrawing latestDrawing, Point location)
         {
             if (latestDrawing != null)
-                drawingContext.ReRenderDrawing(latestDrawing, DrawingTarget.CanvasOnly);
+                drawingContext.ReRenderDrawingOnCanvas(latestDrawing);
 
             drawingContext.Draw((gr, pen) =>
             {

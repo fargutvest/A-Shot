@@ -36,7 +36,7 @@ namespace CaptureImage.Common.Tools
                 if (state == DrawingState.Drawing)
                 {
                     arrow = new Arrow(mouseStartPos, mouse, endCap);
-                    DrawingContext.ReRenderDrawing(arrow, DrawingTarget.CanvasOnly);
+                    DrawingContext.ReRenderDrawingOnCanvas(arrow);
                 }
 
                 MarkerDrawingHelper.DrawMarker(DrawingContext, mouse);

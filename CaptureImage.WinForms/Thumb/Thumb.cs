@@ -189,16 +189,7 @@ namespace CaptureImage.WinForms.Thumb
                 e.Graphics.DrawImage(appContext.DrawingContext.canvasImage, thumbRect, selectionRectangle, GraphicsUnit.Pixel);
             }
 
-            int handleSize = 5;
-            int padding = 2;
-            Rectangle rect = new Rectangle(handleSize / 2 + padding, handleSize / 2 + padding, this.Width - handleSize - padding * 2, this.Height - handleSize - padding * 2);
-
-            HandleRectangles = GraphicsHelper.DrawSelectionBorder(e.Graphics, rect, handleSize);
-
-            for (int i = 0; i< HandleRectangles.Length; i++)
-            {
-                HandleRectangles[i].Offset(this.Location);
-            }
+            DrawBorder(e.Graphics);
 
             // displaySizeLabel
             displaySizeLabel.Text = $"{Size.Width}x{Size.Height}";
@@ -212,8 +203,20 @@ namespace CaptureImage.WinForms.Thumb
             // panelY
             panelY.Location = new Point(this.Location.X + this.Width, this.Location.Y + this.Height - panelY.Height);
             panelY.Refresh();
+        }
 
-  
+        public void DrawBorder(Graphics gr)
+        {
+            int handleSize = 5;
+            int padding = 2;
+            Rectangle rect = new Rectangle(handleSize / 2 + padding, handleSize / 2 + padding, this.Width - handleSize - padding * 2, this.Height - handleSize - padding * 2);
+
+            HandleRectangles = GraphicsHelper.DrawSelectionBorder(gr, rect, handleSize);
+
+            for (int i = 0; i < HandleRectangles.Length; i++)
+            {
+                HandleRectangles[i].Offset(this.Location);
+            }
         }
 
         private Rectangle selectionRectangle;

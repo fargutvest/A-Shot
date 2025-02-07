@@ -85,6 +85,8 @@ namespace CaptureImage.Common.DrawingContext
                             {
                                 gr.TranslateTransform(-canvasControl.GetThumb.SelectionRectangle.X, -canvasControl.GetThumb.SelectionRectangle.Y);
                                 SafeHelper.OnSafe(() => drawing.Erase(gr, erasePen));
+                                gr.TranslateTransform(canvasControl.GetThumb.SelectionRectangle.X, canvasControl.GetThumb.SelectionRectangle.Y);
+                                //callBack?.Invoke(gr);
                             }
                             else
                             {
@@ -117,9 +119,12 @@ namespace CaptureImage.Common.DrawingContext
                     if (forThumb)
                     {
                         bufferedGr.DrawImage(canvasImage, destRectangleThumb, canvasControl.GetThumb.SelectionRectangle, GraphicsUnit.Pixel);
-                        callBack?.Invoke(bufferedGr);
+                      
                         bufferedGr.TranslateTransform(-canvasControl.GetThumb.SelectionRectangle.X, - canvasControl.GetThumb.SelectionRectangle.Y);
                         SafeHelper.OnSafe(() => drawing.Paint(bufferedGr, drawingPen));
+
+                        bufferedGr.TranslateTransform(canvasControl.GetThumb.SelectionRectangle.X, canvasControl.GetThumb.SelectionRectangle.Y);
+                        callBack?.Invoke(bufferedGr);
                     }
                     else
                     {
@@ -143,10 +148,13 @@ namespace CaptureImage.Common.DrawingContext
                 if (forThumb)
                 {
                     gr.DrawImage(cleanImage, destRectangleThumb, canvasControl.GetThumb.SelectionRectangle, GraphicsUnit.Pixel);
-                    callBack?.Invoke(gr);
+                   
                     gr.TranslateTransform(-canvasControl.GetThumb.SelectionRectangle.X, -canvasControl.GetThumb.SelectionRectangle.Y);
                     foreach (IDrawing drawing in Drawings)
                         drawing.Repaint(gr);
+
+                    gr.TranslateTransform(canvasControl.GetThumb.SelectionRectangle.X, canvasControl.GetThumb.SelectionRectangle.Y);
+                    callBack?.Invoke(gr);
                 }
                 else
                 {

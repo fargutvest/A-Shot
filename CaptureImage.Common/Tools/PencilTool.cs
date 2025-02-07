@@ -27,7 +27,7 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                MarkerDrawingHelper.EraseMarker(DrawingContext);
+                DrawingContext.ReRenderCanvas();
 
                 Line line = null;
                 if (state == DrawingState.Drawing)

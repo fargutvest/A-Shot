@@ -103,6 +103,33 @@ namespace CaptureImage.Common.DrawingContext
 
             IsClean = false;
         }
+        public void ReRenderCanvas()
+        {
+            canvasControl.OnGraphics((gr, callBack) =>
+            {
+                Rectangle destRectangleThumb = new Rectangle(0, 0, canvasControl.GetThumb.SelectionRectangle.Width, canvasControl.GetThumb.SelectionRectangle.Height);
+
+                GraphicsHelper.OnBufferedGraphics(gr, callBack != null ? destRectangleThumb : canvasControl.ClientRectangle, bufferedGr =>
+                {
+                    bool forThumb = callBack != null;
+
+                    if (forThumb)
+                    {
+                        bufferedGr.DrawImage(canvasImage, destRectangleThumb, canvasControl.GetThumb.SelectionRectangle, GraphicsUnit.Pixel);
+
+                        bufferedGr.TranslateTransform(-canvasControl.GetThumb.SelectionRectangle.X, -canvasControl.GetThumb.SelectionRectangle.Y);
+
+                        bufferedGr.TranslateTransform(canvasControl.GetThumb.SelectionRectangle.X, canvasControl.GetThumb.SelectionRectangle.Y);
+                        callBack?.Invoke(bufferedGr);
+                    }
+                    else
+                    {
+                        Rectangle destRectangle = new Rectangle(0, 0, canvasControl.ClientRectangle.Width, canvasControl.ClientRectangle.Height);
+                        bufferedGr.DrawImage(canvasImage, destRectangle, destRectangle, GraphicsUnit.Pixel);
+                    }
+                });
+            });
+        }
 
         public void ReRenderDrawingOnCanvas(IDrawing drawing)
         {

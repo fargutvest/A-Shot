@@ -94,9 +94,11 @@ namespace CaptureImage.Common.DrawingContext
 
                 GraphicsHelper.OnBufferedGraphics(gr, callBack!= null? destRectangleThumb : canvasControl.ClientRectangle, bufferedGr =>
                 {
+                    bool forThumb = callBack != null;
+
                     drawingPen.Width = MarkerDrawingHelper.GetPenDiameter();
 
-                    if (callBack != null)
+                    if (forThumb)
                     {
                         bufferedGr.DrawImage(canvasImage, destRectangleThumb, canvasControl.GetThumb.SelectionRectangle, GraphicsUnit.Pixel);
                         bufferedGr.TranslateTransform(-canvasControl.GetThumb.SelectionRectangle.X, - canvasControl.GetThumb.SelectionRectangle.Y);
@@ -123,18 +125,19 @@ namespace CaptureImage.Common.DrawingContext
             {
                 if (forThumb)
                 {
-                   
                     gr.DrawImage(cleanImage, destRectangleThumb, canvasControl.GetThumb.SelectionRectangle, GraphicsUnit.Pixel);
+                    gr.TranslateTransform(-canvasControl.GetThumb.SelectionRectangle.X, -canvasControl.GetThumb.SelectionRectangle.Y);
+                    foreach (IDrawing drawing in Drawings)
+                        drawing.Repaint(gr);
                 }
                 else
                 {
                     Rectangle destRectangle = new Rectangle(0, 0, canvasControl.ClientRectangle.Width, canvasControl.ClientRectangle.Height);
                     gr.DrawImage(cleanImage, destRectangle, destRectangle, GraphicsUnit.Pixel);
+
+                    foreach (IDrawing drawing in Drawings)
+                        drawing.Repaint(gr);
                 }
-
-
-                foreach (IDrawing drawing in Drawings)
-                    drawing.Repaint(gr);
             }
 
             canvasControl.OnGraphics((gr, callBack) =>

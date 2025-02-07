@@ -53,8 +53,16 @@ namespace CaptureImage.Common.DrawingContext
             if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
                 canvasControl.OnGraphics((gr, callBack) =>
                 {
-                    SafeHelper.OnSafe(() => action?.Invoke(gr, drawingPen));
-                    //callBack?.Invoke(gr);
+                    bool forThumb = callBack != null;
+                    if (forThumb)
+                    {
+                        gr.TranslateTransform(-canvasControl.GetThumb.SelectionRectangle.X, -canvasControl.GetThumb.SelectionRectangle.Y);
+                        SafeHelper.OnSafe(() => action?.Invoke(gr, drawingPen));
+                    }
+                    else
+                    {
+                        SafeHelper.OnSafe(() => action?.Invoke(gr, drawingPen));
+                    }
                 });
 
             if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
@@ -72,8 +80,16 @@ namespace CaptureImage.Common.DrawingContext
                     if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
                         canvasControl.OnGraphics((gr, callBack) =>
                         {
-                            SafeHelper.OnSafe(() => drawing.Erase(gr, erasePen));
-                            //callBack?.Invoke(gr);
+                            bool forThumb = callBack != null;
+                            if (forThumb)
+                            {
+                                gr.TranslateTransform(-canvasControl.GetThumb.SelectionRectangle.X, -canvasControl.GetThumb.SelectionRectangle.Y);
+                                SafeHelper.OnSafe(() => drawing.Erase(gr, erasePen));
+                            }
+                            else
+                            {
+                                SafeHelper.OnSafe(() => drawing.Erase(gr, erasePen));
+                            }
                         });
 
                     if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)

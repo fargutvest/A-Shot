@@ -13,7 +13,7 @@ namespace CaptureImage.Common.Tools
         private Point mouseStartPos;
         private Point mousePreviousPos;
         private bool isActive;
-        private IDrawingContextProvider drawingContextProvider;
+        private readonly IDrawingContextProvider drawingContextProvider;
         private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContext;
 
         public PencilTool(IDrawingContextProvider drawingContextProvider)
@@ -27,16 +27,15 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                DrawingContext.RenderDrawing(null, save: false);
+               
 
-                Line line = null;
                 if (state == DrawingState.Drawing)
                 {
-                    line = new Line(mousePreviousPos, mouse);
+                    var line = new Line(mousePreviousPos, mouse);
                     curve.AddLine(line);
-                    DrawingContext.Draw(line.Paint);
+                    DrawingContext.Draw(line.Paint, DrawingTarget.Image);
                 }
-
+                DrawingContext.RenderDrawing(null, save: false);
                 MarkerDrawingHelper.DrawMarker(DrawingContext);
                 mousePreviousPos = mouse;
             }

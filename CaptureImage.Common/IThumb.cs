@@ -9,8 +9,9 @@ namespace CaptureImage.Common
         Rectangle SelectionRectangle { get; }
         Point Location { get; set; }
         void SetSize(Size size, Rectangle rect);
-        void Refresh();
         void HidePanels();
         void ShowPanels();
+        void DrawBorder(Graphics gr);
+        void OnGraphics(DrawingContext.DrawingContext.OnGraphicsDelegate toDo);
     }
 }

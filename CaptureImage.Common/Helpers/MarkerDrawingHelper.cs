@@ -31,7 +31,7 @@ namespace CaptureImage.Common.Helpers
         public static void ReDrawMarker(DrawingContext.DrawingContext drawingContext)
         {
             if (marker != null)
-                drawingContext.Erase(marker.Erase, DrawingTarget.CanvasOnly);
+                drawingContext.Erase(marker.Erase, DrawingTarget.Canvas);
 
             DrawMarkerInternal(drawingContext);
         }
@@ -49,7 +49,7 @@ namespace CaptureImage.Common.Helpers
             {
                 marker = GetMarker(Cursor.Position);
                 marker.Paint(gr, markerPen);
-            }, DrawingTarget.CanvasOnly);
+            }, DrawingTarget.Canvas);
         }
 
         private static IDrawing GetMarker(Point location) => new Circle(diameter,

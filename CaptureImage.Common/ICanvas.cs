@@ -5,14 +5,10 @@ namespace CaptureImage.Common
 {
     public interface ICanvas
     {
-        void OnGraphics(Action<Graphics, Action<Graphics>> action);
+        void OnGraphics(DrawingContext.DrawingContext.OnGraphicsDelegate toDo);
 
         Rectangle ClientRectangle { get; }
 
         IThumb GetThumb { get; }
-
-        Image BackgroundImage { get; set; }
-
-        void Refresh();
     }
 }

@@ -239,5 +239,10 @@ namespace CaptureImage.WinForms.Thumb
             this.panelX.Visible = false;
             this.panelY.Visible = false;
         }
+        
+        public void OnGraphics(DrawingContext.OnGraphicsDelegate toDo)
+        {
+            using (Graphics gr = this.CreateGraphics()) { toDo?.Invoke(gr); }
+        }
     }
 }

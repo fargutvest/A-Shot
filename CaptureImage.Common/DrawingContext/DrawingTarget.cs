@@ -2,8 +2,7 @@
 {
     public enum DrawingTarget
     {
-        CanvasOnly,
-        ImageOnly,
-        CanvasAndImage
+        Canvas,
+        Image
     }
 }

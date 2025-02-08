@@ -3,8 +3,8 @@ using System.Drawing;
 using System.Windows.Forms;
 using CaptureImage.Common.Extensions;
 using System.Linq;
-using System;
 using CaptureImage.Common;
+using CaptureImage.Common.DrawingContext;
 
 namespace CaptureImage.WinForms
 {
@@ -185,19 +185,11 @@ namespace CaptureImage.WinForms
            
         }
 
-        public void OnGraphics(Action<Graphics, Action<Graphics>> action)
+        public void OnGraphics(DrawingContext.OnGraphicsDelegate toDo)
         {
-            using (Graphics gr = this.CreateGraphics()) { action?.Invoke(gr, null); }
-
-            using (Graphics gr = this.thumb.CreateGraphics())
-            {
-                action?.Invoke(gr, bufferedGr =>
-                {
-                    thumb.DrawBorder(bufferedGr);
-                });
-            }
+            using (Graphics gr = this.CreateGraphics()) { toDo?.Invoke(gr); }
         }
-
+        
         public IThumb GetThumb => thumb;
     }
 }

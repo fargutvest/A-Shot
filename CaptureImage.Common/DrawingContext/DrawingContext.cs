@@ -2,6 +2,7 @@
 using CaptureImage.Common.Helpers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 
 namespace CaptureImage.Common.DrawingContext
@@ -12,14 +13,17 @@ namespace CaptureImage.Common.DrawingContext
 
         public static readonly Pen DefaultDrawingPen = new Pen(Color.Yellow, MarkerDrawingHelper.GetPenDiameter());
         public event EventHandler DrawingContextEdited;
-        public Image canvasImage;
+        private Image imageToDraw;
+        public Image imageToDrawCanvas;
         public Image cleanImage;
+        public Image cleanImageCanvas;
         public ICanvas canvasControl;
 
         public Pen drawingPen;
 
         public bool IsClean { get; set; }
 
+        public event EventHandler Updated;
 
         public DrawingContext()
         {
@@ -27,18 +31,25 @@ namespace CaptureImage.Common.DrawingContext
             drawings = new List<IDrawing>();
         }
 
-        public static DrawingContext Create(Image canvasImage, ICanvas canvasControl, bool isClean = false) => new DrawingContext
+        public static DrawingContext Create(Image imageToDraw, ICanvas canvasControl, bool isClean = false) => new DrawingContext
         {
-            canvasImage = canvasImage,
+            imageToDraw = imageToDraw,
+            imageToDrawCanvas = BitmapHelper.DarkenImage(imageToDraw.Clone() as Bitmap, 0.5f),
             canvasControl = canvasControl,
             IsClean = isClean,
-            cleanImage = canvasImage.Clone() as Image
+            cleanImage = imageToDraw.Clone() as Image,
+            cleanImageCanvas = BitmapHelper.DarkenImage(imageToDraw.Clone() as Bitmap, 0.5f)
         };
 
 
         public Image GetImage()
         {
-            return canvasImage;
+            return imageToDraw;
+        }
+
+        public Image GetCanvasImage()
+        {
+            return imageToDrawCanvas;
         }
 
         public void SetColorOfPen(Color color)
@@ -54,6 +65,52 @@ namespace CaptureImage.Common.DrawingContext
                 drawings.RemoveAt(drawings.Count - 1);
                 ReRenderDrawings();
             }
+        }
+
+        public void Erase(Action<Graphics, Pen> action, DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
+        {
+            using (TextureBrush texture = new TextureBrush(imageToDrawCanvas))
+            {
+                using (Pen erasePen = new Pen(texture, drawingPen.Width))
+                {
+                    using (TextureBrush textureCanvas = new TextureBrush(imageToDrawCanvas))
+                    {
+                        using (Pen erasePenCanvas = new Pen(textureCanvas, drawingPen.Width))
+                        {
+                            if (drawingTarget == DrawingTarget.CanvasAndImage ||
+                                drawingTarget == DrawingTarget.CanvasOnly)
+                                canvasControl.OnGraphics((gr, callBack) =>
+                                {
+                                    bool forThumb = callBack != null;
+                                    if (forThumb)
+                                    {
+                                        gr.TranslateTransform(-canvasControl.GetThumb.SelectionRectangle.X,
+                                            -canvasControl.GetThumb.SelectionRectangle.Y);
+                                        SafeHelper.OnSafe(() => action?.Invoke(gr, erasePen));
+                                        gr.TranslateTransform(canvasControl.GetThumb.SelectionRectangle.X,
+                                            canvasControl.GetThumb.SelectionRectangle.Y);
+                                        //callBack?.Invoke(gr);
+                                    }
+                                    else
+                                    {
+                                        SafeHelper.OnSafe(() => action?.Invoke(gr, erasePenCanvas));
+                                    }
+                                });
+
+                            if (drawingTarget == DrawingTarget.CanvasAndImage ||
+                                drawingTarget == DrawingTarget.ImageOnly)
+                                using (Graphics gr = Graphics.FromImage(imageToDrawCanvas))
+                                {
+                                    SafeHelper.OnSafe(() => action?.Invoke(gr, erasePen));
+                                }
+                        }
+                    }
+                }
+            }
+
+            GC.Collect();
+
+            IsClean = false;
         }
 
         public void Draw(Action<Graphics, Pen> action, DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
@@ -76,51 +133,21 @@ namespace CaptureImage.Common.DrawingContext
                 });
 
             if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
-                using (Graphics gr = Graphics.FromImage(canvasImage)) { SafeHelper.OnSafe(() => action?.Invoke(gr, drawingPen)); }
+                using (Graphics gr = Graphics.FromImage(imageToDrawCanvas)) { SafeHelper.OnSafe(() => action?.Invoke(gr, drawingPen)); }
 
-            IsClean = false;
-        }
-
-        public void Erase(Action<Graphics, Pen> action, DrawingTarget drawingTarget = DrawingTarget.CanvasAndImage)
-        {
-            using (TextureBrush texture = new TextureBrush(canvasImage))
-            {
-                using (Pen erasePen = new Pen(texture, drawingPen.Width))
-                {
-                    if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.CanvasOnly)
-                        canvasControl.OnGraphics((gr, callBack) =>
-                        {
-                            bool forThumb = callBack != null;
-                            if (forThumb)
-                            {
-                                gr.TranslateTransform(-canvasControl.GetThumb.SelectionRectangle.X, -canvasControl.GetThumb.SelectionRectangle.Y);
-                                SafeHelper.OnSafe(() => action?.Invoke(gr, erasePen));
-                                gr.TranslateTransform(canvasControl.GetThumb.SelectionRectangle.X, canvasControl.GetThumb.SelectionRectangle.Y);
-                                //callBack?.Invoke(gr);
-                            }
-                            else
-                            {
-                                SafeHelper.OnSafe(() => action?.Invoke(gr, erasePen));
-                            }
-                        });
-
-                    if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
-                        using (Graphics gr = Graphics.FromImage(canvasImage)) { SafeHelper.OnSafe(() => action?.Invoke(gr, erasePen)); }
-                }
-            }
-
-            GC.Collect();
+            if (drawingTarget == DrawingTarget.CanvasAndImage || drawingTarget == DrawingTarget.ImageOnly)
+                using (Graphics gr = Graphics.FromImage(imageToDraw)) { SafeHelper.OnSafe(() => action?.Invoke(gr, drawingPen)); }
 
             IsClean = false;
         }
         
-
         public void RenderDrawing(IDrawing drawing, bool save)
         {
             if (save)
             {
                 drawings.Add(drawing);
                 ReRenderDrawings();
+                Updated?.Invoke(this, EventArgs.Empty);
             }
             else
             {
@@ -143,7 +170,7 @@ namespace CaptureImage.Common.DrawingContext
 
                     if (forThumb)
                     {
-                        bufferedGr.DrawImage(canvasImage, destRectangleThumb, canvasControl.GetThumb.SelectionRectangle, GraphicsUnit.Pixel);
+                        bufferedGr.DrawImage(imageToDraw, destRectangleThumb, canvasControl.GetThumb.SelectionRectangle, GraphicsUnit.Pixel);
 
                         bufferedGr.TranslateTransform(-canvasControl.GetThumb.SelectionRectangle.X, -canvasControl.GetThumb.SelectionRectangle.Y);
 
@@ -157,7 +184,7 @@ namespace CaptureImage.Common.DrawingContext
                     {
                         Rectangle destRectangle = new Rectangle(0, 0, canvasControl.ClientRectangle.Width, canvasControl.ClientRectangle.Height);
 
-                        bufferedGr.DrawImage(canvasImage, destRectangle, destRectangle, GraphicsUnit.Pixel);
+                        bufferedGr.DrawImage(imageToDrawCanvas, destRectangle, destRectangle, GraphicsUnit.Pixel);
 
                         SafeHelper.OnSafe(() => drawing?.Paint(bufferedGr, drawingPen));
                     }
@@ -192,7 +219,7 @@ namespace CaptureImage.Common.DrawingContext
                     {
                         Rectangle destRectangle = new Rectangle(0, 0, canvasControl.ClientRectangle.Width, canvasControl.ClientRectangle.Height);
 
-                        bufferedGr.DrawImage(cleanImage, destRectangle, destRectangle, GraphicsUnit.Pixel);
+                        bufferedGr.DrawImage(cleanImageCanvas, destRectangle, destRectangle, GraphicsUnit.Pixel);
 
                         foreach (IDrawing drawing in drawings)
                             drawing.Repaint(bufferedGr);
@@ -200,21 +227,28 @@ namespace CaptureImage.Common.DrawingContext
                 });
             });
 
-            RefreshCanvasImage();
+            RefreshImages();
         }
 
-        private void RefreshCanvasImage()
+        private void RefreshImages()
         {
-            using (Graphics gr = Graphics.FromImage(canvasImage))
-            {
-                GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, bufferedGr =>
-                {
-                    Rectangle destRectangle = new Rectangle(0, 0, canvasControl.ClientRectangle.Width, canvasControl.ClientRectangle.Height);
-                    bufferedGr.DrawImage(cleanImage, destRectangle, destRectangle, GraphicsUnit.Pixel);
+            Image[] imagesToDraw = { imageToDraw, imageToDrawCanvas };
+            Image[] cleanImages = { cleanImage, cleanImageCanvas };
 
-                    foreach (IDrawing drawing in drawings)
-                        drawing.Repaint(bufferedGr);
-                });
+            for (int i = 0; i < imagesToDraw.Length; i++)
+            {
+                int index = i;
+                using (Graphics gr = Graphics.FromImage(imagesToDraw[index]))
+                {
+                    GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, bufferedGr =>
+                    {
+                        Rectangle destRectangle = new Rectangle(0, 0, canvasControl.ClientRectangle.Width, canvasControl.ClientRectangle.Height);
+                        bufferedGr.DrawImage(cleanImages[index], destRectangle, destRectangle, GraphicsUnit.Pixel);
+
+                        foreach (IDrawing drawing in drawings)
+                            drawing.Repaint(bufferedGr);
+                    });
+                }
             }
         }
 

@@ -9,6 +9,7 @@ namespace CaptureImage.Common.Helpers
     {
         private static Pen markerPen = new Pen(Color.Violet, 2);
         private static int diameter = 2;
+        private static IDrawing marker;
 
         public static int GetPenDiameter()
         {
@@ -27,6 +28,14 @@ namespace CaptureImage.Common.Helpers
                 diameter = diameter - 1;
         }
 
+        public static void ReDrawMarker(DrawingContext.DrawingContext drawingContext)
+        {
+            if (marker != null)
+                drawingContext.Erase(marker.Erase, DrawingTarget.CanvasOnly);
+
+            DrawMarkerInternal(drawingContext);
+        }
+
         public static void DrawMarker(DrawingContext.DrawingContext drawingContext) 
         {
             DrawMarkerInternal(drawingContext);
@@ -38,7 +47,7 @@ namespace CaptureImage.Common.Helpers
         {
             drawingContext.Draw((gr, pen) =>
             {
-                IDrawing marker = GetMarker(Cursor.Position);
+                marker = GetMarker(Cursor.Position);
                 marker.Paint(gr, markerPen);
             }, DrawingTarget.CanvasOnly);
         }

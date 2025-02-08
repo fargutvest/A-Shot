@@ -68,6 +68,8 @@ namespace CaptureImage.WinForms
             
             else if (e < 0)
                 MarkerDrawingHelper.IncreaseMarkerDiameter();
+
+            MarkerDrawingHelper.ReDrawMarker(DrawingContext);
         }
 
         public void UndoDrawing()
@@ -111,8 +113,7 @@ namespace CaptureImage.WinForms
 
             screenShot = desktopInfo.Background;
 
-            DrawingContext = DrawingContext.Create(BitmapHelper.DarkenImage(desktopInfo.Background, 0.5f), 
-                blackoutScreen, isClean: true);
+            DrawingContext = DrawingContext.Create(desktopInfo.Background, blackoutScreen, isClean: true);
 
             ConfigureForm(blackoutScreen, desktopInfo);
 

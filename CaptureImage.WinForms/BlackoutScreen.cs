@@ -33,6 +33,7 @@ namespace CaptureImage.WinForms
 
             this.appContext = appContext;
             this.appContext.DrawingContextChanged += AppContext_DrawingContextChanged;
+          
             
             //TopMost = true;
 
@@ -51,7 +52,7 @@ namespace CaptureImage.WinForms
 
             foreach (Control control in thumb.Components.Except(new Control[] { this.thumb }))
             {
-                control.MouseMove += (sender, e) => BlackoutScreen_MouseMove(sender, e);
+                control.MouseMove += BlackoutScreen_MouseMove;
             }
 
             this.Controls.AddRange(thumb.Components);
@@ -59,7 +60,14 @@ namespace CaptureImage.WinForms
 
         private void AppContext_DrawingContextChanged(object sender, System.EventArgs e)
         {
-            BackgroundImage = appContext.DrawingContext.GetImage();
+            BackgroundImage = appContext.DrawingContext.GetCanvasImage();
+
+            this.appContext.DrawingContext.Updated += DrawingContext_Updated;
+        }
+
+        private void DrawingContext_Updated(object sender, System.EventArgs e)
+        {
+            BackgroundImage = appContext.DrawingContext.GetCanvasImage();
         }
 
         public void SwitchToSelectingMode()

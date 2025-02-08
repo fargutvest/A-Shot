@@ -186,7 +186,7 @@ namespace CaptureImage.WinForms.Thumb
             if (SelectionRectangle.Width > 0 && SelectionRectangle.Height > 0)
             {
                 Rectangle thumbRect = new Rectangle(0, 0, Width, Height);
-                e.Graphics.DrawImage(appContext.DrawingContext.canvasImage, thumbRect, SelectionRectangle, GraphicsUnit.Pixel);
+                e.Graphics.DrawImage(appContext.DrawingContext.GetImage(), thumbRect, SelectionRectangle, GraphicsUnit.Pixel);
             }
 
             DrawBorder(e.Graphics);

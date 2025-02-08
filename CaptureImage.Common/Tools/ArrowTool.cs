@@ -31,15 +31,11 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                DrawingContext.ReRenderDrawingOnCanvas(arrow);
-
                 if (state == DrawingState.Drawing)
-                {
                     arrow = new Arrow(mouseStartPos, mouse, endCap);
-                    DrawingContext.ReRenderDrawingOnCanvas(arrow);
-                }
-
-                MarkerDrawingHelper.DrawMarker(DrawingContext, mouse);
+                    
+                DrawingContext.RenderDrawing(arrow, save: false);
+                MarkerDrawingHelper.DrawMarker(DrawingContext);
                 mousePreviousPos = mouse;
             }
         }
@@ -49,12 +45,10 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 if (arrow != null)
-                    DrawingContext.Drawings.Add(arrow);
-
-                DrawingContext.ReRenderDrawings();
+                    DrawingContext.RenderDrawing(arrow, save: true);
+                
                 state = DrawingState.None;
             }
         }
-
     }
 }

@@ -12,10 +12,9 @@ namespace CaptureImage.Common.Tools
         private Rect rect;
         private DrawingState state;
         private Point mouseStartPos;
-        private Point mousePreviousPos;
         private bool isActive;
+        private readonly IDrawingContextProvider drawingContextProvider;
 
-        protected IDrawingContextProvider drawingContextProvider;
         private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContext;
 
         public RectTool(IDrawingContextProvider drawingContextProvider)
@@ -38,16 +37,11 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                DrawingContext.ReRenderDrawingOnCanvas(rect);
-
                 if (state == DrawingState.Drawing)
-                {
                     rect = new Rect(GetRectangle(mouseStartPos, mouse));
-                    DrawingContext.ReRenderDrawingOnCanvas(rect);
-                }
 
-                MarkerDrawingHelper.DrawMarker(DrawingContext, mouse);
-                mousePreviousPos = mouse;
+                DrawingContext.RenderDrawing(rect, save: false);
+                MarkerDrawingHelper.DrawMarker(DrawingContext);
             }
         }
 
@@ -56,9 +50,8 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 if (rect != null)
-                    DrawingContext.Drawings.Add(rect);
-
-                DrawingContext.ReRenderDrawings();
+                    DrawingContext.RenderDrawing(rect, save: true);
+                
                 state = DrawingState.None;
             }
         }

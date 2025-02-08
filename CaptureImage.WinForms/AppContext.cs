@@ -64,17 +64,10 @@ namespace CaptureImage.WinForms
         private void MouseHookHelper_MouseWheel(object sender, int e)
         {
             if (e > 0)
-            {
                 MarkerDrawingHelper.DecreaseMarkerDiameter();
-                MarkerDrawingHelper.EraseMarker(DrawingContext);
-                MarkerDrawingHelper.DrawMarker(DrawingContext, latestDrawing: null, Cursor.Position);
-            }
+            
             else if (e < 0)
-            {
                 MarkerDrawingHelper.IncreaseMarkerDiameter();
-                MarkerDrawingHelper.EraseMarker(DrawingContext);
-                MarkerDrawingHelper.DrawMarker(DrawingContext, latestDrawing: null, Cursor.Position);
-            }
         }
 
         public void UndoDrawing()

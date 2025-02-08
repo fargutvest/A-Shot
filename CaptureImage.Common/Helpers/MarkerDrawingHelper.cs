@@ -1,6 +1,7 @@
 ﻿using CaptureImage.Common.DrawingContext;
 using CaptureImage.Common.Drawings;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace CaptureImage.Common.Helpers
 {
@@ -8,7 +9,6 @@ namespace CaptureImage.Common.Helpers
     {
         private static Pen markerPen = new Pen(Color.Violet, 2);
         private static int diameter = 2;
-        private static IDrawing marker;
 
         public static int GetPenDiameter()
         {
@@ -27,30 +27,26 @@ namespace CaptureImage.Common.Helpers
                 diameter = diameter - 1;
         }
 
-        private static IDrawing GetMarker(Point location) => new Circle(diameter,
-                location: new Point(location.X - diameter /2, location.Y - diameter / 2));
-
-        public static void EraseMarker(DrawingContext.DrawingContext drawingContext)
+        public static void DrawMarker(DrawingContext.DrawingContext drawingContext) 
         {
-            if (marker != null)
-                drawingContext.Erase(marker, DrawingTarget.CanvasOnly);
+            DrawMarkerInternal(drawingContext);
         }
-
-        public static void DrawMarker(DrawingContext.DrawingContext drawingContext, Point location) 
+        
+        #region private
+        
+        private static void DrawMarkerInternal(DrawingContext.DrawingContext drawingContext)
         {
-            DrawMarker(drawingContext, latestDrawing: null, location);
-        }
-
-        public static void DrawMarker(DrawingContext.DrawingContext drawingContext, IDrawing latestDrawing, Point location)
-        {
-            if (latestDrawing != null)
-                drawingContext.ReRenderDrawingOnCanvas(latestDrawing);
-
             drawingContext.Draw((gr, pen) =>
             {
-                marker = GetMarker(location);
+                IDrawing marker = GetMarker(Cursor.Position);
                 marker.Paint(gr, markerPen);
             }, DrawingTarget.CanvasOnly);
         }
+
+        private static IDrawing GetMarker(Point location) => new Circle(diameter,
+            location: new Point(location.X - diameter / 2, location.Y - diameter / 2));
+
+        #endregion
+
     }
 }

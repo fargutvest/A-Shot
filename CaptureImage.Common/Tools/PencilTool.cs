@@ -27,7 +27,7 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                DrawingContext.ReRenderCanvas();
+                DrawingContext.RenderDrawing(null, save: false);
 
                 Line line = null;
                 if (state == DrawingState.Drawing)
@@ -37,7 +37,7 @@ namespace CaptureImage.Common.Tools
                     DrawingContext.Draw(line.Paint);
                 }
 
-                MarkerDrawingHelper.DrawMarker(DrawingContext, mouse);
+                MarkerDrawingHelper.DrawMarker(DrawingContext);
                 mousePreviousPos = mouse;
             }
         }
@@ -57,7 +57,7 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                DrawingContext.Drawings.Add(curve);
+                DrawingContext.RenderDrawing(curve, save: true);
                 state = DrawingState.None;
             }
         }

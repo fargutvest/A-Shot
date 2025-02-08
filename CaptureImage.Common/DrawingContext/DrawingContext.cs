@@ -9,20 +9,19 @@ namespace CaptureImage.Common.DrawingContext
 {
     public class DrawingContext
     {
-        private readonly List<IDrawing> drawings;    
+        private readonly List<IDrawing> drawings;
+        private Image imageToDraw;
+        private Image imageToDrawCanvas;
+        private Image cleanImage;
+        private Image cleanImageCanvas;
+        private ICanvas canvasControl;
 
         public static readonly Pen DefaultDrawingPen = new Pen(Color.Yellow, MarkerDrawingHelper.GetPenDiameter());
-        public event EventHandler DrawingContextEdited;
-        private Image imageToDraw;
-        public Image imageToDrawCanvas;
-        public Image cleanImage;
-        public Image cleanImageCanvas;
-        public ICanvas canvasControl;
 
         public Pen drawingPen;
 
         public bool IsClean { get; set; }
-
+        
         public event EventHandler Updated;
 
         public DrawingContext()
@@ -55,7 +54,7 @@ namespace CaptureImage.Common.DrawingContext
         public void SetColorOfPen(Color color)
         {
             drawingPen.Color = color;
-            DrawingContextEdited?.Invoke(this, EventArgs.Empty);
+            Updated?.Invoke(this, EventArgs.Empty);
         }
 
         public void UndoDrawing()

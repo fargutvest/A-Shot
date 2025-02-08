@@ -161,10 +161,10 @@ namespace CaptureImage.WinForms.Thumb
 
         private void DrawingContextsKeeper_DrawingContextChanged(object sender, EventArgs e)
         {
-            appContext.DrawingContext.DrawingContextEdited += DrawingContext_DrawingContextEdited;
+            appContext.DrawingContext.Updated += DrawingContext_Updated;
         }
 
-        private void DrawingContext_DrawingContextEdited(object sender, EventArgs e)
+        private void DrawingContext_Updated(object sender, EventArgs e)
         {
             btnColor.BackColor = appContext.DrawingContext.drawingPen.Color;
             btnColor.Invalidate();

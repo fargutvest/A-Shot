@@ -170,11 +170,6 @@ namespace CaptureImage.Common.Tools
 
                 switch (state)
                 {
-                    case SelectingState.None:
-                        int offsetX = 0;
-                        int offsetY = 30;
-                        cursorHint.Show("Выберите область", canvas, mousePosition.X + offsetX, mousePosition.Y + offsetY);
-                        break;
                     case SelectingState.Selecting:
                         UpdateSelectingRect();
                         break;
@@ -185,6 +180,13 @@ namespace CaptureImage.Common.Tools
                         ResizeSelectingRect();
                         break;
                 }
+                
+                int offsetY = 30;
+
+                if (selectingRect.IsEmpty)
+                    cursorHint.Show("Выберите область", canvas, mousePosition.X, mousePosition.Y + offsetY);
+                else
+                    cursorHint.Hide(canvas);
             }
         }
 

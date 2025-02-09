@@ -6,7 +6,7 @@ namespace CaptureImage.Common.Helpers
 {
     public static class GraphicsHelper
     {
-        public static Rectangle[] DrawSelectionBorder(Graphics gr, Rectangle rect, int handleSize = 5)
+        public static Rectangle[] DrawBorderWithHandles(Graphics gr, Rectangle rect, int handleSize = 5)
         {
             Pen solidPen = new Pen(Color.Black, 1);  
             Pen dashedPen = new Pen(Color.White, 1);  
@@ -43,6 +43,16 @@ namespace CaptureImage.Common.Helpers
             gr.DrawRectangles(Pens.White, rectangles.ToArray());
 
             return rectangles.ToArray();
+        }
+
+        public static void DrawBorder(Graphics gr, Rectangle rect)
+        {
+            Pen solidPen = new Pen(Color.Black, 1);
+            Pen dashedPen = new Pen(Color.White, 1);
+            dashedPen.DashPattern = new float[] { 3, 3 };
+
+            gr.DrawRectangle(solidPen, rect);
+            gr.DrawRectangle(dashedPen, rect);
         }
 
         public static void OnBufferedGraphics(Graphics gr, Rectangle bounds, Action<Graphics> action)

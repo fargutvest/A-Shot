@@ -1,4 +1,5 @@
 ﻿using CaptureImage.Common.DrawingContext;
+using CaptureImage.Common.Helpers;
 using CaptureImage.Common.Tools.Misc;
 using System.Drawing;
 
@@ -9,11 +10,13 @@ namespace CaptureImage.Common.Tools
         private readonly IDrawingContextProvider drawingContextProvider;
         private DrawingState state;
         private bool isActive;
+        private Point mousePosition;
+        private ICanvas canvas;
 
-
-        public TextTool(IDrawingContextProvider drawingContextProvider)
+        public TextTool(IDrawingContextProvider drawingContextProvider, ICanvas canvas)
         {
             this.drawingContextProvider = drawingContextProvider;
+            this.canvas = canvas;
             this.state = DrawingState.None;
         }
         
@@ -29,7 +32,7 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-
+                canvas.OnGraphics(DrawBorder);
             }
         }
 
@@ -37,7 +40,7 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-
+                mousePosition = mouse;
             }
         }
 
@@ -49,6 +52,12 @@ namespace CaptureImage.Common.Tools
         public void Deactivate()
         {
             isActive = false;
+        }
+
+        private void DrawBorder(Graphics gr)
+        {
+            Rectangle rect = new Rectangle(mousePosition.X, mousePosition.Y, 50, 50 );
+            GraphicsHelper.DrawBorder(gr, rect);
         }
     }
 }

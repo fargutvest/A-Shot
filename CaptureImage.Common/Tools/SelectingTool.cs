@@ -70,7 +70,7 @@ namespace CaptureImage.Common.Tools
         {
             gr.DrawImage(background, selectingRect, selectingRect, GraphicsUnit.Pixel);
 
-            handleRectangles = GraphicsHelper.DrawSelectionBorder(gr, selectingRect);
+            handleRectangles = GraphicsHelper.DrawBorderWithHandles(gr, selectingRect);
         }
 
         public void Paint(IThumb selector)

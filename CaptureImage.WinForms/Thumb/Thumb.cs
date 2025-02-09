@@ -238,7 +238,7 @@ namespace CaptureImage.WinForms.Thumb
             Rectangle rect = new Rectangle(handleSize / 2 + padding, handleSize / 2 + padding,
                 this.Width - handleSize - padding * 2, this.Height - handleSize - padding * 2);
 
-            HandleRectangles = GraphicsHelper.DrawSelectionBorder(gr, rect, handleSize);
+            HandleRectangles = GraphicsHelper.DrawBorderWithHandles(gr, rect, handleSize);
 
             for (int i = 0; i < HandleRectangles.Length; i++)
             {

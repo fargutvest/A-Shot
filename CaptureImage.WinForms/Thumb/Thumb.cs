@@ -166,7 +166,7 @@ namespace CaptureImage.WinForms.Thumb
 
         private void DrawingContext_Updated(object sender, EventArgs e)
         {
-            btnColor.BackColor = appContext.DrawingContext.drawingPen.Color;
+            btnColor.BackColor = appContext.DrawingContext.GetColorOfPen();
             btnColor.Invalidate();
         }
 

@@ -3,6 +3,8 @@ using CaptureImage.Common.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using Color = System.Drawing.Color;
+using Pen = System.Drawing.Pen;
 
 namespace CaptureImage.Common.DrawingContext
 {
@@ -16,11 +18,10 @@ namespace CaptureImage.Common.DrawingContext
         private Image cleanImage;
         private Image cleanImageCanvas;
         private ICanvas canvasControl;
+        private readonly Pen drawingPen;
 
         public static readonly Pen DefaultDrawingPen = new Pen(Color.Yellow, MarkerDrawingHelper.GetPenDiameter());
-
-        public Pen drawingPen;
-
+        
         public bool IsClean { get; set; }
 
         public event EventHandler Updated;
@@ -56,6 +57,11 @@ namespace CaptureImage.Common.DrawingContext
         {
             drawingPen.Color = color;
             Updated?.Invoke(this, EventArgs.Empty);
+        }
+
+        public Color GetColorOfPen()
+        {
+            return drawingPen.Color;
         }
 
         public void UndoDrawing()

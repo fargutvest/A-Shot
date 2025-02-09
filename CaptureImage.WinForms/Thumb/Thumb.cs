@@ -31,6 +31,8 @@ namespace CaptureImage.WinForms.Thumb
         private Button btnSave;
         private Button btnClose;
 
+        private ToolTip toolTip;
+
         public Control[] Components { get; }
 
         private ThumbState state;
@@ -129,7 +131,7 @@ namespace CaptureImage.WinForms.Thumb
             this.btnCpClipboard.Image = Resources.copy;
             this.btnCpClipboard.Size = new Size(24, 24);
             this.btnCpClipboard.Location = new Point(xOffset + 96, 3);
-            this.btnCpClipboard.MouseClick += (sender, e) => CallAction(ThumbAction.CopyToClipboard);
+            this.btnCpClipboard.MouseClick += (sender, e) => CallAction(ThumbAction.Copy);
 
             // btnSave
             this.btnSave = new Button();
@@ -144,6 +146,20 @@ namespace CaptureImage.WinForms.Thumb
             this.btnClose.Size = new Size(24, 24);
             this.btnClose.Location = new Point(xOffset + 160, 3);
             this.btnClose.MouseClick += (sender, e) => CallAction(ThumbAction.Close);
+
+
+            // toolTip
+            this.toolTip = new ToolTip();
+            this.toolTip.SetToolTip(btnPencil, "Карандаш");
+            this.toolTip.SetToolTip(btnLine, "Линия");
+            this.toolTip.SetToolTip(btnArrow, "Стрелка");
+            this.toolTip.SetToolTip(btnRect, "Прямоугольник");
+            this.toolTip.SetToolTip(btnText, "Текст");
+            this.toolTip.SetToolTip(btnColor, "Цвет");
+            this.toolTip.SetToolTip(btnUndo, "Отменить (Ctrl+Z)");
+            this.toolTip.SetToolTip(btnClose, "Закрыть (Ctrl+X)");
+            this.toolTip.SetToolTip(btnSave, "Сохранить (Ctrl+S)");
+            this.toolTip.SetToolTip(btnCpClipboard, "Копировать (Ctrl+C)");
 
             this.panelY.Controls.Add(this.btnUndo);
             this.panelY.Controls.Add(this.btnPencil);

@@ -3,7 +3,7 @@
     public enum ThumbAction
     {
         Save,
-        CopyToClipboard,
+        Copy,
         Print,
         Undo,
         Close,

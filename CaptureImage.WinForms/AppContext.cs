@@ -8,6 +8,7 @@ using System.IO;
 using CaptureImage.WinForms.Helpers;
 using CaptureImage.Common.DrawingContext;
 using CaptureImage.Common.Helpers.HotKeys;
+using CaptureImage.Common.Drawings;
 
 namespace CaptureImage.WinForms
 {
@@ -41,6 +42,8 @@ namespace CaptureImage.WinForms
             hotKeysHelper.RegisterHotKey(Keys.Control, Keys.P, StartSession);
             hotKeysHelper.RegisterHotKey(Keys.Control, Keys.Z, UndoDrawing);
             hotKeysHelper.RegisterHotKey(Keys.Control, Keys.C, MakeScreenShot);
+            hotKeysHelper.RegisterHotKey(Keys.Control, Keys.S, SaveScreenShot);
+            hotKeysHelper.RegisterHotKey(Keys.Control, Keys.X, EndSession);
             hotKeysHelper.RegisterHotKey(Keys.Escape, OnEscape);
 
             mouseHookHelper = new MouseHookHelper();
@@ -132,18 +135,13 @@ namespace CaptureImage.WinForms
 
         public void MakeScreenShot()
         {
-            MakeScreenShot(blackoutScreen.GetThumb.SelectionRectangle);
+            Clipboard.SetImage(GetScreenShot(blackoutScreen.GetThumb.SelectionRectangle));
             EndSession();
         }
 
-        public void MakeScreenShot(Rectangle rect)
+        public void SaveScreenShot()
         {
-            Clipboard.SetImage(GetScreenShot(rect));
-        }
-
-        internal void SaveScreenShot(Rectangle rect)
-        {
-            Bitmap bitmap = GetScreenShot(rect);
+            Bitmap bitmap = GetScreenShot(blackoutScreen.GetThumb.SelectionRectangle);
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "PNG|*.png|JPEG|*.jpeg|BMP|*.bmp";
 

@@ -32,10 +32,10 @@ namespace CaptureImage.WinForms
 
             this.appContext = appContext;
             this.appContext.DrawingContextChanged += AppContext_DrawingContextChanged;
-          
-            
-            //TopMost = true;
 
+#if RELEASE
+            TopMost = true;
+#endif
             selectingTool = new SelectingTool();
             selectingTool.Activate();
 
@@ -85,21 +85,18 @@ namespace CaptureImage.WinForms
         {
             switch (e)
             {
-                case Thumb.ThumbAction.CopyToClipboard:
-                    appContext.MakeScreenShot(selectingTool.selectingRect);
-                    appContext.EndSession();
+                case Thumb.ThumbAction.Copy:
+                    appContext.MakeScreenShot();
                     break;
 
                 case Thumb.ThumbAction.Undo:
                     appContext.UndoDrawing();
                     if (appContext.DrawingContext.IsClean)
-                    {
                         SwitchToSelectingMode();
-                    }
                     break;
 
                 case Thumb.ThumbAction.Save:
-                    appContext.SaveScreenShot(selectingTool.selectingRect);
+                    appContext.SaveScreenShot();
                     break;
 
                 case Thumb.ThumbAction.Close:

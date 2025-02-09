@@ -52,7 +52,8 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                DrawingContext.RenderDrawing(line, needRemember: true);
+                if (line != null)
+                    DrawingContext.RenderDrawing(line, needRemember: true);
                 line = null;
                 state = DrawingState.None;
             }

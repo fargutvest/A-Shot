@@ -46,7 +46,7 @@ namespace CaptureImage.Common.Tools
             {
                 if (arrow != null)
                     DrawingContext.RenderDrawing(arrow, needRemember: true);
-                
+                arrow = null;
                 state = DrawingState.None;
             }
         }

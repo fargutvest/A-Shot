@@ -51,7 +51,7 @@ namespace CaptureImage.Common.Tools
             {
                 if (rect != null)
                     DrawingContext.RenderDrawing(rect, needRemember: true);
-                
+                rect = null;
                 state = DrawingState.None;
             }
         }

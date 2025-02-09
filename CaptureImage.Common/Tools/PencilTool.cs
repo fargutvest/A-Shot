@@ -52,7 +52,8 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                DrawingContext.RenderDrawing(curve, needRemember: true);
+                if (curve != null)
+                    DrawingContext.RenderDrawing(curve, needRemember: true);
                 state = DrawingState.None;
             }
         }

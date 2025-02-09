@@ -1,7 +1,9 @@
 ﻿using CaptureImage.Common.DrawingContext;
 using CaptureImage.Common.Helpers;
 using CaptureImage.Common.Tools.Misc;
+using System;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace CaptureImage.Common.Tools
 {
@@ -12,12 +14,17 @@ namespace CaptureImage.Common.Tools
         private bool isActive;
         private Point mousePosition;
         private ICanvas canvas;
+        private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContext;
+      
+        private TextArea textArea;
 
         public TextTool(IDrawingContextProvider drawingContextProvider, ICanvas canvas)
         {
             this.drawingContextProvider = drawingContextProvider;
             this.canvas = canvas;
             this.state = DrawingState.None;
+            textArea = new TextArea(drawingContextProvider);
+            textArea.Parent = canvas as Control;
         }
         
         public void MouseMove(Point mouse)
@@ -32,11 +39,9 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                canvas.OnGraphics(gr =>
-                {
-                    Rectangle rect = new Rectangle(mousePosition.X, mousePosition.Y, 50, 50);
-                    GraphicsHelper.DrawBorder(gr, rect);
-                });
+                mousePosition = mouse;
+                textArea.Refresh(mousePosition);
+                textArea.Show();
             }
         }
 
@@ -71,5 +76,7 @@ namespace CaptureImage.Common.Tools
                 }
             }
         }
+
+
     }
 }

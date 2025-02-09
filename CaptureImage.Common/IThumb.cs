@@ -4,18 +4,15 @@ namespace CaptureImage.Common
 {
     public interface IThumb
     {
+        void Refresh(Rectangle bounds);
         Rectangle[] HandleRectangles { get; }
-        bool Visible { get; set; }
-        Rectangle SelectionRectangle { get; }
+        Rectangle Bounds { get; }
         Rectangle ClientRectangle { get; }
-        Point Location { get; set; }
-        void SetSize(Size size, Rectangle rect);
         void HidePanels();
         void ShowPanels();
         void DrawBorder(Graphics gr);
         void OnGraphics(DrawingContext.DrawingContext.OnGraphicsDelegate toDo);
         void TranslateTransform(Graphics gr);
-
         void DrawBackgroundImage(Graphics gr, Image image);
     }
 }

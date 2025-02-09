@@ -135,13 +135,13 @@ namespace CaptureImage.WinForms
 
         public void MakeScreenShot()
         {
-            Clipboard.SetImage(GetScreenShot(blackoutScreen.GetThumb.SelectionRectangle));
+            Clipboard.SetImage(GetScreenShot(blackoutScreen.GetThumb.Bounds));
             EndSession();
         }
 
         public void SaveScreenShot()
         {
-            Bitmap bitmap = GetScreenShot(blackoutScreen.GetThumb.SelectionRectangle);
+            Bitmap bitmap = GetScreenShot(blackoutScreen.GetThumb.Bounds);
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "PNG|*.png|JPEG|*.jpeg|BMP|*.bmp";
 

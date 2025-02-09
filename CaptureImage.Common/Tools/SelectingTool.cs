@@ -81,12 +81,8 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 handleRectangles = selector.HandleRectangles;
-                selector.Visible = false;
-                selector.SetSize(selectingRect.Size, selectingRect);
-                selector.Location = selectingRect.Location;
-                selector.Visible = true;
-
-
+                selector.Refresh(selectingRect);
+                
                 switch (state)
                 {
                     case SelectingState.Selecting:

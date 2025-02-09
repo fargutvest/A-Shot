@@ -117,6 +117,7 @@
     <Content Include="icons\line.png" />
     <Content Include="icons\rect.png" />
     <Content Include="icons\save.png" />
+    <Content Include="icons\text.png" />
     <Content Include="icons\undo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

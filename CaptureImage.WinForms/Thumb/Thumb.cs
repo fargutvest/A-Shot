@@ -24,6 +24,7 @@ namespace CaptureImage.WinForms.Thumb
         private Button btnLine;
         private Button btnArrow;
         private Button btnRect;
+        private Button btnText;
         private Button btnColor;
 
         private Button btnCpClipboard;
@@ -105,6 +106,13 @@ namespace CaptureImage.WinForms.Thumb
             this.btnRect.Location = new Point(3, 75);
             this.btnRect.MouseClick += (sender, e) => SelectState(ThumbState.Rect);
 
+            // btnText
+            this.btnText = new Button();
+            this.btnText.Image = Resources.text;
+            this.btnText.Size = new Size(24, 24);
+            this.btnText.Location = new Point(3, 123);
+            this.btnText.MouseClick += (sender, e) => SelectState(ThumbState.Text);
+
             // btnColor
             this.btnColor = new Button();
             this.btnColor.FlatStyle = FlatStyle.Flat;
@@ -142,6 +150,7 @@ namespace CaptureImage.WinForms.Thumb
             this.panelY.Controls.Add(this.btnLine);
             this.panelY.Controls.Add(this.btnArrow);
             this.panelY.Controls.Add(this.btnRect);
+            this.panelY.Controls.Add(this.btnText);
             this.panelY.Controls.Add(this.btnColor);
 
             panelX.Controls.Add(this.btnCpClipboard);

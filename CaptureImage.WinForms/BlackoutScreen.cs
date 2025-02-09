@@ -145,6 +145,12 @@ namespace CaptureImage.WinForms
                     drawingTool.Activate();
                     Mode = Mode.Drawing;
                     break;
+                case ThumbState.Text:
+                    selectingTool.Deactivate();
+                    drawingTool = new TextTool(appContext);
+                    drawingTool.Activate();
+                    Mode = Mode.Drawing;
+                    break;
 
             }
         }

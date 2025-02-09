@@ -1,33 +1,40 @@
-﻿using System;
+﻿using CaptureImage.Common.DrawingContext;
 using System.Drawing;
 
 namespace CaptureImage.Common.Tools
 {
-    internal class TextTool : ITool
+    public class TextTool : ITool
     {
+        private readonly IDrawingContextProvider drawingContextProvider;
+
+        public TextTool(IDrawingContextProvider drawingContextProvider)
+        {
+            this.drawingContextProvider = drawingContextProvider;
+        }
+
         public void Activate()
         {
-            throw new NotImplementedException();
+
         }
 
         public void Deactivate()
         {
-            throw new NotImplementedException();
+
         }
 
         public void MouseMove(Point mouse)
         {
-            throw new NotImplementedException();
+
         }
 
         public void MouseUp(Point mouse)
         {
-            throw new NotImplementedException();
+
         }
 
         public void MouseDown(Point mouse)
         {
-            throw new NotImplementedException();
+
         }
     }
 }

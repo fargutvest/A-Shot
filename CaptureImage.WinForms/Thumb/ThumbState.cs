@@ -8,6 +8,7 @@ namespace CaptureImage.WinForms
         Pencil,
         Line,
         Arrow,
-        Rect
+        Rect,
+        Text
     }
 }

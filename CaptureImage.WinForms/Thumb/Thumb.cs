@@ -128,7 +128,7 @@ namespace CaptureImage.WinForms.Thumb
         {
             using (Graphics gr = this.CreateGraphics())
             {
-                toDo?.Invoke(gr);
+                toDo?.Invoke(gr, this.ClientRectangle);
             }
         }
 

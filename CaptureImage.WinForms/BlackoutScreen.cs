@@ -191,7 +191,7 @@ namespace CaptureImage.WinForms
 
         public void OnGraphics(DrawingContext.OnGraphicsDelegate toDo)
         {
-            using (Graphics gr = this.CreateGraphics()) { toDo?.Invoke(gr); }
+            using (Graphics gr = this.CreateGraphics()) { toDo?.Invoke(gr, this.ClientRectangle); }
         }
         
         public IThumb GetThumb => thumb;

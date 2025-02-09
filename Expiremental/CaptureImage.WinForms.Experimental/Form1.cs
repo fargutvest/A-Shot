@@ -28,7 +28,7 @@ namespace CaptureImage.WinForms.Experimental
             UpdateStyles();
 
             desktopInfo = ScreensHelper.GetDesktopInfo();
-            selectingTool = new SelectingTool();
+            selectingTool = new SelectingTool(canvas: null);
             hotKeysHelper = new HotKeysHelper();
             hotKeysHelper.RegisterHotKey(Keys.F6, ShowForm);
             hotKeysHelper.RegisterHotKey(Keys.Escape, HideForm);
@@ -88,7 +88,7 @@ namespace CaptureImage.WinForms.Experimental
 
         private void MouseMoveEvent(object sender, EventArgs e)
         {
-            selectingTool.MouseMove(this.GetMousePosition(), this);
+            selectingTool.MouseMove(this.GetMousePosition());
             Refresh();
         }
 

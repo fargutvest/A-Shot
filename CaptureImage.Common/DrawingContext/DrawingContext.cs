@@ -10,7 +10,7 @@ namespace CaptureImage.Common.DrawingContext
 {
     public class DrawingContext
     {
-        public delegate void OnGraphicsDelegate(Graphics canvasGraphics);
+        public delegate void OnGraphicsDelegate(Graphics canvasGraphics, Rectangle clientRectangle);
 
         private readonly List<IDrawing> drawings;
         private Image image;
@@ -77,12 +77,12 @@ namespace CaptureImage.Common.DrawingContext
         {
             if (drawingTarget == DrawingTarget.Canvas)
             {
-                canvasControl.OnGraphics(gr =>
+                canvasControl.OnGraphics((gr, clientRectangle) =>
                 {
                     OnTexturePen(imageCanvas, drawingPen.Width, pen => { SafeHelper.OnSafe(() => action?.Invoke(gr, pen)); });
                 });
 
-                canvasControl.GetThumb.OnGraphics(gr =>
+                canvasControl.GetThumb.OnGraphics((gr, clientRectangle) =>
                 {
                     canvasControl.GetThumb.TranslateTransform(gr);
                     OnTexturePen(image, drawingPen.Width, pen => { SafeHelper.OnSafe(() => action?.Invoke(gr, pen)); });
@@ -110,9 +110,9 @@ namespace CaptureImage.Common.DrawingContext
 
             if (drawingTarget == DrawingTarget.Canvas)
             {
-                canvasControl.OnGraphics(gr => { SafeHelper.OnSafe(() => action?.Invoke(gr, drawingPen));  });
+                canvasControl.OnGraphics((gr, clientRectangle) => { SafeHelper.OnSafe(() => action?.Invoke(gr, drawingPen));  });
 
-                canvasControl.GetThumb.OnGraphics(gr =>
+                canvasControl.GetThumb.OnGraphics((gr, clientRectangle) =>
                 {
                     canvasControl.GetThumb.TranslateTransform(gr);
                     SafeHelper.OnSafe(() => action?.Invoke(gr, drawingPen));
@@ -148,18 +148,18 @@ namespace CaptureImage.Common.DrawingContext
         {
             drawingPen.Width = MarkerDrawingHelper.GetPenDiameter();
             
-            canvasControl.OnGraphics(gr =>
+            canvasControl.OnGraphics((gr, clientRectangle) =>
             {
-                GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, bufferedGr =>
+                GraphicsHelper.OnBufferedGraphics(gr, clientRectangle, bufferedGr =>
                     {
                         canvasControl.DrawBackgroundImage(bufferedGr, imageCanvas);
                         SafeHelper.OnSafe(() => drawing?.Paint(bufferedGr, drawingPen));
                     });
             });
 
-            canvasControl.GetThumb.OnGraphics(gr =>
+            canvasControl.GetThumb.OnGraphics((gr, clientRectangle) =>
             {
-                GraphicsHelper.OnBufferedGraphics(gr, canvasControl.GetThumb.ClientRectangle, bufferedGr =>
+                GraphicsHelper.OnBufferedGraphics(gr, clientRectangle, bufferedGr =>
                 {
                     canvasControl.GetThumb.DrawBackgroundImage(bufferedGr, image);
 
@@ -176,9 +176,9 @@ namespace CaptureImage.Common.DrawingContext
 
         private void ReRenderDrawings()
         {
-            canvasControl.OnGraphics(gr =>
+            canvasControl.OnGraphics((gr, clientRectangle) =>
             {
-                GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, bufferedGr =>
+                GraphicsHelper.OnBufferedGraphics(gr, clientRectangle, bufferedGr =>
                 {
                     canvasControl.DrawBackgroundImage(bufferedGr, cleanImageCanvas);
 
@@ -188,9 +188,9 @@ namespace CaptureImage.Common.DrawingContext
                 });
             });
 
-            canvasControl.GetThumb.OnGraphics(gr =>
+            canvasControl.GetThumb.OnGraphics((gr, clientRectangle) =>
             {
-                GraphicsHelper.OnBufferedGraphics(gr, canvasControl.GetThumb.ClientRectangle, bufferedGr =>
+                GraphicsHelper.OnBufferedGraphics(gr, clientRectangle, bufferedGr =>
                 {
                     canvasControl.GetThumb.DrawBackgroundImage(bufferedGr, cleanImage);
 
@@ -218,9 +218,11 @@ namespace CaptureImage.Common.DrawingContext
                 int index = i;
                 using (Graphics gr = Graphics.FromImage(imagesToDraw[index]))
                 {
-                    GraphicsHelper.OnBufferedGraphics(gr, canvasControl.ClientRectangle, bufferedGr =>
+                    Rectangle imageBounds = new Rectangle(new Point(0,0), imagesToDraw[index].Size);
+
+                    GraphicsHelper.OnBufferedGraphics(gr, imageBounds, bufferedGr =>
                     {
-                        Rectangle destRectangle = new Rectangle(0, 0, canvasControl.ClientRectangle.Width, canvasControl.ClientRectangle.Height);
+                        Rectangle destRectangle = new Rectangle(0, 0, imageBounds.Width, imageBounds.Height);
                         bufferedGr.DrawImage(cleanImages[index], destRectangle, destRectangle, GraphicsUnit.Pixel);
 
                         foreach (IDrawing drawing in drawings)

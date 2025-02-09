@@ -8,7 +8,7 @@ namespace CaptureImage.Common.Tools
 {
     public partial class TextArea : UserControl
     {
-        private Timer cursorTimer;
+        private readonly Timer cursorTimer;
         private bool textCursorVisible;
         private readonly IDrawingContextProvider drawingContextProvider;
         private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContext;
@@ -34,18 +34,15 @@ namespace CaptureImage.Common.Tools
         {
             using (Graphics gr = this.CreateGraphics())
             {
-                toDo?.Invoke(gr);
+                toDo?.Invoke(gr, this.ClientRectangle);
             }
         }
 
-        
+
         private void CursorTimer_Tick(object sender, EventArgs e)
         {
-            OnGraphics(gr =>
-            {
-                textCursorVisible = !textCursorVisible;
-                this.Refresh();
-            });
+            textCursorVisible = !textCursorVisible;
+            this.Refresh();
         }
 
         private void TextArea_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
@@ -73,6 +70,20 @@ namespace CaptureImage.Common.Tools
             this.Visible = false;
             this.Location = location;
             this.Visible = true;
+        }
+
+        private void DrawText(Graphics gr, string text, Point mouse)
+        {
+            int offsetX = 10;
+            int offsetY = 10;
+
+            using (Font font = new Font("Arial", 12))
+            {
+                using (Brush brush = new SolidBrush(Color.Black))
+                {
+                    gr.DrawString(text, font, brush, mouse.X + offsetX, mouse.Y + offsetY);
+                }
+            }
         }
     }
 }

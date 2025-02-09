@@ -7,7 +7,6 @@ namespace CaptureImage.Common
         void Refresh(Rectangle bounds);
         Rectangle[] HandleRectangles { get; }
         Rectangle Bounds { get; }
-        Rectangle ClientRectangle { get; }
         void HidePanels();
         void ShowPanels();
         void DrawBorder(Graphics gr);

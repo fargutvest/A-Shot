@@ -22,6 +22,8 @@ namespace CaptureImage.Common.Tools
         private Rectangle selectingRectResizeStart;
         private Dictionary<int, Cursor> handleCursors;
         private bool isActive;
+        private ICanvas canvas;
+        private ToolTip cursorHint;
 
         private bool IsHandleHovered => handleRectangles.Any(rect => rect.Contains(mousePos));
 
@@ -47,8 +49,9 @@ namespace CaptureImage.Common.Tools
 
         public event EventHandler<Point> MouseEnterSelection;
 
-        public SelectingTool()
+        public SelectingTool(ICanvas canvas)
         {
+            this.canvas = canvas;
             handleRectangles = new Rectangle[0];
 
             handleCursors = new Dictionary<int, Cursor>
@@ -62,10 +65,10 @@ namespace CaptureImage.Common.Tools
                 { 6, Cursors.SizeNESW }, // угол
                 { 7, Cursors.SizeWE }
             };
+
+            cursorHint = new ToolTip();
         }
-
-        public Point Translate(Point point) => new Point(point.X - selectingRect.X, point.Y - selectingRect.Y);
-
+        
         public void Paint(Graphics gr, Bitmap background)
         {
             gr.DrawImage(background, selectingRect, selectingRect, GraphicsUnit.Pixel);
@@ -143,7 +146,7 @@ namespace CaptureImage.Common.Tools
         }
 
 
-        public void MouseMove(Point mousePosition, Control canvas)
+        public void MouseMove(Point mousePosition)
         {
             mousePos = mousePosition;
             IsMouseOver = selectingRect.Contains(mousePos);
@@ -167,6 +170,11 @@ namespace CaptureImage.Common.Tools
 
                 switch (state)
                 {
+                    case SelectingState.None:
+                        int offsetX = 0;
+                        int offsetY = 30;
+                        cursorHint.Show("Выберите область", canvas, mousePosition.X + offsetX, mousePosition.Y + offsetY);
+                        break;
                     case SelectingState.Selecting:
                         UpdateSelectingRect();
                         break;

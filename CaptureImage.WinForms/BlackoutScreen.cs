@@ -16,6 +16,8 @@ namespace CaptureImage.WinForms
         private ITool drawingTool;
         private readonly AppContext appContext;
 
+        
+
         public Mode Mode { get; set; }
 
         public BlackoutScreen(AppContext appContext)
@@ -36,7 +38,7 @@ namespace CaptureImage.WinForms
 #if RELEASE
             TopMost = true;
 #endif
-            selectingTool = new SelectingTool();
+            selectingTool = new SelectingTool(this);
             selectingTool.Activate();
 
             Mode = Mode.Selecting;
@@ -159,7 +161,7 @@ namespace CaptureImage.WinForms
 
         private void MouseMoveEvent(Point mouse)
         {
-            selectingTool.MouseMove(mouse, this);
+            selectingTool.MouseMove(mouse);
             selectingTool.Paint(this.thumb);
             drawingTool?.MouseMove(mouse);
         }

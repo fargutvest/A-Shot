@@ -32,7 +32,11 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                canvas.OnGraphics(DrawBorder);
+                canvas.OnGraphics(gr =>
+                {
+                    Rectangle rect = new Rectangle(mousePosition.X, mousePosition.Y, 50, 50);
+                    GraphicsHelper.DrawBorder(gr, rect);
+                });
             }
         }
 
@@ -54,10 +58,18 @@ namespace CaptureImage.Common.Tools
             isActive = false;
         }
 
-        private void DrawBorder(Graphics gr)
+        private void DrawText(Graphics gr, string text, Point mouse)
         {
-            Rectangle rect = new Rectangle(mousePosition.X, mousePosition.Y, 50, 50 );
-            GraphicsHelper.DrawBorder(gr, rect);
+            int offsetX = 10;
+            int offsetY = 10;
+
+            using (Font font = new Font("Arial", 12))
+            {
+                using (Brush brush = new SolidBrush(Color.Black))
+                {
+                    gr.DrawString(text, font, brush, mouse.X + offsetX, mouse.Y + offsetY);
+                }
+            }
         }
     }
 }

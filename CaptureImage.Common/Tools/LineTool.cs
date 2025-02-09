@@ -42,7 +42,7 @@ namespace CaptureImage.Common.Tools
                 if (state == DrawingState.Drawing)
                     line = new Line(mouseStartPos, mouse);
 
-                DrawingContext.RenderDrawing(line, save: false);
+                DrawingContext.RenderDrawing(line, needRemember: false);
                 MarkerDrawingHelper.DrawMarker(DrawingContext);
                 mousePreviousPos = mouse;
             }
@@ -52,7 +52,7 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                DrawingContext.RenderDrawing(line, save: true);
+                DrawingContext.RenderDrawing(line, needRemember: true);
                 line = null;
                 state = DrawingState.None;
             }

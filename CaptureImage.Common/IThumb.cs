@@ -13,5 +13,6 @@ namespace CaptureImage.Common
         void ShowPanels();
         void DrawBorder(Graphics gr);
         void OnGraphics(DrawingContext.DrawingContext.OnGraphicsDelegate toDo);
+        void TranslateTransform(Graphics gr);
     }
 }

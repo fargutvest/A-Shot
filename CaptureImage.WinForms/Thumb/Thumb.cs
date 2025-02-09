@@ -244,5 +244,10 @@ namespace CaptureImage.WinForms.Thumb
         {
             using (Graphics gr = this.CreateGraphics()) { toDo?.Invoke(gr); }
         }
+
+        public void TranslateTransform(Graphics gr)
+        {
+            gr.TranslateTransform(-SelectionRectangle.X, -SelectionRectangle.Y);
+        }
     }
 }

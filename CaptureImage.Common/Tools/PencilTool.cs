@@ -10,7 +10,6 @@ namespace CaptureImage.Common.Tools
     {
         private Curve curve;
         private DrawingState state;
-        private Point mouseStartPos;
         private Point mousePreviousPos;
         private bool isActive;
         private readonly IDrawingContextProvider drawingContextProvider;
@@ -27,15 +26,13 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-               
-
                 if (state == DrawingState.Drawing)
                 {
                     var line = new Line(mousePreviousPos, mouse);
                     curve.AddLine(line);
                     DrawingContext.Draw(line.Paint, DrawingTarget.Image);
                 }
-                DrawingContext.RenderDrawing(null, save: false);
+                DrawingContext.RenderDrawing(null, needRemember: false);
                 MarkerDrawingHelper.DrawMarker(DrawingContext);
                 mousePreviousPos = mouse;
             }
@@ -46,7 +43,6 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 curve = new Curve();
-                mouseStartPos = mouse;
                 mousePreviousPos = mouse;
                 state = DrawingState.Drawing;
             }
@@ -56,7 +52,7 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                DrawingContext.RenderDrawing(curve, save: true);
+                DrawingContext.RenderDrawing(curve, needRemember: true);
                 state = DrawingState.None;
             }
         }

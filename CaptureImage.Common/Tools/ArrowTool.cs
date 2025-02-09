@@ -34,7 +34,7 @@ namespace CaptureImage.Common.Tools
                 if (state == DrawingState.Drawing)
                     arrow = new Arrow(mouseStartPos, mouse, endCap);
                     
-                DrawingContext.RenderDrawing(arrow, save: false);
+                DrawingContext.RenderDrawing(arrow, needRemember: false);
                 MarkerDrawingHelper.DrawMarker(DrawingContext);
                 mousePreviousPos = mouse;
             }
@@ -45,7 +45,7 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 if (arrow != null)
-                    DrawingContext.RenderDrawing(arrow, save: true);
+                    DrawingContext.RenderDrawing(arrow, needRemember: true);
                 
                 state = DrawingState.None;
             }

@@ -47,8 +47,8 @@ namespace CaptureImage.WinForms.Thumb
 
             this.DoubleBuffered = true;
             SetStyle(ControlStyles.AllPaintingInWmPaint |
-            ControlStyles.UserPaint |
-            ControlStyles.OptimizedDoubleBuffer, true);
+                     ControlStyles.UserPaint |
+                     ControlStyles.OptimizedDoubleBuffer, true);
             UpdateStyles();
 
             // displaySizeLabel
@@ -186,7 +186,8 @@ namespace CaptureImage.WinForms.Thumb
             if (SelectionRectangle.Width > 0 && SelectionRectangle.Height > 0)
             {
                 Rectangle thumbRect = new Rectangle(0, 0, Width, Height);
-                e.Graphics.DrawImage(appContext.DrawingContext.GetImage(), thumbRect, SelectionRectangle, GraphicsUnit.Pixel);
+                e.Graphics.DrawImage(appContext.DrawingContext.GetImage(), thumbRect, SelectionRectangle,
+                    GraphicsUnit.Pixel);
             }
 
             DrawBorder(e.Graphics);
@@ -209,7 +210,8 @@ namespace CaptureImage.WinForms.Thumb
         {
             int handleSize = 5;
             int padding = 2;
-            Rectangle rect = new Rectangle(handleSize / 2 + padding, handleSize / 2 + padding, this.Width - handleSize - padding * 2, this.Height - handleSize - padding * 2);
+            Rectangle rect = new Rectangle(handleSize / 2 + padding, handleSize / 2 + padding,
+                this.Width - handleSize - padding * 2, this.Height - handleSize - padding * 2);
 
             HandleRectangles = GraphicsHelper.DrawSelectionBorder(gr, rect, handleSize);
 
@@ -225,7 +227,7 @@ namespace CaptureImage.WinForms.Thumb
         {
             this.Size = size;
             this.displaySizeLabel.Visible = size.Width > 0 && size.Height > 0;
-            SelectionRectangle = rect;  
+            SelectionRectangle = rect;
         }
 
         public void ShowPanels()
@@ -239,15 +241,24 @@ namespace CaptureImage.WinForms.Thumb
             this.panelX.Visible = false;
             this.panelY.Visible = false;
         }
-        
+
         public void OnGraphics(DrawingContext.OnGraphicsDelegate toDo)
         {
-            using (Graphics gr = this.CreateGraphics()) { toDo?.Invoke(gr); }
+            using (Graphics gr = this.CreateGraphics())
+            {
+                toDo?.Invoke(gr);
+            }
         }
 
         public void TranslateTransform(Graphics gr)
         {
             gr.TranslateTransform(-SelectionRectangle.X, -SelectionRectangle.Y);
         }
+
+        public void DrawBackgroundImage(Graphics gr, Image image)
+        {
+            gr.DrawImage(image, ClientRectangle, SelectionRectangle, GraphicsUnit.Pixel);
+        }
+
     }
 }

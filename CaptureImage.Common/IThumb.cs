@@ -7,6 +7,7 @@ namespace CaptureImage.Common
         Rectangle[] HandleRectangles { get; }
         bool Visible { get; set; }
         Rectangle SelectionRectangle { get; }
+        Rectangle ClientRectangle { get; }
         Point Location { get; set; }
         void SetSize(Size size, Rectangle rect);
         void HidePanels();
@@ -14,5 +15,7 @@ namespace CaptureImage.Common
         void DrawBorder(Graphics gr);
         void OnGraphics(DrawingContext.DrawingContext.OnGraphicsDelegate toDo);
         void TranslateTransform(Graphics gr);
+
+        void DrawBackgroundImage(Graphics gr, Image image);
     }
 }

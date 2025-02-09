@@ -1,5 +1,4 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace CaptureImage.Common
 {
@@ -10,5 +9,7 @@ namespace CaptureImage.Common
         Rectangle ClientRectangle { get; }
 
         IThumb GetThumb { get; }
+
+        void DrawBackgroundImage(Graphics gr, Image image);
     }
 }

@@ -13,20 +13,17 @@ namespace CaptureImage.WinForms
 {
     public class AppContext : ApplicationContext, IDrawingContextProvider
     {
-        private NotifyIcon trayIcon;
-        private HotKeysHelper hotKeysHelper;
-        private MouseHookHelper mouseHookHelper;
-        private BlackoutScreen blackoutScreen;
+        private readonly NotifyIcon trayIcon;
+        private readonly HotKeysHelper hotKeysHelper;
+        private readonly MouseHookHelper mouseHookHelper;
+        private readonly BlackoutScreen blackoutScreen;
         private bool isSessionOn;
         private Bitmap screenShot;
 
         private DrawingContext drawingContext;
         public DrawingContext DrawingContext
         {
-            get
-            {
-                return drawingContext;
-            }
+            get => drawingContext;
             private set
             {
                 drawingContext = value;
@@ -43,7 +40,7 @@ namespace CaptureImage.WinForms
             hotKeysHelper = new HotKeysHelper();
             hotKeysHelper.RegisterHotKey(Keys.Control, Keys.P, StartSession);
             hotKeysHelper.RegisterHotKey(Keys.Control, Keys.Z, UndoDrawing);
-            hotKeysHelper.RegisterHotKey(Keys.Control, Keys.C, MakeScreenshot);
+            hotKeysHelper.RegisterHotKey(Keys.Control, Keys.C, MakeScreenShot);
             hotKeysHelper.RegisterHotKey(Keys.Escape, OnEscape);
 
             mouseHookHelper = new MouseHookHelper();
@@ -114,8 +111,10 @@ namespace CaptureImage.WinForms
             screenShot = desktopInfo.Background;
 
             DrawingContext = DrawingContext.Create(desktopInfo.Background, blackoutScreen, isClean: true);
-
-            ConfigureForm(blackoutScreen, desktopInfo);
+            
+            blackoutScreen.ClientSize = desktopInfo.ClientSize;
+            blackoutScreen.Location = desktopInfo.Location;
+            blackoutScreen.Region = new Region(desktopInfo.Path);
 
             blackoutScreen.Invalidate();
             blackoutScreen.Show();
@@ -123,7 +122,7 @@ namespace CaptureImage.WinForms
             isSessionOn = true;
         }
 
-        private Bitmap GetScreenshot(Rectangle rect)
+        private Bitmap GetScreenShot(Rectangle rect)
         {
             if (screenShot != null)
                 return BitmapHelper.Crop((Bitmap)screenShot, rect);
@@ -131,20 +130,20 @@ namespace CaptureImage.WinForms
             return null;
         }
 
-        public void MakeScreenshot()
+        public void MakeScreenShot()
         {
-            MakeScreenshot(blackoutScreen.selectingTool.selectingRect);
+            MakeScreenShot(blackoutScreen.GetThumb.SelectionRectangle);
             EndSession();
         }
 
-        public void MakeScreenshot(Rectangle rect)
+        public void MakeScreenShot(Rectangle rect)
         {
-            Clipboard.SetImage(GetScreenshot(rect));
+            Clipboard.SetImage(GetScreenShot(rect));
         }
 
-        internal void SaveScreenshot(Rectangle rect)
+        internal void SaveScreenShot(Rectangle rect)
         {
-            Bitmap bitmap = GetScreenshot(rect);
+            Bitmap bitmap = GetScreenShot(rect);
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "PNG|*.png|JPEG|*.jpeg|BMP|*.bmp";
 
@@ -173,15 +172,7 @@ namespace CaptureImage.WinForms
             if (colorDialog.ShowDialog() == DialogResult.OK)
                 DrawingContext.SetColorOfPen(colorDialog.Color);
         }
-
-        private void ConfigureForm(Form form, DesktopInfo desktopInfo) 
-        {
-            form.ClientSize = desktopInfo.ClientSize;
-            form.Location = desktopInfo.Location;
-            form.Region = new Region(desktopInfo.Path);
-        }
-
-
+        
         protected override void ExitThreadCore()
         {
             this.hotKeysHelper.Dispose();

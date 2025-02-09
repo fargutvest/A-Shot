@@ -11,11 +11,10 @@ namespace CaptureImage.WinForms
     public partial class BlackoutScreen : Form, ICanvas
     {
         private bool isInit = true;
-        public Thumb.Thumb thumb;
-        public SelectingTool selectingTool;
+        private readonly Thumb.Thumb thumb;
+        private readonly SelectingTool selectingTool;
         private ITool drawingTool;
-
-        private AppContext appContext;
+        private readonly AppContext appContext;
 
         public Mode Mode { get; set; }
 
@@ -87,7 +86,7 @@ namespace CaptureImage.WinForms
             switch (e)
             {
                 case Thumb.ThumbAction.CopyToClipboard:
-                    appContext.MakeScreenshot(selectingTool.selectingRect);
+                    appContext.MakeScreenShot(selectingTool.selectingRect);
                     appContext.EndSession();
                     break;
 
@@ -100,7 +99,7 @@ namespace CaptureImage.WinForms
                     break;
 
                 case Thumb.ThumbAction.Save:
-                    appContext.SaveScreenshot(selectingTool.selectingRect);
+                    appContext.SaveScreenShot(selectingTool.selectingRect);
                     break;
 
                 case Thumb.ThumbAction.Close:
@@ -191,5 +190,10 @@ namespace CaptureImage.WinForms
         }
         
         public IThumb GetThumb => thumb;
+
+        public void DrawBackgroundImage(Graphics gr, Image image)
+        {
+            gr.DrawImage(image, ClientRectangle, ClientRectangle, GraphicsUnit.Pixel);
+        }
     }
 }

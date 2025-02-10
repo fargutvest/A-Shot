@@ -1,6 +1,7 @@
 ﻿using CaptureImage.Common.DrawingContext;
 using CaptureImage.Common.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -13,10 +14,14 @@ namespace CaptureImage.Common.Tools
         private readonly IDrawingContextProvider drawingContextProvider;
         private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContext;
 
+        private List<char> pressedKeys;
+
         public TextArea(IDrawingContextProvider drawingContextProvider)
         {
             this.drawingContextProvider = drawingContextProvider;
             InitializeComponent();
+
+            pressedKeys = new List<char>();
 
             this.cursorTimer = new Timer();
             cursorTimer.Interval = 500;
@@ -57,6 +62,8 @@ namespace CaptureImage.Common.Tools
 
                 if (textCursorVisible)
                     e.Graphics.DrawLine(pen, textCursorUp, textCursorDown);
+
+                DrawText(e.Graphics, new string(pressedKeys.ToArray()), textCursorUp);
             }
         }
 
@@ -84,6 +91,11 @@ namespace CaptureImage.Common.Tools
                     gr.DrawString(text, font, brush, mouse.X + offsetX, mouse.Y + offsetY);
                 }
             }
+        }
+
+        public new void KeyPress(char keyChar)
+        {
+            pressedKeys.Add(keyChar);
         }
     }
 }

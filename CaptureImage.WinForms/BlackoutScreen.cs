@@ -189,6 +189,14 @@ namespace CaptureImage.WinForms
            
         }
 
+        private void BlackoutScreen_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
+        {
+            if (drawingTool is ITextTool textTool)
+            {
+                textTool.KeyPress(e.KeyChar);
+            }
+        }
+
         public void OnGraphics(DrawingContext.OnGraphicsDelegate toDo)
         {
             using (Graphics gr = this.CreateGraphics()) { toDo?.Invoke(gr, this.ClientRectangle); }

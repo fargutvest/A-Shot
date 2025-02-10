@@ -38,12 +38,15 @@ namespace CaptureImage.WinForms
             this.Name = "BlackoutScreen";
             this.Text = "BlackoutScreen";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BlackoutScreen_KeyDown);
+            this.KeyPress += BlackoutScreen_KeyPress;
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BlackoutScreen_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.BlackoutScreen_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.BlackoutScreen_MouseUp);
             this.ResumeLayout(false);
 
         }
+
+  
 
         #endregion
     }

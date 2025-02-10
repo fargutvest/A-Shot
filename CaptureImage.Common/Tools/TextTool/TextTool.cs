@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace CaptureImage.Common.Tools
 {
-    public class TextTool : ITool
+    public class TextTool : ITool, ITextTool
     {
         private readonly TextArea textArea;
         private DrawingState state;
@@ -59,5 +59,14 @@ namespace CaptureImage.Common.Tools
         {
             isActive = false;
         }
+
+        #region ITextTool
+
+        public void KeyPress(char keyChar)
+        {
+            textArea.KeyPress(keyChar);
+        }
+
+        #endregion
     }
 }

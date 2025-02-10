@@ -86,6 +86,7 @@
     <Compile Include="Tools\Misc\SelectingState.cs" />
     <Compile Include="Tools\SelectingTool.cs" />
     <Compile Include="Helpers\HotKeys\WinApi\KBDLLHOOKSTRUCT.cs" />
+    <Compile Include="Tools\TextTool\ITextTool.cs" />
     <Compile Include="Tools\TextTool\TextArea.cs">
       <SubType>UserControl</SubType>
     </Compile>

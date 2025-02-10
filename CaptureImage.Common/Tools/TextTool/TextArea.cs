@@ -88,7 +88,7 @@ namespace CaptureImage.Common.Tools
 
             using (Font font = new Font("Arial", 12))
             {
-                using (Brush brush = new SolidBrush(Color.Black))
+                using (Brush brush = new SolidBrush(DrawingContext.GetColorOfPen()))
                 {
                     gr.DrawString(text, font, brush, mouse.X + offsetX, mouse.Y + offsetY);
                 }

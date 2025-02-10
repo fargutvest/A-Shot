@@ -18,6 +18,8 @@ namespace CaptureImage.Common.Helpers.HotKeys.WinApi
         public const int WH_MOUSE_LL = 14;
         public const int WM_MOUSEWHEEL = 0x020A;
 
+        public const uint MAPVK_VK_TO_CHAR = 2;
+
         #endregion
 
         #region Windows API вызовы
@@ -35,6 +37,10 @@ namespace CaptureImage.Common.Helpers.HotKeys.WinApi
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
+
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern uint MapVirtualKey(uint uCode, uint uMapType);
 
 
         #endregion

@@ -35,6 +35,8 @@ namespace CaptureImage.WinForms
             this.appContext = appContext;
             this.appContext.DrawingContextChanged += AppContext_DrawingContextChanged;
 
+            this.appContext.hotKeysHelper.KeyPress += HotKeysHelper_KeyPress;
+
 #if RELEASE
             TopMost = true;
 #endif
@@ -57,6 +59,14 @@ namespace CaptureImage.WinForms
             }
 
             this.Controls.AddRange(thumb.Components);
+        }
+
+        private void HotKeysHelper_KeyPress(object sender, char keyChar)
+        {
+            if (drawingTool is ITextTool textTool)
+            {
+                textTool.KeyPress(keyChar);
+            }
         }
 
         private void AppContext_DrawingContextChanged(object sender, System.EventArgs e)
@@ -191,10 +201,7 @@ namespace CaptureImage.WinForms
 
         private void BlackoutScreen_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
-            if (drawingTool is ITextTool textTool)
-            {
-                textTool.KeyPress(e.KeyChar);
-            }
+            
         }
 
         public void OnGraphics(DrawingContext.OnGraphicsDelegate toDo)

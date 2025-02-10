@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -13,6 +14,9 @@ namespace CaptureImage.Common.Helpers.HotKeys
         private LowLevelKeyboardProc _keyboardProc;
         private IntPtr _hookID = IntPtr.Zero;
         private Dictionary<HotKey, Action> hotKeyDict = new Dictionary<HotKey, Action>();
+
+
+        public event EventHandler<char> KeyPress;
 
         public HotKeysHelper()
         {
@@ -53,6 +57,16 @@ namespace CaptureImage.Common.Helpers.HotKeys
             {
                 Keys key = (Keys)lParam.vkCode;
 
+                char keyChar = GetCharFromVirtualKey(lParam.vkCode);
+
+                KeyPress?.Invoke(this, keyChar);
+
+#if DEBUG
+
+                Debug.WriteLine($"{key.ToString()} - {keyChar}");
+
+#endif
+
                 HotKey pressedHotKey = new HotKey()
                 {
                     ModifierKey = Control.ModifierKeys,
@@ -68,8 +82,20 @@ namespace CaptureImage.Common.Helpers.HotKeys
 
             return CallNextHookEx(_hookID, nCode, wParam, pnt);
         }
+        
+        private char GetCharFromVirtualKey(uint vkCode)
+        {
+            uint charCode = MapVirtualKey(vkCode, MAPVK_VK_TO_CHAR);
+            
+            if (charCode != 0)
+            {
+                return (char)charCode;
+            }
+            
+            return '\0';
+        }
 
-      
+
         public void Dispose()
         {
             UnhookWindowsHookEx(_hookID);

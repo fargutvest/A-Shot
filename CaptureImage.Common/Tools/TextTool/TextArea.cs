@@ -15,6 +15,8 @@ namespace CaptureImage.Common.Tools
         private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContext;
 
         private List<char> pressedKeys;
+        private Point textCursorUp = new Point(0, 0);
+        private Point textCursorDown = new Point(0, 20);
 
         public TextArea(IDrawingContextProvider drawingContextProvider)
         {
@@ -52,19 +54,19 @@ namespace CaptureImage.Common.Tools
 
         private void TextArea_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
         {
-            DrawBackgroundImage( e.Graphics, DrawingContext.GetCanvasImage());
-            DrawBorder(e.Graphics);
-
-            using (Pen pen = new Pen(Color.DimGray))
+            GraphicsHelper.OnBufferedGraphics(e.Graphics, this.ClientRectangle, bufferedGr =>
             {
-                Point textCursorUp = new Point(0, 0);
-                Point textCursorDown = new Point(0, 20);
+                DrawBackgroundImage(bufferedGr, DrawingContext.GetCanvasImage());
+                DrawBorder(bufferedGr);
 
-                if (textCursorVisible)
-                    e.Graphics.DrawLine(pen, textCursorUp, textCursorDown);
+                using (Pen pen = new Pen(Color.DimGray))
+                {
+                    if (textCursorVisible)
+                        bufferedGr.DrawLine(pen, textCursorUp, textCursorDown);
 
-                DrawText(e.Graphics, new string(pressedKeys.ToArray()), textCursorUp);
-            }
+                    DrawText(bufferedGr, new string(pressedKeys.ToArray()), new Point(0,0));
+                }
+            });
         }
 
         public void DrawBackgroundImage(Graphics gr, Image image)
@@ -96,6 +98,10 @@ namespace CaptureImage.Common.Tools
         public new void KeyPress(char keyChar)
         {
             pressedKeys.Add(keyChar);
+            this.Width += 10;
+
+            this.textCursorUp.X += 10;
+            this.textCursorDown.X += 10;
         }
     }
 }

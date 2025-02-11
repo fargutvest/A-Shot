@@ -8,7 +8,6 @@ using System.IO;
 using CaptureImage.WinForms.Helpers;
 using CaptureImage.Common.DrawingContext;
 using CaptureImage.Common.Helpers.HotKeys;
-using CaptureImage.Common.Drawings;
 
 namespace CaptureImage.WinForms
 {
@@ -16,7 +15,7 @@ namespace CaptureImage.WinForms
     {
         private readonly NotifyIcon trayIcon;
         public readonly HotKeysHelper hotKeysHelper;
-        private readonly MouseHookHelper mouseHookHelper;
+        public MouseHookHelper mouseHookHelper { get; }
         private readonly BlackoutScreen blackoutScreen;
         private bool isSessionOn;
         private Bitmap screenShot;

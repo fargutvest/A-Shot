@@ -15,9 +15,7 @@ namespace CaptureImage.WinForms
         private readonly SelectingTool selectingTool;
         private ITool drawingTool;
         private readonly AppContext appContext;
-
         
-
         public Mode Mode { get; set; }
 
         public BlackoutScreen(AppContext appContext)
@@ -132,30 +130,35 @@ namespace CaptureImage.WinForms
                     break;
                 case ThumbState.Pencil:
                     selectingTool.Deactivate();
+                    drawingTool?.Deactivate();
                     drawingTool = new PencilTool(appContext);
                     drawingTool.Activate();
                     Mode = Mode.Drawing;
                     break;
                 case ThumbState.Line:
                     selectingTool.Deactivate();
+                    drawingTool?.Deactivate();
                     drawingTool = new LineTool(appContext);
                     drawingTool.Activate();
                     Mode = Mode.Drawing;
                     break;
                 case ThumbState.Arrow:
                     selectingTool.Deactivate();
+                    drawingTool?.Deactivate();
                     drawingTool = new ArrowTool(appContext);
                     drawingTool.Activate();
                     Mode = Mode.Drawing;
                     break;
                 case ThumbState.Rect:
                     selectingTool.Deactivate();
+                    drawingTool?.Deactivate();
                     drawingTool = new RectTool(appContext);
                     drawingTool.Activate();
                     Mode = Mode.Drawing;
                     break;
                 case ThumbState.Text:
                     selectingTool.Deactivate();
+                    drawingTool?.Deactivate();
                     drawingTool = new TextTool(appContext, this);
                     drawingTool.Activate();
                     Mode = Mode.Drawing;

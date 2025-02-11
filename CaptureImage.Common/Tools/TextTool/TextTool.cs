@@ -2,6 +2,7 @@
 using CaptureImage.Common.Tools.Misc;
 using System.Drawing;
 using System.Windows.Forms;
+using CaptureImage.Common.Drawings;
 
 namespace CaptureImage.Common.Tools
 {
@@ -58,6 +59,11 @@ namespace CaptureImage.Common.Tools
         public void Deactivate()
         {
             isActive = false;
+
+            textArea.Hide();
+
+            Text text = new Text(new string(textArea.Chars.ToArray()), DrawingContext.GetColorOfPen(), mousePosition);
+            DrawingContext.RenderDrawing(text, needRemember: true);
         }
 
         #region ITextTool

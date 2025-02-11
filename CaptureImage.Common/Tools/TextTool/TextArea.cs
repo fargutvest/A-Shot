@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using CaptureImage.Common.Drawings;
 
 namespace CaptureImage.Common.Tools
 {
@@ -14,21 +15,35 @@ namespace CaptureImage.Common.Tools
         private readonly IDrawingContextProvider drawingContextProvider;
         private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContext;
 
-        private List<char> pressedKeys;
+        public List<char> Chars;
         private Point textCursorUp = new Point(0, 0);
         private Point textCursorDown = new Point(0, 20);
 
+        private int width;
+        private int height;
+
         public TextArea(IDrawingContextProvider drawingContextProvider)
         {
+            width = this.Width;
+            height = this.Height;
             this.drawingContextProvider = drawingContextProvider;
+
+            drawingContextProvider.mouseHookHelper.MouseWheel += MouseHookHelper_MouseWheel;
+            
             InitializeComponent();
 
-            pressedKeys = new List<char>();
+            Chars = new List<char>();
 
             this.cursorTimer = new Timer();
             cursorTimer.Interval = 500;
             cursorTimer.Tick += new EventHandler(CursorTimer_Tick);
             cursorTimer.Start();
+        }
+
+        private void MouseHookHelper_MouseWheel(object sender, int e)
+        {
+            CalculateSize();
+            Refresh();
         }
 
         public void DrawBorder(Graphics gr)
@@ -54,6 +69,9 @@ namespace CaptureImage.Common.Tools
 
         private void TextArea_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
         {
+            Width = width;
+            Height = height;
+
             GraphicsHelper.OnBufferedGraphics(e.Graphics, this.ClientRectangle, bufferedGr =>
             {
                 DrawBackgroundImage(bufferedGr, DrawingContext.GetCanvasImage());
@@ -64,7 +82,8 @@ namespace CaptureImage.Common.Tools
                     if (textCursorVisible)
                         bufferedGr.DrawLine(pen, textCursorUp, textCursorDown);
 
-                    DrawText(bufferedGr, new string(pressedKeys.ToArray()), new Point(0,0));
+                    Text text = new Text(new string(Chars.ToArray()), DrawingContext.GetColorOfPen(), new Point(0,0));
+                    text.Paint(bufferedGr, null);
                 }
             });
         }
@@ -76,32 +95,27 @@ namespace CaptureImage.Common.Tools
 
         public void Refresh(Point location)
         {
+            Chars.Clear();
             this.Visible = false;
             this.Location = location;
             this.Visible = true;
         }
 
-        private void DrawText(Graphics gr, string text, Point mouse)
-        {
-            int offsetX = 10;
-            int offsetY = 10;
-
-            using (Font font = new Font("Arial", 12))
-            {
-                using (Brush brush = new SolidBrush(DrawingContext.GetColorOfPen()))
-                {
-                    gr.DrawString(text, font, brush, mouse.X + offsetX, mouse.Y + offsetY);
-                }
-            }
-        }
-
         public new void KeyPress(char keyChar)
         {
-            pressedKeys.Add(keyChar);
-            this.Width += 10;
+            Chars.Add(keyChar);
+            width += 10;
 
             this.textCursorUp.X += 10;
             this.textCursorDown.X += 10;
+
+            Refresh();
+        }
+
+        private void CalculateSize()
+        {
+            width =  MarkerDrawingHelper.GetPenDiameter() * 3;
+            height = MarkerDrawingHelper.GetPenDiameter() * 7;
         }
     }
 }

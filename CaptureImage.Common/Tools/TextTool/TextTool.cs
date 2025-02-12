@@ -92,6 +92,7 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
+                SaveText();
                 mousePosition = mouse;
                 textArea.Refresh(mousePosition);
                 textArea.Show();
@@ -114,9 +115,12 @@ namespace CaptureImage.Common.Tools
         public void Deactivate()
         {
             isActive = false;
-
             textArea.Hide();
+            SaveText();
+        }
 
+        private void SaveText()
+        {
             Text text = new Text(new string(textArea.Chars.ToArray()), DrawingContext.GetColorOfPen(), mousePosition);
             DrawingContext.RenderDrawing(text, needRemember: true);
         }

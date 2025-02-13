@@ -10,6 +10,7 @@ namespace CaptureImage.Common.Tools
 {
     public class TextTool : ITool, ITextTool
     {
+        private readonly Color colorOfCursor = Color.DimGray;
         private Text text;
         private readonly Timer cursorTimer;
         private Point textCursorUp = new Point(0, 0);
@@ -52,10 +53,8 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 if (isMouseDown)
-                {
-                    DrawingContext.RenderDrawing(null, needRemember: false);
-                    DrawingContext.Draw((gr, pen) => Paint(gr), DrawingTarget.Canvas);
-                }
+                    Refresh();
+                
 
                 if (isMouseOver)
                     Cursor.Current = Cursors.SizeAll;
@@ -71,8 +70,7 @@ namespace CaptureImage.Common.Tools
             {
                 isMouseDown = false;
                 mousePosition = mouse;
-                DrawingContext.RenderDrawing(null, needRemember: false);
-                DrawingContext.Draw((gr, pen) => Paint(gr), DrawingTarget.Canvas);
+                Refresh();
             }
         }
 
@@ -106,9 +104,8 @@ namespace CaptureImage.Common.Tools
 
         public void KeyPress(char keyChar)
         {
-            chars.Add(keyChar);
-            DrawingContext.RenderDrawing(null, needRemember: false);
-            DrawingContext.Draw((gr, pen) => Paint(gr), DrawingTarget.Canvas);
+            chars.Add(keyChar); 
+            Refresh();
         }
 
         #endregion
@@ -122,37 +119,35 @@ namespace CaptureImage.Common.Tools
             if (text != null)
                 DrawingContext.RenderDrawing(text, needRemember: true);
         }
-        
-        private void Paint(Graphics gr)
+
+        private void Paint(Graphics gr, Image canvasImage, Color textColor)
         {
-            Calculate();
-            GraphicsHelper.OnBufferedGraphics(gr, this.textAreaRect, bufferedGr =>
+            CalculateForPaint();
+
+            gr.DrawImage(canvasImage, textAreaRect, textAreaRect, GraphicsUnit.Pixel);
+
+            Rectangle borderRect = new Rectangle(textAreaRect.Location, textAreaRect.Size);
+            borderRect.Width -= 1;
+            borderRect.Height -= 1;
+            GraphicsHelper.DrawBorder(gr, borderRect);
+
+            using (Pen pen = new Pen(colorOfCursor))
             {
-                bufferedGr.DrawImage(DrawingContext.GetCanvasImage(), textAreaRect, textAreaRect, GraphicsUnit.Pixel);
+                if (textCursorVisible)
+                    gr.DrawLine(pen, textCursorUp, textCursorDown);
 
-                Rectangle borderRect = new Rectangle(textAreaRect.Location, textAreaRect.Size);
-                borderRect.Width -= 1;
-                borderRect.Height -= 1;
-                GraphicsHelper.DrawBorder(bufferedGr, borderRect);
+                Point textLocation = textAreaRect.Location;
+                textLocation.X += topPaddingText;
+                textLocation.Y += leftPaddingText;
 
-                using (Pen pen = new Pen(Color.DimGray))
-                {
-                    if (textCursorVisible)
-                        bufferedGr.DrawLine(pen, textCursorUp, textCursorDown);
-
-                    Point textLocation = textAreaRect.Location;
-                    textLocation.X += topPaddingText;
-                    textLocation.Y += leftPaddingText;
-
-                    text = new Text(new string(chars.ToArray()), DrawingContext.GetColorOfPen(), textAreaRect.Location);
-                    text.Paint(bufferedGr, null);
-                }
-            });
+                text = new Text(new string(chars.ToArray()), textColor, textAreaRect.Location);
+                text.Paint(gr, null);
+            }
         }
-        
-        private void Calculate()
+
+        private void CalculateForPaint()
         {
-            int textAreaHeight = 100;
+            int textAreaHeight = 70;
             textAreaRect = new Rectangle(mousePosition, new Size(0, textAreaHeight));
             textAreaRect.Width = chars.Count * symbolWidth + leftPaddingText + rightPaddingText;
 
@@ -165,9 +160,15 @@ namespace CaptureImage.Common.Tools
         private void CursorTimer_Tick(object sender, EventArgs e)
         {
             textCursorVisible = !textCursorVisible;
+            Refresh();
+        }
 
+        private void Refresh()
+        {
             DrawingContext.RenderDrawing(null, needRemember: false);
-            DrawingContext.Draw((gr, pen) => Paint(gr), DrawingTarget.Canvas);
+
+            Image image = canvas.GetThumb.Bounds.Contains(mousePosition) ? DrawingContext.GetImage() : DrawingContext.GetCanvasImage();
+            DrawingContext.Draw((gr, _) => Paint(gr, image, DrawingContext.GetColorOfPen()), DrawingTarget.Canvas);
         }
 
         #endregion

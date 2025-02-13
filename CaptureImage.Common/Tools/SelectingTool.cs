@@ -13,17 +13,17 @@ namespace CaptureImage.Common.Tools
     public class SelectingTool
     {
         private SelectingState state;
-        public Rectangle selectingRect;
+        private Rectangle selectingRect;
         private Point mousePos;
         private Point mouseStartPos;
         private Point relativeMouseStartPos;
         private Rectangle[] handleRectangles;
         private int hoveredHandleIndex;
         private Rectangle selectingRectResizeStart;
-        private Dictionary<int, Cursor> handleCursors;
+        private readonly Dictionary<int, Cursor> handleCursors;
         private bool isActive;
         private ICanvas canvas;
-        private ToolTip cursorHint;
+        private readonly ToolTip cursorHint;
 
         private bool IsHandleHovered => handleRectangles.Any(rect => rect.Contains(mousePos));
 

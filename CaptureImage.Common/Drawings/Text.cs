@@ -43,5 +43,14 @@ namespace CaptureImage.Common.Drawings
                 }
             }
         }
+
+        #region override
+
+        public override string ToString()
+        {
+            return $"{text}";
+        }
+
+        #endregion
     }
 }

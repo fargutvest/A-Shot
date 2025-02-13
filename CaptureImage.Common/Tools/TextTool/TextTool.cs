@@ -1,105 +1,67 @@
 ﻿using CaptureImage.Common.DrawingContext;
-using CaptureImage.Common.Tools.Misc;
 using System.Drawing;
 using System.Windows.Forms;
-using CaptureImage.Common.Drawings;
 using System;
 using CaptureImage.Common.Helpers;
 using System.Collections.Generic;
-using static System.Net.Mime.MediaTypeNames;
 using Text = CaptureImage.Common.Drawings.Text;
 
 namespace CaptureImage.Common.Tools
 {
     public class TextTool : ITool, ITextTool
     {
-        //private readonly TextArea textArea;
-        private DrawingState state;
+        private Text text;
+        private readonly Timer cursorTimer;
+        private Point textCursorUp = new Point(0, 0);
+        private Point textCursorDown = new Point(0, 20);
+        private bool textCursorVisible;
+        private Rectangle textAreaRect;
+        private readonly List<char> chars;
+        private bool isMouseDown;
+        private readonly int topPaddingText = 5;
+        private readonly int leftPaddingText = 5;
+        private readonly int rightPaddingText = 20;
+        private readonly int symbolWidth = 10;
         private bool isActive;
         private Point mousePosition;
         private ICanvas canvas;
         private readonly IDrawingContextProvider drawingContextProvider;
         private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContext;
-
-        bool isMoving;
-
-
-        private bool isMouseOver;
-
-        private Point mousePos;
-
-        public bool IsMouseOver
-        {
-            get
-            {
-                return isMouseOver;
-            }
-            private set
-            {
-                if (isMouseOver != value)
-                {
-                    isMouseOver = value;
-
-                    if (isMouseOver)
-                        MouseEnterSelection?.Invoke(this, mousePos);
-                }
-            }
-        }
-
-        public event EventHandler<Point> MouseEnterSelection;
-
-
+        
         public TextTool(IDrawingContextProvider drawingContextProvider, ICanvas canvas)
         {
             this.drawingContextProvider = drawingContextProvider;
             this.canvas = canvas;
-            this.state = DrawingState.None;
+            chars = new List<char>();
 
-            Chars = new List<char>() { 'П', 'р', 'и', 'в', 'е', 'т' };
-            // textArea = new TextArea(drawingContextProvider);
-            // textArea.Parent = canvas as Control;
-
-            //  textArea.MouseDown += TextArea_MouseDown;
-            //  textArea.MouseUp += TextArea_MouseUp;
-
-
+            this.cursorTimer = new Timer();
+            cursorTimer.Interval = 500;
+            cursorTimer.Tick += CursorTimer_Tick;
+            cursorTimer.Start();
         }
 
-        private void TextArea_MouseUp(object sender, MouseEventArgs e)
-        {
-            isMoving = false;
-        }
-
-        private void TextArea_MouseDown(object sender, MouseEventArgs e)
-        {
-            isMoving = true;
-        }
+        #region ITool
 
         public void MouseMove(Point mouse)
         {
-            mousePos = mouse;
-           // IsMouseOver = textArea.Bounds.Contains(mousePos);
+            if (isMouseDown)
+                mousePosition = mouse;
+
+            bool isMouseOver = textAreaRect.Contains(mouse);
 
             if (isActive)
             {
                 if (isMouseDown)
                 {
-                    this.textAreaRect = new Rectangle(mousePos, new Size(200, 200));
                     DrawingContext.RenderDrawing(null, needRemember: false);
                     DrawingContext.Draw((gr, pen) => Paint(gr), DrawingTarget.Canvas);
                 }
 
-                if (IsMouseOver)
-                {
-                   // textArea.Cursor = Cursors.SizeAll;
-
-                    //if (isMoving)
-                    //    textArea.Location = new Point(mouse.X, mouse.Y);
-                }
+                if (isMouseOver)
+                    Cursor.Current = Cursors.SizeAll;
+                
                 else
-                {
-                   // textArea.Cursor = Cursors.Default;
-                }
+                    Cursor.Current = Cursors.Default;
             }
         }
 
@@ -108,14 +70,9 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 isMouseDown = false;
-                SaveText();
                 mousePosition = mouse;
-                this.textAreaRect = new Rectangle(mouse, new Size(200, 200));
                 DrawingContext.RenderDrawing(null, needRemember: false);
                 DrawingContext.Draw((gr, pen) => Paint(gr), DrawingTarget.Canvas);
-
-                //textArea.Refresh(mousePosition);
-                //textArea.Show();
             }
         }
 
@@ -125,6 +82,9 @@ namespace CaptureImage.Common.Tools
             {
                 isMouseDown = true;
                 mousePosition = mouse;
+
+                if (textAreaRect.Contains(mouse) == false)
+                    RememberText();
             }
         }
 
@@ -135,37 +95,37 @@ namespace CaptureImage.Common.Tools
 
         public void Deactivate()
         {
+            cursorTimer.Stop();
             isActive = false;
-           // textArea.Hide();
-            SaveText();
+            RememberText();
         }
 
-        private void SaveText()
-        {
-           // Text text = new Text(new string(textArea.Chars.ToArray()), DrawingContext.GetColorOfPen(), mousePosition);
-         //   DrawingContext.RenderDrawing(text, needRemember: true);
-        }
+        #endregion
 
         #region ITextTool
 
         public void KeyPress(char keyChar)
         {
-           // textArea.KeyPress(keyChar);
+            chars.Add(keyChar);
+            DrawingContext.RenderDrawing(null, needRemember: false);
+            DrawingContext.Draw((gr, pen) => Paint(gr), DrawingTarget.Canvas);
         }
 
         #endregion
 
-        private Point textCursorUp = new Point(0, 0);
-        private Point textCursorDown = new Point(0, 20);
-        private bool textCursorVisible;
+        #region private 
 
-        private Rectangle textAreaRect;
-        public List<char> Chars;
+        private void RememberText()
+        {
+            chars.Clear();
 
-        private bool isMouseDown;
-
+            if (text != null)
+                DrawingContext.RenderDrawing(text, needRemember: true);
+        }
+        
         private void Paint(Graphics gr)
         {
+            Calculate();
             GraphicsHelper.OnBufferedGraphics(gr, this.textAreaRect, bufferedGr =>
             {
                 bufferedGr.DrawImage(DrawingContext.GetCanvasImage(), textAreaRect, textAreaRect, GraphicsUnit.Pixel);
@@ -180,10 +140,36 @@ namespace CaptureImage.Common.Tools
                     if (textCursorVisible)
                         bufferedGr.DrawLine(pen, textCursorUp, textCursorDown);
 
-                    Text text = new Text(new string(Chars.ToArray()), DrawingContext.GetColorOfPen(), textAreaRect.Location);
+                    Point textLocation = textAreaRect.Location;
+                    textLocation.X += topPaddingText;
+                    textLocation.Y += leftPaddingText;
+
+                    text = new Text(new string(chars.ToArray()), DrawingContext.GetColorOfPen(), textAreaRect.Location);
                     text.Paint(bufferedGr, null);
                 }
             });
         }
+        
+        private void Calculate()
+        {
+            int textAreaHeight = 100;
+            textAreaRect = new Rectangle(mousePosition, new Size(0, textAreaHeight));
+            textAreaRect.Width = chars.Count * symbolWidth + leftPaddingText + rightPaddingText;
+
+            textCursorUp = textAreaRect.Location;
+            textCursorUp.X += chars.Count * symbolWidth;
+            textCursorDown = textCursorUp;
+            textCursorDown.Y += 20;
+        }
+        
+        private void CursorTimer_Tick(object sender, EventArgs e)
+        {
+            textCursorVisible = !textCursorVisible;
+
+            DrawingContext.RenderDrawing(null, needRemember: false);
+            DrawingContext.Draw((gr, pen) => Paint(gr), DrawingTarget.Canvas);
+        }
+
+        #endregion
     }
 }

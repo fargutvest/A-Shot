@@ -73,6 +73,9 @@ namespace CaptureImage.WinForms
 
         public void UndoDrawing()
         {
+            if (isSessionOn == false)
+                return;
+
             DrawingContext.UndoDrawing();
         }
 
@@ -134,12 +137,18 @@ namespace CaptureImage.WinForms
 
         public void MakeScreenShot()
         {
+            if (isSessionOn == false)
+                return;
+
             Clipboard.SetImage(GetScreenShot(blackoutScreen.GetThumb.Bounds));
             EndSession();
         }
 
         public void SaveScreenShot()
         {
+            if (isSessionOn == false)
+                return;
+
             Bitmap bitmap = GetScreenShot(blackoutScreen.GetThumb.Bounds);
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "PNG|*.png|JPEG|*.jpeg|BMP|*.bmp";

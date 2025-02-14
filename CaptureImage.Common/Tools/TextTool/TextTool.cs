@@ -120,12 +120,10 @@ namespace CaptureImage.Common.Tools
                 DrawingContext.RenderDrawing(text, needRemember: true);
         }
 
-        private void Paint(Graphics gr, Image canvasImage, Color textColor)
+        private void Paint(Graphics gr, Color textColor)
         {
             CalculateForPaint();
-
-            gr.DrawImage(canvasImage, textAreaRect, textAreaRect, GraphicsUnit.Pixel);
-
+            
             Rectangle borderRect = new Rectangle(textAreaRect.Location, textAreaRect.Size);
             borderRect.Width -= 1;
             borderRect.Height -= 1;
@@ -166,9 +164,7 @@ namespace CaptureImage.Common.Tools
         private void Refresh()
         {
             DrawingContext.RenderDrawing(null, needRemember: false);
-
-            Image image = canvas.GetThumb.Bounds.Contains(mousePosition) ? DrawingContext.GetImage() : DrawingContext.GetCanvasImage();
-            DrawingContext.Draw((gr, _) => Paint(gr, image, DrawingContext.GetColorOfPen()), DrawingTarget.Canvas);
+            DrawingContext.Draw((gr, _) => Paint(gr, DrawingContext.GetColorOfPen()), DrawingTarget.Canvas);
         }
 
         #endregion

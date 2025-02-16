@@ -232,6 +232,17 @@ namespace CaptureImage.Common.Tools
                         Refresh();
                     }
 
+                break;
+
+                case Keys.Delete:
+
+                    if (chars.Count > 0)
+                    {
+                        char charToDelete = chars[numberOfCharWithCursor];
+                        chars.Remove(charToDelete);
+                        Refresh();
+                    }
+
                     break;
 
                 case Keys.Left:
@@ -245,7 +256,8 @@ namespace CaptureImage.Common.Tools
 
                     Refresh();
 
-                    break;
+                break;
+
                 case Keys.Right:
 
                     if (e.Shift == true)
@@ -258,12 +270,12 @@ namespace CaptureImage.Common.Tools
 
                     Refresh();
 
-                    break;
+                break;
             }
-       
+
         }
 
-       
+
 
         #endregion
     }

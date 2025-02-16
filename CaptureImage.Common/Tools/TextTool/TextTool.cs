@@ -12,15 +12,15 @@ namespace CaptureImage.Common.Tools
     public class TextTool : ITool, IKeyInputReceiver
     {
         private Point relativeMouseStartPos;
-        private string fontName = "Arial";
+        private string fontName = "Veranda";
         private int numberOfCharWithCursor = 0;
         private int numberOfCharWithCursorShift = 0;
         private KeyEventArgs specialKeyDown = null;
-        private readonly Color colorOfCursor = Color.DimGray;
+        private readonly Color colorOfCursor = Color.DarkRed;
         private Text text;
         private readonly Timer cursorTimer;
-        private Point textCursorUp = new Point(0, 0);
-        private Point textCursorDown = new Point(0, 20);
+        private Point textCursorUp = Point.Empty;
+        private Point textCursorDown = Point.Empty;
         private bool textCursorVisible;
         private Rectangle textAreaRect;
         private readonly List<char> chars;
@@ -171,14 +171,14 @@ namespace CaptureImage.Common.Tools
             borderRect.Height -= 1;
             GraphicsHelper.DrawBorder(gr, borderRect);
 
-            using (Pen pen = new Pen(colorOfCursor))
+            using (Pen pen = new Pen(colorOfCursor, 5))
             {
                 if (textCursorVisible)
                     gr.DrawLine(pen, textCursorUp, textCursorDown);
 
                 Point textLocation = textAreaRect.Location;
-                textLocation.X += topPaddingText;
-                textLocation.Y += leftPaddingText;
+                textLocation.Y += topPaddingText;
+                textLocation.X += leftPaddingText;
 
                 string str = new string(chars.ToArray());
 
@@ -191,6 +191,10 @@ namespace CaptureImage.Common.Tools
 
         private void CalculateForPaint(Graphics gr)
         {
+            float owerWidth = 0;
+            if (chars.Count > 0)
+                owerWidth = GraphicsHelper.GetFirstSymbolOverWidth(gr, chars.First(), fontName, FontSize); 
+
             int textWidth = (int)GraphicsHelper.GetStringSize(gr, new string(chars.ToArray()), fontName, FontSize).Width;
             int cursorPosition = (int)GraphicsHelper.GetStringSize(gr, new string(chars.Take(numberOfCharWithCursor).ToArray()), fontName, FontSize).Width;
 
@@ -199,10 +203,10 @@ namespace CaptureImage.Common.Tools
             Point textAreaRectPos = new Point(mousePosition.X - relativeMouseStartPos.X, mousePosition.Y - relativeMouseStartPos.Y);
 
             textAreaRect = new Rectangle(textAreaRectPos, new Size(0, textHeight * 2));
-            textAreaRect.Width = textWidth + leftPaddingText + rightPaddingText;
+            textAreaRect.Width = leftPaddingText + textWidth + rightPaddingText;
                 
             textCursorUp = textAreaRect.Location;
-            textCursorUp.X += cursorPosition;
+            textCursorUp.X += leftPaddingText + cursorPosition - (int)owerWidth;
             textCursorDown = textCursorUp;
             textCursorDown.Y += textHeight;
         }
@@ -239,7 +243,7 @@ namespace CaptureImage.Common.Tools
                         Refresh();
                     }
 
-                break;
+                    break;
 
                 case Keys.Delete:
 
@@ -263,6 +267,8 @@ namespace CaptureImage.Common.Tools
                     {
                         if (numberOfCharWithCursor > 0)
                             numberOfCharWithCursor -= 1;
+
+                        numberOfCharWithCursorShift = numberOfCharWithCursor;
                     }
 
                     Refresh();
@@ -280,6 +286,8 @@ namespace CaptureImage.Common.Tools
                     {
                         if (numberOfCharWithCursor < chars.Count)
                             numberOfCharWithCursor += 1;
+
+                        numberOfCharWithCursorShift = numberOfCharWithCursor;
                     }
 
                     Refresh();

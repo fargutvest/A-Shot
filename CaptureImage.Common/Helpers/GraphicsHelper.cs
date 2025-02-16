@@ -72,5 +72,21 @@ namespace CaptureImage.Common.Helpers
                 return textSize;
             }
         }
+
+        public static float GetFirstSymbolOverWidth(Graphics gr, char firstChar, string fontName, float fontSize)
+        {
+            using (Font font = new Font(fontName, fontSize))
+            {
+                string oneChar = new string(firstChar, 1);
+                string twoChar = new string(firstChar, 2);
+
+
+                float oneCharWidth = gr.MeasureString(oneChar, font).Width;
+                float twoCharWidth = gr.MeasureString(twoChar, font).Width;
+                
+                return (oneCharWidth * 2 - twoCharWidth) / 2;
+                
+            }
+        }
     }
 }

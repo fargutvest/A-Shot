@@ -9,10 +9,14 @@ namespace CaptureImage.Common.Drawings
         private Point location;
         private bool isDrawed;
         private Color color;
+        private string fontName;
+        private float fontSize;
 
-        public Text(string text, Color color, Point location)
+        public Text(string text, string fontName, float fontSize, Color color, Point location)
         {
             this.text = text;
+            this.fontName = fontName;
+            this.fontSize = fontSize;
             this.color = color;
             this.location = location; 
         }
@@ -35,11 +39,26 @@ namespace CaptureImage.Common.Drawings
 
         private void PaintInternal(Graphics gr)
         {
-            using (Font font = new Font("Arial", MarkerDrawingHelper.GetPenDiameter() * 5))
+            using (Font font = new Font(fontName, fontSize))
             {
                 using (Brush brush = new SolidBrush(color))
                 {
                     gr.DrawString(text, font, brush, location.X, location.Y);
+                }
+            }
+        }
+
+        private void HighlightSubstring(Graphics gr, string substring)
+        {
+            using (Font font = new Font(fontName, fontSize))
+            {
+                SizeF textSize = gr.MeasureString(text, font);
+                SizeF substringSize = gr.MeasureString(substring, font);
+                Point substringLocation = location;
+
+                using (Brush highlightBrush = new SolidBrush(Color.Yellow))
+                {
+                    gr.FillRectangle(highlightBrush, new RectangleF(substringLocation, textSize));
                 }
             }
         }

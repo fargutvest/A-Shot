@@ -43,9 +43,11 @@ namespace CaptureImage.WinForms
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BlackoutScreen_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.BlackoutScreen_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.BlackoutScreen_MouseUp);
+            this.MouseWheel += BlackoutScreen_MouseWheel;
             this.ResumeLayout(false);
 
         }
+
 
 
 

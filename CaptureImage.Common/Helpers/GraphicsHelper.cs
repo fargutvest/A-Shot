@@ -63,5 +63,14 @@ namespace CaptureImage.Common.Helpers
                 bufferedGraphics.Render(gr);
             }
         }
+
+        public static SizeF GetStringSize(Graphics gr, string str, string fontName, float fontSize)
+        {
+            using (Font font = new Font(fontName, fontSize))
+            {
+                SizeF textSize = gr.MeasureString(str, font);
+                return textSize;
+            }
+        }
     }
 }

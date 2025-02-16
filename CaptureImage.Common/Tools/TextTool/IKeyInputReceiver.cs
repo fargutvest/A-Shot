@@ -8,5 +8,7 @@ namespace CaptureImage.Common.Tools
         void KeyPress(KeyPressEventArgs e);
         void KeyDown(KeyEventArgs e);
         void KeyUp(KeyEventArgs e);
+
+        void MouseWheel(MouseEventArgs e);
     }
 }

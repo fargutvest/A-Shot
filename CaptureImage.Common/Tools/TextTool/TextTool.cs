@@ -5,13 +5,15 @@ using System;
 using CaptureImage.Common.Helpers;
 using System.Collections.Generic;
 using Text = CaptureImage.Common.Drawings.Text;
+using System.Linq;
 
 namespace CaptureImage.Common.Tools
 {
     public class TextTool : ITool, IKeyInputReceiver
     {
-        private int textCursorPosition = 0;
-        private Keys specialKeyDown = Keys.None;
+        private string fontName = "Arial";
+        private int numberOfCharWithCursor = 0;
+        private KeyEventArgs specialKeyDown = null;
         private readonly Color colorOfCursor = Color.DimGray;
         private Text text;
         private readonly Timer cursorTimer;
@@ -24,13 +26,14 @@ namespace CaptureImage.Common.Tools
         private readonly int topPaddingText = 5;
         private readonly int leftPaddingText = 5;
         private readonly int rightPaddingText = 20;
-        private readonly int symbolWidth = 10;
         private bool isActive;
         private Point mousePosition;
         private ICanvas canvas;
         private readonly IDrawingContextProvider drawingContextProvider;
         private DrawingContext.DrawingContext DrawingContext => drawingContextProvider.DrawingContext;
-        
+
+        private float FontSize => MarkerDrawingHelper.GetPenDiameter() * 5;
+
         public TextTool(IDrawingContextProvider drawingContextProvider, ICanvas canvas)
         {
             this.drawingContextProvider = drawingContextProvider;
@@ -41,6 +44,7 @@ namespace CaptureImage.Common.Tools
             cursorTimer.Interval = 500;
             cursorTimer.Tick += CursorTimer_Tick;
             cursorTimer.Start();
+
         }
 
         #region ITool
@@ -106,9 +110,10 @@ namespace CaptureImage.Common.Tools
 
         public void KeyPress(KeyPressEventArgs e)
         {
-            if (specialKeyDown == Keys.None)
+            if (specialKeyDown == null)
             {
                 chars.Add(e.KeyChar);
+                numberOfCharWithCursor += 1;
                 Refresh();
             }
         }
@@ -117,7 +122,7 @@ namespace CaptureImage.Common.Tools
         {
             if (IsSpecialKey(e.KeyCode))
             {
-                specialKeyDown = e.KeyData;
+                specialKeyDown = e;
             }
         }
 
@@ -125,13 +130,18 @@ namespace CaptureImage.Common.Tools
         {
             if (IsSpecialKey(e.KeyCode))
             {
-                if (e.KeyData == specialKeyDown)
+                if (e.KeyData == specialKeyDown?.KeyData)
                 {
-                    specialKeyDown = Keys.None;
+                    specialKeyDown = null;
                 }
 
-                ProcessSpecialKeyUp(e.KeyCode);
+                ProcessSpecialKeyUp(e);
             }
+        }
+
+        public void MouseWheel(MouseEventArgs e)
+        {
+            Refresh();
         }
 
         #endregion
@@ -148,7 +158,7 @@ namespace CaptureImage.Common.Tools
 
         private void Paint(Graphics gr, Color textColor)
         {
-            CalculateForPaint();
+            CalculateForPaint(gr);
             
             Rectangle borderRect = new Rectangle(textAreaRect.Location, textAreaRect.Size);
             borderRect.Width -= 1;
@@ -164,21 +174,25 @@ namespace CaptureImage.Common.Tools
                 textLocation.X += topPaddingText;
                 textLocation.Y += leftPaddingText;
 
-                text = new Text(new string(chars.ToArray()), textColor, textAreaRect.Location);
+                text = new Text(new string(chars.ToArray()), fontName, FontSize, textColor, textAreaRect.Location);
                 text.Paint(gr, null);
             }
         }
 
-        private void CalculateForPaint()
+        private void CalculateForPaint(Graphics gr)
         {
-            int textAreaHeight = 70;
-            textAreaRect = new Rectangle(mousePosition, new Size(0, textAreaHeight));
-            textAreaRect.Width = chars.Count * symbolWidth + leftPaddingText + rightPaddingText;
+            int textWidth = (int)GraphicsHelper.GetStringSize(gr, new string(chars.ToArray()), fontName, FontSize).Width;
+            int cursorPosition = (int)GraphicsHelper.GetStringSize(gr, new string(chars.Take(numberOfCharWithCursor).ToArray()), fontName, FontSize).Width;
 
+            int textHeight = (int)GraphicsHelper.GetStringSize(gr, "1", fontName, FontSize).Height;
+
+            textAreaRect = new Rectangle(mousePosition, new Size(0, textHeight * 2));
+            textAreaRect.Width = textWidth + leftPaddingText + rightPaddingText;
+                
             textCursorUp = textAreaRect.Location;
-            textCursorUp.X += textCursorPosition * symbolWidth;
+            textCursorUp.X += cursorPosition;
             textCursorDown = textCursorUp;
-            textCursorDown.Y += 20;
+            textCursorDown.Y += textHeight;
         }
         
         private void CursorTimer_Tick(object sender, EventArgs e)
@@ -201,9 +215,9 @@ namespace CaptureImage.Common.Tools
             return false;
         }
         
-        private void ProcessSpecialKeyUp(Keys key)
+        private void ProcessSpecialKeyUp(KeyEventArgs e)
         {
-            switch (key)
+            switch (e.KeyCode)
             {
                 case Keys.Back:
 
@@ -217,16 +231,25 @@ namespace CaptureImage.Common.Tools
 
                 case Keys.Left:
 
-                    if (textCursorPosition > 0)
-                        textCursorPosition -= 1;
+                    if (e.Shift == true)
+                    {
+
+                    }
+                    if (numberOfCharWithCursor > 0)
+                        numberOfCharWithCursor -= 1;
 
                     Refresh();
 
                     break;
                 case Keys.Right:
 
-                    if (textCursorPosition < chars.Count - 1)
-                        textCursorPosition += 1;
+                    if (e.Shift == true)
+                    {
+
+                    }
+
+                    if (numberOfCharWithCursor < chars.Count)
+                        numberOfCharWithCursor += 1;
 
                     Refresh();
 
@@ -234,6 +257,8 @@ namespace CaptureImage.Common.Tools
             }
        
         }
+
+       
 
         #endregion
     }

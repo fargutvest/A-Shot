@@ -162,6 +162,13 @@ namespace CaptureImage.WinForms
             MouseMoveEvent(e.Location);
         }
 
+
+        private void BlackoutScreen_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (drawingTool is IKeyInputReceiver textTool)
+                textTool.MouseWheel(e);
+        }
+
         private void MouseMoveEvent(Point mouse)
         {
             selectingTool.MouseMove(mouse);
@@ -216,5 +223,6 @@ namespace CaptureImage.WinForms
         {
             gr.DrawImage(image, ClientRectangle, ClientRectangle, GraphicsUnit.Pixel);
         }
+
     }
 }

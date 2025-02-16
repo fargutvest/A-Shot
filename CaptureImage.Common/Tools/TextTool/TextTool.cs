@@ -184,7 +184,7 @@ namespace CaptureImage.Common.Tools
 
                 string substr = GetSubstringByShift();
 
-                text = new Text(str, substr, fontName, FontSize, textColor, textAreaRect.Location);
+                text = new Text(str, substr, fontName, FontSize, textColor, textLocation);
                 text.Paint(gr, null);
             }
         }

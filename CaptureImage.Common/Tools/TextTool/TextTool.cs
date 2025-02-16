@@ -8,8 +8,10 @@ using Text = CaptureImage.Common.Drawings.Text;
 
 namespace CaptureImage.Common.Tools
 {
-    public class TextTool : ITool, ITextTool
+    public class TextTool : ITool, IKeyInputReceiver
     {
+        private int textCursorPosition = 0;
+        private Keys specialKeyDown = Keys.None;
         private readonly Color colorOfCursor = Color.DimGray;
         private Text text;
         private readonly Timer cursorTimer;
@@ -100,12 +102,36 @@ namespace CaptureImage.Common.Tools
 
         #endregion
 
-        #region ITextTool
+        #region IKeyInputReceiver
 
-        public void KeyPress(char keyChar)
+        public void KeyPress(KeyPressEventArgs e)
         {
-            chars.Add(keyChar); 
-            Refresh();
+            if (specialKeyDown == Keys.None)
+            {
+                chars.Add(e.KeyChar);
+                Refresh();
+            }
+        }
+
+        public void KeyDown(KeyEventArgs e)
+        {
+            if (IsSpecialKey(e.KeyCode))
+            {
+                specialKeyDown = e.KeyData;
+            }
+        }
+
+        public void KeyUp(KeyEventArgs e)
+        {
+            if (IsSpecialKey(e.KeyCode))
+            {
+                if (e.KeyData == specialKeyDown)
+                {
+                    specialKeyDown = Keys.None;
+                }
+
+                ProcessSpecialKeyUp(e.KeyCode);
+            }
         }
 
         #endregion
@@ -150,7 +176,7 @@ namespace CaptureImage.Common.Tools
             textAreaRect.Width = chars.Count * symbolWidth + leftPaddingText + rightPaddingText;
 
             textCursorUp = textAreaRect.Location;
-            textCursorUp.X += chars.Count * symbolWidth;
+            textCursorUp.X += textCursorPosition * symbolWidth;
             textCursorDown = textCursorUp;
             textCursorDown.Y += 20;
         }
@@ -165,6 +191,48 @@ namespace CaptureImage.Common.Tools
         {
             DrawingContext.RenderDrawing(null, needRemember: false);
             DrawingContext.Draw((gr, _) => Paint(gr, DrawingContext.GetColorOfPen()), DrawingTarget.Canvas);
+        }
+
+        private bool IsSpecialKey(Keys key)
+        {
+            if (key < Keys.D0 || key > Keys.Z)
+                return true;
+
+            return false;
+        }
+        
+        private void ProcessSpecialKeyUp(Keys key)
+        {
+            switch (key)
+            {
+                case Keys.Back:
+
+                    if (chars.Count > 0)
+                    {
+                        chars.RemoveAt(chars.Count - 1);
+                        Refresh();
+                    }
+
+                    break;
+
+                case Keys.Left:
+
+                    if (textCursorPosition > 0)
+                        textCursorPosition -= 1;
+
+                    Refresh();
+
+                    break;
+                case Keys.Right:
+
+                    if (textCursorPosition < chars.Count - 1)
+                        textCursorPosition += 1;
+
+                    Refresh();
+
+                    break;
+            }
+       
         }
 
         #endregion

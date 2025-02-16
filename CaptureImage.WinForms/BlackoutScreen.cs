@@ -5,7 +5,6 @@ using CaptureImage.Common.Extensions;
 using System.Linq;
 using CaptureImage.Common;
 using CaptureImage.Common.DrawingContext;
-using System.Diagnostics;
 
 namespace CaptureImage.WinForms
 {
@@ -56,11 +55,6 @@ namespace CaptureImage.WinForms
             }
 
             this.Controls.AddRange(thumb.Components);
-        }
-
-        private void HotKeysHelper_KeyPress(object sender, char keyChar)
-        {
-            
         }
 
         private void AppContext_DrawingContextChanged(object sender, System.EventArgs e)
@@ -195,15 +189,20 @@ namespace CaptureImage.WinForms
 
         private void BlackoutScreen_KeyDown(object sender, KeyEventArgs e)
         {
-           
+            if (drawingTool is IKeyInputReceiver textTool)
+                textTool.KeyDown(e);
+        }
+
+        private void BlackoutScreen_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (drawingTool is IKeyInputReceiver textTool)
+                textTool.KeyUp(e);
         }
 
         private void BlackoutScreen_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
-            if (drawingTool is ITextTool textTool)
-            {
-                textTool.KeyPress(e.KeyChar);
-            }
+            if (drawingTool is IKeyInputReceiver textTool)
+                textTool.KeyPress(e);
         }
 
         public void OnGraphics(DrawingContext.OnGraphicsDelegate toDo)

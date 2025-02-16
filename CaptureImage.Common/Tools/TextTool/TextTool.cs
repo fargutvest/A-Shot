@@ -14,6 +14,7 @@ namespace CaptureImage.Common.Tools
         private Point relativeMouseStartPos;
         private string fontName = "Arial";
         private int numberOfCharWithCursor = 0;
+        private int numberOfCharWithCursorShift = 0;
         private KeyEventArgs specialKeyDown = null;
         private readonly Color colorOfCursor = Color.DimGray;
         private Text text;
@@ -89,7 +90,8 @@ namespace CaptureImage.Common.Tools
                 mousePosition = mouse;
 
                 if (textAreaRect.Contains(mouse))
-                    relativeMouseStartPos = textAreaRect.Location.IsEmpty ? Point.Empty : new Point(mousePosition.X - textAreaRect.X, mousePosition.Y - textAreaRect.Y);
+                    relativeMouseStartPos = textAreaRect.Location.IsEmpty ? Point.Empty :
+                        new Point(mousePosition.X - textAreaRect.X, mousePosition.Y - textAreaRect.Y);
                 else
                     RememberText();
             }
@@ -117,6 +119,7 @@ namespace CaptureImage.Common.Tools
             {
                 chars.Add(e.KeyChar);
                 numberOfCharWithCursor += 1;
+                numberOfCharWithCursorShift = numberOfCharWithCursor;
                 Refresh();
             }
         }
@@ -177,7 +180,11 @@ namespace CaptureImage.Common.Tools
                 textLocation.X += topPaddingText;
                 textLocation.Y += leftPaddingText;
 
-                text = new Text(new string(chars.ToArray()), fontName, FontSize, textColor, textAreaRect.Location);
+                string str = new string(chars.ToArray());
+
+                string substr = GetSubstringByShift();
+
+                text = new Text(str, substr, fontName, FontSize, textColor, textAreaRect.Location);
                 text.Paint(gr, null);
             }
         }
@@ -249,10 +256,14 @@ namespace CaptureImage.Common.Tools
 
                     if (e.Shift == true)
                     {
-
+                        if (numberOfCharWithCursorShift > 0)
+                            numberOfCharWithCursorShift -= 1;
                     }
-                    if (numberOfCharWithCursor > 0)
-                        numberOfCharWithCursor -= 1;
+                    else
+                    {
+                        if (numberOfCharWithCursor > 0)
+                            numberOfCharWithCursor -= 1;
+                    }
 
                     Refresh();
 
@@ -262,11 +273,14 @@ namespace CaptureImage.Common.Tools
 
                     if (e.Shift == true)
                     {
-
+                        if (numberOfCharWithCursorShift < chars.Count)
+                            numberOfCharWithCursorShift += 1;
                     }
-
-                    if (numberOfCharWithCursor < chars.Count)
-                        numberOfCharWithCursor += 1;
+                    else 
+                    {
+                        if (numberOfCharWithCursor < chars.Count)
+                            numberOfCharWithCursor += 1;
+                    }
 
                     Refresh();
 
@@ -275,6 +289,22 @@ namespace CaptureImage.Common.Tools
 
         }
 
+        private string GetSubstringByShift()
+        {
+            if (numberOfCharWithCursor > numberOfCharWithCursorShift)
+            {
+                char[] substrChars = chars.Skip(numberOfCharWithCursorShift).Take(numberOfCharWithCursor - numberOfCharWithCursorShift).ToArray();
+                return new string(substrChars);
+            }
+
+            if (numberOfCharWithCursor < numberOfCharWithCursorShift)
+            {
+                char[] substrChars = chars.Skip(numberOfCharWithCursor).Take(numberOfCharWithCursorShift - numberOfCharWithCursor).ToArray();
+                return new string(substrChars);
+            }
+
+            return string.Empty;
+        }
 
 
         #endregion

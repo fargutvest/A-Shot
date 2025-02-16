@@ -6,15 +6,21 @@ namespace CaptureImage.Common.Drawings
     public class Text: IDrawing
     {
         private string text;
+        private string substrToHighLight;
         private Point location;
         private bool isDrawed;
         private Color color;
         private string fontName;
         private float fontSize;
 
-        public Text(string text, string fontName, float fontSize, Color color, Point location)
+        public Text(string text, string fontName, float fontSize, Color color, Point location) :
+            this(text, string.Empty, fontName, fontSize, color, location) { }
+        
+
+        public Text(string text, string substrToHighLight, string fontName, float fontSize, Color color, Point location)
         {
             this.text = text;
+            this.substrToHighLight = substrToHighLight;
             this.fontName = fontName;
             this.fontSize = fontSize;
             this.color = color;
@@ -41,6 +47,8 @@ namespace CaptureImage.Common.Drawings
         {
             using (Font font = new Font(fontName, fontSize))
             {
+                HighlightSubstring(gr, font, substrToHighLight);
+
                 using (Brush brush = new SolidBrush(color))
                 {
                     gr.DrawString(text, font, brush, location.X, location.Y);
@@ -48,18 +56,22 @@ namespace CaptureImage.Common.Drawings
             }
         }
 
-        private void HighlightSubstring(Graphics gr, string substring)
+        private void HighlightSubstring(Graphics gr, Font font, string substr)
         {
-            using (Font font = new Font(fontName, fontSize))
-            {
-                SizeF textSize = gr.MeasureString(text, font);
-                SizeF substringSize = gr.MeasureString(substring, font);
-                Point substringLocation = location;
+            SizeF textSize = gr.MeasureString(text, font);
+            SizeF substrSize = gr.MeasureString(substr, font);
 
-                using (Brush highlightBrush = new SolidBrush(Color.Yellow))
-                {
-                    gr.FillRectangle(highlightBrush, new RectangleF(substringLocation, textSize));
-                }
+            int substrIndex = text.IndexOf(substr);
+            string textBeforeSubstr = text.Substring(0, substrIndex);
+
+            SizeF textBeforuSubstrSize = gr.MeasureString(textBeforeSubstr, font); 
+            
+            Point substrLocation = location;
+            substrLocation.X += (int)textBeforuSubstrSize.Width;
+
+            using (Brush highlightBrush = new SolidBrush(Color.Indigo))
+            {
+                gr.FillRectangle(highlightBrush, new RectangleF(substrLocation, substrSize));
             }
         }
 

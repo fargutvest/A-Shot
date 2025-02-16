@@ -14,7 +14,7 @@ namespace CaptureImage.WinForms
     public class AppContext : ApplicationContext, IDrawingContextProvider
     {
         private readonly NotifyIcon trayIcon;
-        public readonly HotKeysHelper hotKeysHelper;
+        private readonly HotKeysHelper hotKeysHelper;
         public MouseHookHelper mouseHookHelper { get; }
         private readonly BlackoutScreen blackoutScreen;
         private bool isSessionOn;

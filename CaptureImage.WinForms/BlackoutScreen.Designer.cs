@@ -33,8 +33,8 @@ namespace CaptureImage.WinForms
             // 
             // BlackoutScreen
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.ClientSize = new System.Drawing.Size(300, 300);
+            this.KeyPreview = true;
             this.Name = "BlackoutScreen";
             this.Text = "BlackoutScreen";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BlackoutScreen_KeyDown);
@@ -46,7 +46,7 @@ namespace CaptureImage.WinForms
 
         }
 
-  
+
 
         #endregion
     }

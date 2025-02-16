@@ -11,6 +11,7 @@ namespace CaptureImage.Common.Tools
 {
     public class TextTool : ITool, IKeyInputReceiver
     {
+        private Point relativeMouseStartPos;
         private string fontName = "Arial";
         private int numberOfCharWithCursor = 0;
         private KeyEventArgs specialKeyDown = null;
@@ -87,7 +88,9 @@ namespace CaptureImage.Common.Tools
                 isMouseDown = true;
                 mousePosition = mouse;
 
-                if (textAreaRect.Contains(mouse) == false)
+                if (textAreaRect.Contains(mouse))
+                    relativeMouseStartPos = textAreaRect.Location.IsEmpty ? Point.Empty : new Point(mousePosition.X - textAreaRect.X, mousePosition.Y - textAreaRect.Y);
+                else
                     RememberText();
             }
         }
@@ -186,7 +189,9 @@ namespace CaptureImage.Common.Tools
 
             int textHeight = (int)GraphicsHelper.GetStringSize(gr, "1", fontName, FontSize).Height;
 
-            textAreaRect = new Rectangle(mousePosition, new Size(0, textHeight * 2));
+            Point textAreaRectPos = new Point(mousePosition.X - relativeMouseStartPos.X, mousePosition.Y - relativeMouseStartPos.Y);
+
+            textAreaRect = new Rectangle(textAreaRectPos, new Size(0, textHeight * 2));
             textAreaRect.Width = textWidth + leftPaddingText + rightPaddingText;
                 
             textCursorUp = textAreaRect.Location;

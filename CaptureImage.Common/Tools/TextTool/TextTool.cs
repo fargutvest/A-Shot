@@ -117,7 +117,7 @@ namespace CaptureImage.Common.Tools
         {
             if (specialKeyDown == null)
             {
-                chars.Add(e.KeyChar);
+                chars.Insert(numberOfCharWithCursor, e.KeyChar);
                 numberOfCharWithCursor += 1;
                 numberOfCharWithCursorShift = numberOfCharWithCursor;
                 Refresh();
@@ -157,6 +157,8 @@ namespace CaptureImage.Common.Tools
         private void RememberText()
         {
             chars.Clear();
+            numberOfCharWithCursor = 0;
+            numberOfCharWithCursorShift = numberOfCharWithCursor;
 
             if (text != null)
                 DrawingContext.RenderDrawing(text, needRemember: true);
@@ -182,18 +184,18 @@ namespace CaptureImage.Common.Tools
 
                 string str = new string(chars.ToArray());
 
-                string substr = GetSubstringByShift();
+                GetLocatorToHighlight(out int startIndexToHighlight, out int lengthToHighlight);
 
-                text = new Text(str, substr, fontName, FontSize, textColor, textLocation);
+                text = new Text(str, startIndexToHighlight, lengthToHighlight, fontName, FontSize, textColor, textLocation);
                 text.Paint(gr, null);
             }
         }
 
         private void CalculateForPaint(Graphics gr)
         {
-            float owerWidth = 0;
-            if (chars.Count > 0)
-                owerWidth = GraphicsHelper.GetFirstSymbolOverWidth(gr, chars.First(), fontName, FontSize); 
+            float overWidth = 0;
+            if (chars.Count > 0 && numberOfCharWithCursor > 0)
+                overWidth = GraphicsHelper.GetFirstSymbolOverWidth(gr, chars.First(), fontName, FontSize); 
 
             int textWidth = (int)GraphicsHelper.GetStringSize(gr, new string(chars.ToArray()), fontName, FontSize).Width;
             int cursorPosition = (int)GraphicsHelper.GetStringSize(gr, new string(chars.Take(numberOfCharWithCursor).ToArray()), fontName, FontSize).Width;
@@ -206,7 +208,7 @@ namespace CaptureImage.Common.Tools
             textAreaRect.Width = leftPaddingText + textWidth + rightPaddingText;
                 
             textCursorUp = textAreaRect.Location;
-            textCursorUp.X += leftPaddingText + cursorPosition - (int)owerWidth;
+            textCursorUp.X += leftPaddingText + cursorPosition - (int)overWidth;
             textCursorDown = textCursorUp;
             textCursorDown.Y += textHeight;
         }
@@ -239,7 +241,9 @@ namespace CaptureImage.Common.Tools
 
                     if (chars.Count > 0)
                     {
-                        chars.RemoveAt(chars.Count - 1);
+                        chars.RemoveAt(numberOfCharWithCursor - 1);
+                        numberOfCharWithCursor -= 1;
+                        numberOfCharWithCursorShift = numberOfCharWithCursor;
                         Refresh();
                     }
 
@@ -249,8 +253,7 @@ namespace CaptureImage.Common.Tools
 
                     if (chars.Count > 0)
                     {
-                        char charToDelete = chars[numberOfCharWithCursor];
-                        chars.Remove(charToDelete);
+                        chars.RemoveAt(numberOfCharWithCursor);
                         Refresh();
                     }
 
@@ -297,21 +300,22 @@ namespace CaptureImage.Common.Tools
 
         }
 
-        private string GetSubstringByShift()
+        private void GetLocatorToHighlight(out int startIndexToHighlight, out int lengthToHighlight)
         {
+            startIndexToHighlight = 0;
+            lengthToHighlight = 0;
+
             if (numberOfCharWithCursor > numberOfCharWithCursorShift)
             {
-                char[] substrChars = chars.Skip(numberOfCharWithCursorShift).Take(numberOfCharWithCursor - numberOfCharWithCursorShift).ToArray();
-                return new string(substrChars);
+                startIndexToHighlight = numberOfCharWithCursorShift;
+                lengthToHighlight = numberOfCharWithCursor - numberOfCharWithCursorShift;
             }
 
-            if (numberOfCharWithCursor < numberOfCharWithCursorShift)
+            else if (numberOfCharWithCursor < numberOfCharWithCursorShift)
             {
-                char[] substrChars = chars.Skip(numberOfCharWithCursor).Take(numberOfCharWithCursorShift - numberOfCharWithCursor).ToArray();
-                return new string(substrChars);
+                startIndexToHighlight = numberOfCharWithCursor;
+                lengthToHighlight = numberOfCharWithCursorShift - numberOfCharWithCursor;
             }
-
-            return string.Empty;
         }
 
 

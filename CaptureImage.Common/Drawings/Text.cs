@@ -5,8 +5,10 @@ namespace CaptureImage.Common.Drawings
 {
     public class Text: IDrawing
     {
+        private Color highlightColor = Color.Indigo;
         private string text;
-        private string substrToHighLight;
+        private int startIndexToHighlight;
+        private int lengthToHighlight;
         private Point location;
         private bool isDrawed;
         private Color color;
@@ -14,13 +16,14 @@ namespace CaptureImage.Common.Drawings
         private float fontSize;
 
         public Text(string text, string fontName, float fontSize, Color color, Point location) :
-            this(text, string.Empty, fontName, fontSize, color, location) { }
+            this(text, 0, 0, fontName, fontSize, color, location) { }
         
 
-        public Text(string text, string substrToHighLight, string fontName, float fontSize, Color color, Point location)
+        public Text(string text, int startIndexToHighlight, int lengthToHighlight, string fontName, float fontSize, Color color, Point location)
         {
             this.text = text;
-            this.substrToHighLight = substrToHighLight;
+            this.startIndexToHighlight = startIndexToHighlight;
+            this.lengthToHighlight = lengthToHighlight;
             this.fontName = fontName;
             this.fontSize = fontSize;
             this.color = color;
@@ -47,7 +50,7 @@ namespace CaptureImage.Common.Drawings
         {
             using (Font font = new Font(fontName, fontSize))
             {
-                HighlightSubstring(gr, font, substrToHighLight);
+                HighlightSubstring(gr, font);
 
                 using (Brush brush = new SolidBrush(color))
                 {
@@ -56,20 +59,31 @@ namespace CaptureImage.Common.Drawings
             }
         }
 
-        private void HighlightSubstring(Graphics gr, Font font, string substr)
+        private void HighlightSubstring(Graphics gr, Font font)
         {
-            SizeF textSize = gr.MeasureString(text, font);
+            if (lengthToHighlight == 0)
+                return; 
+
+            string substr = text.Substring(startIndexToHighlight, lengthToHighlight);
+            float overWidth = GraphicsHelper.GetFirstSymbolOverWidth(gr, substr[0], fontName, fontSize);
             SizeF substrSize = gr.MeasureString(substr, font);
 
-            int substrIndex = text.IndexOf(substr);
-            string textBeforeSubstr = text.Substring(0, substrIndex);
-
-            SizeF textBeforuSubstrSize = gr.MeasureString(textBeforeSubstr, font); 
+            string textBeforeSubstr = text.Substring(0, startIndexToHighlight);
+            SizeF textBeforeSubstrSize = gr.MeasureString(textBeforeSubstr, font);
             
             Point substrLocation = location;
-            substrLocation.X += (int)textBeforuSubstrSize.Width;
 
-            using (Brush highlightBrush = new SolidBrush(Color.Indigo))
+            if (textBeforeSubstrSize.Width > 0)
+            {
+                substrSize.Width -= overWidth * 2;
+                substrLocation.X += (int)textBeforeSubstrSize.Width - (int)overWidth;
+            }
+            else if (textBeforeSubstrSize.Width == 0)
+            {
+                substrSize.Width -= overWidth;
+            }
+
+            using (Brush highlightBrush = new SolidBrush(highlightColor))
             {
                 gr.FillRectangle(highlightBrush, new RectangleF(substrLocation, substrSize));
             }

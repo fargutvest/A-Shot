@@ -5,15 +5,15 @@ namespace CaptureImage.Common.Drawings
 {
     public class Text: IDrawing
     {
-        private Color highlightColor = Color.Indigo;
-        private string text;
-        private int startIndexToHighlight;
-        private int lengthToHighlight;
+        private readonly Color highlightColor = Color.Indigo;
+        private readonly string text;
+        private readonly int startIndexToHighlight;
+        private readonly int lengthToHighlight;
         private Point location;
         private bool isDrawed;
-        private Color color;
-        private string fontName;
-        private float fontSize;
+        private readonly Color color;
+        private readonly string fontName;
+        private readonly float fontSize;
 
         public Text(string text, string fontName, float fontSize, Color color, Point location) :
             this(text, 0, 0, fontName, fontSize, color, location) { }

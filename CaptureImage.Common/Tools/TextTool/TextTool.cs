@@ -209,6 +209,7 @@ namespace CaptureImage.Common.Tools
                 
             textCursorUp = textAreaRect.Location;
             textCursorUp.X += leftPaddingText + cursorPosition - (int)overWidth;
+            textCursorUp.Y += topPaddingText;
             textCursorDown = textCursorUp;
             textCursorDown.Y += textHeight;
         }

@@ -11,10 +11,11 @@ namespace CaptureImage.Common.Tools
 {
     public class TextTool : ITool, IKeyInputReceiver
     {
+        private bool shiftPressed;
         private Point relativeMouseStartPos;
         private string fontName = "Veranda";
         private int numberOfCharWithCursor = 0;
-        private int numberOfCharWithCursorShift = 0;
+        private int numberOfCharWithCursorShift = -1;
         private KeyEventArgs specialKeyDown = null;
         private readonly Color colorOfCursor = Color.DarkRed;
         private Text text;
@@ -119,13 +120,19 @@ namespace CaptureImage.Common.Tools
             {
                 chars.Insert(numberOfCharWithCursor, e.KeyChar);
                 numberOfCharWithCursor += 1;
-                numberOfCharWithCursorShift = numberOfCharWithCursor;
                 Refresh();
             }
         }
 
         public void KeyDown(KeyEventArgs e)
         {
+            if (e.KeyCode == Keys.ShiftKey)
+            {
+                numberOfCharWithCursorShift = numberOfCharWithCursor;
+                shiftPressed = true;
+            }
+               
+
             if (IsSpecialKey(e.KeyCode))
             {
                 specialKeyDown = e;
@@ -134,6 +141,9 @@ namespace CaptureImage.Common.Tools
 
         public void KeyUp(KeyEventArgs e)
         {
+            if (e.KeyCode == Keys.ShiftKey)
+                shiftPressed = false;
+
             if (IsSpecialKey(e.KeyCode))
             {
                 if (e.KeyData == specialKeyDown?.KeyData)
@@ -158,7 +168,6 @@ namespace CaptureImage.Common.Tools
         {
             chars.Clear();
             numberOfCharWithCursor = 0;
-            numberOfCharWithCursorShift = numberOfCharWithCursor;
 
             if (text != null)
                 DrawingContext.RenderDrawing(text, needRemember: true);
@@ -184,7 +193,10 @@ namespace CaptureImage.Common.Tools
 
                 string str = new string(chars.ToArray());
 
-                GetLocatorToHighlight(out int startIndexToHighlight, out int lengthToHighlight);
+                int startIndexToHighlight = 0;
+                int lengthToHighlight = 0;
+
+                GetShiftSelection(out startIndexToHighlight, out lengthToHighlight);
 
                 text = new Text(str, startIndexToHighlight, lengthToHighlight, fontName, FontSize, textColor, textLocation);
                 text.Paint(gr, null);
@@ -242,9 +254,21 @@ namespace CaptureImage.Common.Tools
 
                     if (chars.Count > 0)
                     {
-                        chars.RemoveAt(numberOfCharWithCursor - 1);
-                        numberOfCharWithCursor -= 1;
-                        numberOfCharWithCursorShift = numberOfCharWithCursor;
+                        if (numberOfCharWithCursorShift != -1)
+                        {
+                            GetShiftSelection(out int start, out int length);
+
+                            chars.RemoveRange(start, length);
+
+                            numberOfCharWithCursor = start;
+                            numberOfCharWithCursorShift = -1;
+                        }
+                        else
+                        {
+                            chars.RemoveAt(numberOfCharWithCursor - 1);
+                            numberOfCharWithCursor -= 1;
+                        }
+                       
                         Refresh();
                     }
 
@@ -254,7 +278,20 @@ namespace CaptureImage.Common.Tools
 
                     if (chars.Count > 0)
                     {
-                        chars.RemoveAt(numberOfCharWithCursor);
+                        if (numberOfCharWithCursorShift != -1)
+                        {
+                            GetShiftSelection(out int start, out int length);
+                            
+                            chars.RemoveRange(start, length);
+
+                            numberOfCharWithCursor = start;
+                            numberOfCharWithCursorShift = -1;
+                        }
+                        else
+                        {
+                            chars.RemoveAt(numberOfCharWithCursor);
+                        }
+
                         Refresh();
                     }
 
@@ -262,17 +299,19 @@ namespace CaptureImage.Common.Tools
 
                 case Keys.Left:
 
-                    if (e.Shift == true)
+                    if (shiftPressed == false && numberOfCharWithCursorShift != -1 && numberOfCharWithCursorShift < numberOfCharWithCursor)
                     {
-                        if (numberOfCharWithCursorShift > 0)
-                            numberOfCharWithCursorShift -= 1;
+                        numberOfCharWithCursor = numberOfCharWithCursorShift;
+                        numberOfCharWithCursorShift = -1;
+                    }
+                    else if (shiftPressed == false && numberOfCharWithCursorShift != -1 && numberOfCharWithCursorShift > numberOfCharWithCursor)
+                    {
+                        numberOfCharWithCursorShift = -1;
                     }
                     else
                     {
                         if (numberOfCharWithCursor > 0)
                             numberOfCharWithCursor -= 1;
-
-                        numberOfCharWithCursorShift = numberOfCharWithCursor;
                     }
 
                     Refresh();
@@ -281,41 +320,47 @@ namespace CaptureImage.Common.Tools
 
                 case Keys.Right:
 
-                    if (e.Shift == true)
+
+                    if (shiftPressed == false && numberOfCharWithCursorShift != -1 && numberOfCharWithCursorShift > numberOfCharWithCursor)
                     {
-                        if (numberOfCharWithCursorShift < chars.Count)
-                            numberOfCharWithCursorShift += 1;
+                        numberOfCharWithCursor = numberOfCharWithCursorShift;
+                        numberOfCharWithCursorShift = -1;
                     }
-                    else 
+                    else if (shiftPressed == false && numberOfCharWithCursorShift!= -1 && numberOfCharWithCursorShift < numberOfCharWithCursor)
+                    {
+                        numberOfCharWithCursorShift = -1;
+                    }
+                    else
                     {
                         if (numberOfCharWithCursor < chars.Count)
                             numberOfCharWithCursor += 1;
-
-                        numberOfCharWithCursorShift = numberOfCharWithCursor;
                     }
 
                     Refresh();
 
-                break;
+                    break;
             }
 
         }
 
-        private void GetLocatorToHighlight(out int startIndexToHighlight, out int lengthToHighlight)
+        private void GetShiftSelection(out int start, out int length)
         {
-            startIndexToHighlight = 0;
-            lengthToHighlight = 0;
+            start = 0;
+            length = 0;
+
+            if (numberOfCharWithCursorShift == -1)
+                return;
 
             if (numberOfCharWithCursor > numberOfCharWithCursorShift)
             {
-                startIndexToHighlight = numberOfCharWithCursorShift;
-                lengthToHighlight = numberOfCharWithCursor - numberOfCharWithCursorShift;
+                start = numberOfCharWithCursorShift;
+                length = numberOfCharWithCursor - numberOfCharWithCursorShift;
             }
 
             else if (numberOfCharWithCursor < numberOfCharWithCursorShift)
             {
-                startIndexToHighlight = numberOfCharWithCursor;
-                lengthToHighlight = numberOfCharWithCursorShift - numberOfCharWithCursor;
+                start = numberOfCharWithCursor;
+                length = numberOfCharWithCursorShift - numberOfCharWithCursor;
             }
         }
 

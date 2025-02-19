@@ -88,6 +88,7 @@
     <Compile Include="Tools\SelectingTool.cs" />
     <Compile Include="Helpers\HotKeys\WinApi\KBDLLHOOKSTRUCT.cs" />
     <Compile Include="Tools\TextTool\IKeyInputReceiver.cs" />
+    <Compile Include="Tools\TextTool\TextEditor.cs" />
     <Compile Include="Tools\TextTool\TextTool.cs" />
     <Compile Include="WinAPi.cs" />
     <Compile Include="Helpers\HotKeys\WinApi\WinAPI.Hook.cs" />

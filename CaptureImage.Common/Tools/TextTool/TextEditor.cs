@@ -14,17 +14,16 @@ namespace CaptureImage.Common.Tools
     {
         private bool shiftPressed;
         private string fontName = "Veranda";
-        public int numberOfCharWithCursor = 0;
+        private int numberOfCharWithCursor = 0;
         private int numberOfCharWithCursorShift = -1;
         private KeyEventArgs specialKeyDown = null;
         private readonly Color colorOfCursor = Color.DarkRed;
-        public Text text;
         private readonly Timer cursorTimer;
         private Point textCursorUp = Point.Empty;
         private Point textCursorDown = Point.Empty;
         private bool textCursorVisible;
-        public Rectangle textAreaRect;
-        public readonly List<char> chars;
+        private Rectangle textAreaRect;
+        private readonly List<char> chars;
         private bool isMouseDown;
         private readonly int topPaddingText = 5;
         private readonly int leftPaddingText = 5;
@@ -33,7 +32,9 @@ namespace CaptureImage.Common.Tools
 
         private float FontSize => MarkerDrawingHelper.GetPenDiameter() * 5;
 
-        public event EventHandler Refresh;
+        public Rectangle Bounds => textAreaRect;
+
+        public event EventHandler Updated;
 
         public TextEditor()
         {
@@ -45,12 +46,50 @@ namespace CaptureImage.Common.Tools
             cursorTimer.Start();
         }
 
+        public void CleanText()
+        {
+            chars.Clear();
+            numberOfCharWithCursor = 0;
+        }
+
+        public Text Render(Graphics gr, Color textColor, Point mousePosition, Point relativeMouseStartPos)
+        {
+            CalculateBeforeRender(gr, mousePosition, relativeMouseStartPos);
+
+            Rectangle borderRect = new Rectangle(textAreaRect.Location, textAreaRect.Size);
+            borderRect.Width -= 1;
+            borderRect.Height -= 1;
+            GraphicsHelper.DrawBorder(gr, borderRect);
+
+            using (Pen pen = new Pen(colorOfCursor, 5))
+            {
+                if (textCursorVisible)
+                    gr.DrawLine(pen, textCursorUp, textCursorDown);
+
+                Point textLocation = textAreaRect.Location;
+                textLocation.Y += topPaddingText;
+                textLocation.X += leftPaddingText;
+
+                string str = new string(chars.ToArray());
+
+                int startIndexToHighlight = 0;
+                int lengthToHighlight = 0;
+
+                GetShiftSelection(out startIndexToHighlight, out lengthToHighlight);
+
+                Text text = new Text(str, startIndexToHighlight, lengthToHighlight, fontName, FontSize, textColor, textLocation);
+                text.Paint(gr, null);
+
+                return text;
+            }
+        }
+
 
         #region IKeyInputReceiver
 
         public void MouseWheel(MouseEventArgs e)
         {
-            Refresh?.Invoke(this, new EventArgs());
+            Updated?.Invoke(this, new EventArgs());
         }
 
 
@@ -60,7 +99,7 @@ namespace CaptureImage.Common.Tools
             {
                 chars.Insert(numberOfCharWithCursor, e.KeyChar);
                 numberOfCharWithCursor += 1;
-                Refresh?.Invoke(this, new EventArgs());
+                Updated?.Invoke(this, new EventArgs());
             }
         }
 
@@ -97,40 +136,10 @@ namespace CaptureImage.Common.Tools
 
         #endregion
 
+
         #region private 
 
-
-        public void Paint(Graphics gr, Color textColor, Point mousePosition, Point relativeMouseStartPos)
-        {
-            CalculateForPaint(gr, mousePosition, relativeMouseStartPos);
-
-            Rectangle borderRect = new Rectangle(textAreaRect.Location, textAreaRect.Size);
-            borderRect.Width -= 1;
-            borderRect.Height -= 1;
-            GraphicsHelper.DrawBorder(gr, borderRect);
-
-            using (Pen pen = new Pen(colorOfCursor, 5))
-            {
-                if (textCursorVisible)
-                    gr.DrawLine(pen, textCursorUp, textCursorDown);
-
-                Point textLocation = textAreaRect.Location;
-                textLocation.Y += topPaddingText;
-                textLocation.X += leftPaddingText;
-
-                string str = new string(chars.ToArray());
-
-                int startIndexToHighlight = 0;
-                int lengthToHighlight = 0;
-
-                GetShiftSelection(out startIndexToHighlight, out lengthToHighlight);
-
-                text = new Text(str, startIndexToHighlight, lengthToHighlight, fontName, FontSize, textColor, textLocation);
-                text.Paint(gr, null);
-            }
-        }
-
-        private void CalculateForPaint(Graphics gr, Point mousePosition, Point relativeMouseStartPos)
+        private void CalculateBeforeRender(Graphics gr, Point mousePosition, Point relativeMouseStartPos)
         {
             float overWidth = 0;
             if (chars.Count > 0 && numberOfCharWithCursor > 0)
@@ -156,7 +165,7 @@ namespace CaptureImage.Common.Tools
         private void CursorTimer_Tick(object sender, EventArgs e)
         {
             textCursorVisible = !textCursorVisible;
-            Refresh?.Invoke(this, new EventArgs());
+            Updated?.Invoke(this, new EventArgs());
         }
 
 
@@ -191,7 +200,7 @@ namespace CaptureImage.Common.Tools
                             numberOfCharWithCursor -= 1;
                         }
 
-                        Refresh?.Invoke(this, new EventArgs());
+                        Updated?.Invoke(this, new EventArgs());
                     }
 
                     break;
@@ -214,7 +223,7 @@ namespace CaptureImage.Common.Tools
                             chars.RemoveAt(numberOfCharWithCursor);
                         }
 
-                        Refresh?.Invoke(this, new EventArgs());
+                        Updated?.Invoke(this, new EventArgs());
                     }
 
                     break;
@@ -236,7 +245,7 @@ namespace CaptureImage.Common.Tools
                             numberOfCharWithCursor -= 1;
                     }
 
-                    Refresh?.Invoke(this, new EventArgs());
+                    Updated?.Invoke(this, new EventArgs());
 
                     break;
 
@@ -258,7 +267,7 @@ namespace CaptureImage.Common.Tools
                             numberOfCharWithCursor += 1;
                     }
 
-                    Refresh?.Invoke(this, new EventArgs());
+                    Updated?.Invoke(this, new EventArgs());
 
                     break;
             }

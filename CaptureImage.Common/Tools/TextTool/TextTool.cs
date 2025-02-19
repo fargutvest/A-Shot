@@ -2,12 +2,14 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System;
+using CaptureImage.Common.Drawings;
 
 namespace CaptureImage.Common.Tools
 {
     public class TextTool : ITool, IKeyInputReceiver
     {
         private TextEditor textEditor;
+        private Text text;
 
         private Point relativeMouseStartPos;
         private bool isMouseDown;
@@ -21,14 +23,14 @@ namespace CaptureImage.Common.Tools
         public TextTool(IDrawingContextProvider drawingContextProvider)
         {
             this.textEditor = new TextEditor();
-            textEditor.Refresh += TextEditor_Refresh;
+            textEditor.Updated += TextEditor_Updated;
 
             this.drawingContextProvider = drawingContextProvider;
         }
 
-        private void TextEditor_Refresh(object sender, EventArgs e)
+        private void TextEditor_Updated(object sender, EventArgs e)
         {
-            Refresh();
+            ReRender();
         }
 
 
@@ -39,12 +41,12 @@ namespace CaptureImage.Common.Tools
             if (isMouseDown)
                 mousePosition = mouse;
 
-            bool isMouseOver = textEditor.textAreaRect.Contains(mouse);
+            bool isMouseOver = textEditor.Bounds.Contains(mouse);
 
             if (isActive)
             {
                 if (isMouseDown)
-                    Refresh();
+                    ReRender();
                 
                 if (isMouseOver)
                     Cursor.Current = Cursors.SizeAll;
@@ -60,7 +62,7 @@ namespace CaptureImage.Common.Tools
             {
                 isMouseDown = false;
                 mousePosition = mouse;
-                Refresh();
+                ReRender();
             }
         }
 
@@ -71,9 +73,9 @@ namespace CaptureImage.Common.Tools
                 isMouseDown = true;
                 mousePosition = mouse;
 
-                if (textEditor.textAreaRect.Contains(mouse))
-                    relativeMouseStartPos = textEditor.textAreaRect.Location.IsEmpty ? Point.Empty :
-                        new Point(mousePosition.X - textEditor.textAreaRect.X, mousePosition.Y - textEditor.textAreaRect.Y);
+                if (textEditor.Bounds.Contains(mouse))
+                    relativeMouseStartPos = textEditor.Bounds.Location.IsEmpty ? Point.Empty :
+                        new Point(mousePosition.X - textEditor.Bounds.X, mousePosition.Y - textEditor.Bounds.Y);
                 else
                     RememberText();
             }
@@ -120,17 +122,20 @@ namespace CaptureImage.Common.Tools
 
         private void RememberText()
         {
-            textEditor.chars.Clear();
-            textEditor.numberOfCharWithCursor = 0;
+            textEditor.CleanText();
 
-            if (textEditor.text != null)
-                DrawingContext.RenderDrawing(textEditor.text, needRemember: true);
+            if (text != null)
+                DrawingContext.RenderDrawing(text, needRemember: true);
         }
 
-        private void Refresh()
+        private void ReRender()
         {
             DrawingContext.RenderDrawing(null, needRemember: false);
-            DrawingContext.Draw((gr, _) =>  textEditor.Paint(gr, DrawingContext.GetColorOfPen(), mousePosition, relativeMouseStartPos), DrawingTarget.Canvas);
+            DrawingContext.Draw((gr, _) =>
+            {
+                text = textEditor.Render(gr, DrawingContext.GetColorOfPen(), mousePosition, relativeMouseStartPos);
+            },
+            DrawingTarget.Canvas);
         }
 
 

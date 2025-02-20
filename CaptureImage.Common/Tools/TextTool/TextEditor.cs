@@ -71,13 +71,10 @@ namespace CaptureImage.Common.Tools
                 textLocation.X += leftPaddingText;
 
                 string str = new string(chars.ToArray());
+                Text text = new Text(str, fontName, FontSize, textColor, textLocation);
+                GetShiftSelection(out var startIndexToHighlight, out var lengthToHighlight);
+                text.Highlight(startIndexToHighlight, lengthToHighlight);
 
-                int startIndexToHighlight = 0;
-                int lengthToHighlight = 0;
-
-                GetShiftSelection(out startIndexToHighlight, out lengthToHighlight);
-
-                Text text = new Text(str, startIndexToHighlight, lengthToHighlight, fontName, FontSize, textColor, textLocation);
                 text.Paint(gr, null);
 
                 return text;
@@ -89,7 +86,7 @@ namespace CaptureImage.Common.Tools
 
         public void MouseWheel(MouseEventArgs e)
         {
-            Updated?.Invoke(this, new EventArgs());
+            Updated?.Invoke(this, EventArgs.Empty);
         }
 
 
@@ -99,7 +96,7 @@ namespace CaptureImage.Common.Tools
             {
                 chars.Insert(numberOfCharWithCursor, e.KeyChar);
                 numberOfCharWithCursor += 1;
-                Updated?.Invoke(this, new EventArgs());
+                Updated?.Invoke(this, EventArgs.Empty);
             }
         }
 

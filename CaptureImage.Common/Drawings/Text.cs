@@ -7,28 +7,36 @@ namespace CaptureImage.Common.Drawings
     {
         private readonly Color highlightColor = Color.Indigo;
         private readonly string text;
-        private readonly int startIndexToHighlight;
-        private readonly int lengthToHighlight;
+        private int startIndexToHighlight;
+        private int lengthToHighlight;
         private Point location;
         private bool isDrawed;
         private readonly Color color;
         private readonly string fontName;
         private readonly float fontSize;
-
-        public Text(string text, string fontName, float fontSize, Color color, Point location) :
-            this(text, 0, 0, fontName, fontSize, color, location) { }
         
 
-        public Text(string text, int startIndexToHighlight, int lengthToHighlight, string fontName, float fontSize, Color color, Point location)
+        public Text(string text, string fontName, float fontSize, Color color, Point location)
         {
             this.text = text;
-            this.startIndexToHighlight = startIndexToHighlight;
-            this.lengthToHighlight = lengthToHighlight;
             this.fontName = fontName;
             this.fontSize = fontSize;
             this.color = color;
             this.location = location; 
         }
+
+        public void Highlight(int startIndexToHighlight, int lengthToHighlight)
+        {
+            this.startIndexToHighlight = startIndexToHighlight;
+            this.lengthToHighlight = lengthToHighlight;
+        }
+
+        public void ResetHighlight()
+        {
+            this.startIndexToHighlight = 0;
+            this.lengthToHighlight = 0;
+        }
+
 
         public void Paint(Graphics gr, Pen pen)
         {
@@ -45,6 +53,8 @@ namespace CaptureImage.Common.Drawings
         {
             PaintInternal(gr);
         }
+
+        #region private
 
         private void PaintInternal(Graphics gr)
         {
@@ -88,6 +98,8 @@ namespace CaptureImage.Common.Drawings
                 gr.FillRectangle(highlightBrush, new RectangleF(substrLocation, substrSize));
             }
         }
+
+        #endregion
 
         #region override
 

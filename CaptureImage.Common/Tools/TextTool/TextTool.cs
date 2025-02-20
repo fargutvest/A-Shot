@@ -125,7 +125,10 @@ namespace CaptureImage.Common.Tools
             textEditor.CleanText();
 
             if (text != null)
+            {
+                text.ResetHighlight();
                 DrawingContext.RenderDrawing(text, needRemember: true);
+            }
         }
 
         private void ReRender()

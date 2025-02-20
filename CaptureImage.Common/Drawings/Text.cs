@@ -14,7 +14,14 @@ namespace CaptureImage.Common.Drawings
         private readonly Color color;
         private readonly string fontName;
         private readonly float fontSize;
-        
+        private Point cursorTop;
+        private Point cursorBottom;
+        private readonly Color colorOfCursor = Color.DarkRed;
+        private Rectangle borderRect;
+
+        public bool ShowCursor { get; set; }
+
+        public bool ShowBorder { get; set; }
 
         public Text(string text, string fontName, float fontSize, Color color, Point location)
         {
@@ -37,6 +44,16 @@ namespace CaptureImage.Common.Drawings
             this.lengthToHighlight = 0;
         }
 
+        public void SetCursor(Point top, Point bottom)
+        {
+            this.cursorTop = top;
+            this.cursorBottom = bottom;
+        }
+
+        public void SetBorderRect(Rectangle borderRect)
+        {
+            this.borderRect = borderRect;
+        }
 
         public void Paint(Graphics gr, Pen pen)
         {
@@ -58,6 +75,15 @@ namespace CaptureImage.Common.Drawings
 
         private void PaintInternal(Graphics gr)
         {
+            if (ShowBorder)
+                GraphicsHelper.DrawBorder(gr, borderRect);
+
+            using (Pen pen = new Pen(colorOfCursor, 5))
+            {
+                if (ShowCursor)
+                    gr.DrawLine(pen, cursorTop, cursorBottom);
+            }
+
             using (Font font = new Font(fontName, fontSize))
             {
                 HighlightSubstring(gr, font);

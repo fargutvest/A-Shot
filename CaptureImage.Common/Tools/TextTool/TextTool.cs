@@ -22,9 +22,6 @@ namespace CaptureImage.Common.Tools
 
         public TextTool(IDrawingContextProvider drawingContextProvider)
         {
-            this.textEditor = new TextEditor();
-            textEditor.Updated += TextEditor_Updated;
-
             this.drawingContextProvider = drawingContextProvider;
         }
 
@@ -72,10 +69,9 @@ namespace CaptureImage.Common.Tools
             {
                 isMouseDown = true;
                 mousePosition = mouse;
-
+                
                 if (textEditor.Bounds.Contains(mouse))
-                    relativeMouseStartPos = textEditor.Bounds.Location.IsEmpty ? Point.Empty :
-                        new Point(mousePosition.X - textEditor.Bounds.X, mousePosition.Y - textEditor.Bounds.Y);
+                    relativeMouseStartPos = textEditor.Translate(mousePosition);
                 else
                     RememberText();
             }
@@ -83,11 +79,15 @@ namespace CaptureImage.Common.Tools
 
         public void Activate()
         {
+            textEditor = new TextEditor();
+            textEditor.Updated += TextEditor_Updated;
             isActive = true;
         }
 
         public void Deactivate()
         {
+            textEditor.Updated -= TextEditor_Updated;
+            textEditor.Dispose();
             isActive = false;
             RememberText();
         }
@@ -127,18 +127,17 @@ namespace CaptureImage.Common.Tools
             if (text != null)
             {
                 text.ResetHighlight();
+                text.ShowBorder = false;
+                text.ShowCursor = false;
                 DrawingContext.RenderDrawing(text, needRemember: true);
             }
         }
 
         private void ReRender()
         {
-            DrawingContext.RenderDrawing(null, needRemember: false);
-            DrawingContext.Draw((gr, _) =>
-            {
-                text = textEditor.Render(gr, DrawingContext.GetColorOfPen(), mousePosition, relativeMouseStartPos);
-            },
-            DrawingTarget.Canvas);
+            Point drawingLocation = new Point(mousePosition.X - relativeMouseStartPos.X, mousePosition.Y - relativeMouseStartPos.Y);
+            text = textEditor.GetDrawing(DrawingContext.GetColorOfPen(), drawingLocation);
+            DrawingContext.RenderDrawing(text, needRemember: false);
         }
 
 

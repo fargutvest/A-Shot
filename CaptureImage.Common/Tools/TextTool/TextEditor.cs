@@ -1,5 +1,4 @@
-﻿using CaptureImage.Common.DrawingContext;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Windows.Forms;
 using System;
 using CaptureImage.Common.Helpers;
@@ -10,29 +9,29 @@ using System.Linq;
 
 namespace CaptureImage.Common.Tools
 {
-    internal class TextEditor: IKeyInputReceiver
+    internal class TextEditor: IKeyInputReceiver, IDisposable
     {
         private bool shiftPressed;
-        private string fontName = "Veranda";
+        private readonly string fontName = "Veranda";
         private int numberOfCharWithCursor = 0;
         private int numberOfCharWithCursorShift = -1;
         private KeyEventArgs specialKeyDown = null;
         private readonly Color colorOfCursor = Color.DarkRed;
         private readonly Timer cursorTimer;
-        private Point textCursorUp = Point.Empty;
-        private Point textCursorDown = Point.Empty;
+        private Point textCursorTop = Point.Empty;
+        private Point textCursorBottom = Point.Empty;
         private bool textCursorVisible;
         private Rectangle textAreaRect;
         private readonly List<char> chars;
-        private bool isMouseDown;
         private readonly int topPaddingText = 5;
         private readonly int leftPaddingText = 5;
         private readonly int rightPaddingText = 20;
-        private bool isActive;
 
         private float FontSize => MarkerDrawingHelper.GetPenDiameter() * 5;
 
         public Rectangle Bounds => textAreaRect;
+
+        public Point Translate(Point point) => Bounds.Location.IsEmpty || Bounds.Contains(point) == false ? Point.Empty : new Point(point.X - Bounds.X, point.Y - Bounds.Y);
 
         public event EventHandler Updated;
 
@@ -51,34 +50,51 @@ namespace CaptureImage.Common.Tools
             chars.Clear();
             numberOfCharWithCursor = 0;
         }
-
-        public Text Render(Graphics gr, Color textColor, Point mousePosition, Point relativeMouseStartPos)
+        
+        public Text GetDrawing(Color textColor, Point location)
         {
-            CalculateBeforeRender(gr, mousePosition, relativeMouseStartPos);
+            using (Bitmap bitmap = new Bitmap(1, 1))
+            {
+                using (Graphics gr = Graphics.FromImage(bitmap))
+                {
+                    float overWidth = 0;
+                    if (chars.Count > 0 && numberOfCharWithCursor > 0)
+                        overWidth = GraphicsHelper.GetFirstSymbolOverWidth(gr, chars.First(), fontName, FontSize);
+
+                    int textWidth = (int)GraphicsHelper.GetStringSize(gr, new string(chars.ToArray()), fontName, FontSize).Width;
+                    int cursorPosition = (int)GraphicsHelper.GetStringSize(gr, new string(chars.Take(numberOfCharWithCursor).ToArray()), fontName, FontSize).Width;
+
+                    int textHeight = (int)GraphicsHelper.GetStringSize(gr, "1", fontName, FontSize).Height;
+                    
+                    textAreaRect = new Rectangle(location, new Size(0, textHeight * 2));
+                    textAreaRect.Width = leftPaddingText + textWidth + rightPaddingText;
+
+                    textCursorTop = textAreaRect.Location;
+                    textCursorTop.X += leftPaddingText + cursorPosition - (int)overWidth;
+                    textCursorTop.Y += topPaddingText;
+                    textCursorBottom = textCursorTop;
+                    textCursorBottom.Y += textHeight;
+                }
+            }
 
             Rectangle borderRect = new Rectangle(textAreaRect.Location, textAreaRect.Size);
             borderRect.Width -= 1;
             borderRect.Height -= 1;
-            GraphicsHelper.DrawBorder(gr, borderRect);
+            
+            Point textLocation = textAreaRect.Location;
+            textLocation.Y += topPaddingText;
+            textLocation.X += leftPaddingText;
 
-            using (Pen pen = new Pen(colorOfCursor, 5))
-            {
-                if (textCursorVisible)
-                    gr.DrawLine(pen, textCursorUp, textCursorDown);
+            string str = new string(chars.ToArray());
+            Text text = new Text(str, fontName, FontSize, textColor, textLocation);
+            GetShiftSelection(out var startIndexToHighlight, out var lengthToHighlight);
 
-                Point textLocation = textAreaRect.Location;
-                textLocation.Y += topPaddingText;
-                textLocation.X += leftPaddingText;
-
-                string str = new string(chars.ToArray());
-                Text text = new Text(str, fontName, FontSize, textColor, textLocation);
-                GetShiftSelection(out var startIndexToHighlight, out var lengthToHighlight);
-                text.Highlight(startIndexToHighlight, lengthToHighlight);
-
-                text.Paint(gr, null);
-
-                return text;
-            }
+            text.Highlight(startIndexToHighlight, lengthToHighlight);
+            text.SetBorderRect(borderRect);
+            text.ShowBorder = true;
+            text.SetCursor(textCursorTop, textCursorBottom);
+            text.ShowCursor = textCursorVisible;
+            return text;
         }
 
 
@@ -88,8 +104,7 @@ namespace CaptureImage.Common.Tools
         {
             Updated?.Invoke(this, EventArgs.Empty);
         }
-
-
+        
         public void KeyPress(KeyPressEventArgs e)
         {
             if (specialKeyDown == null)
@@ -135,34 +150,11 @@ namespace CaptureImage.Common.Tools
 
 
         #region private 
-
-        private void CalculateBeforeRender(Graphics gr, Point mousePosition, Point relativeMouseStartPos)
-        {
-            float overWidth = 0;
-            if (chars.Count > 0 && numberOfCharWithCursor > 0)
-                overWidth = GraphicsHelper.GetFirstSymbolOverWidth(gr, chars.First(), fontName, FontSize);
-
-            int textWidth = (int)GraphicsHelper.GetStringSize(gr, new string(chars.ToArray()), fontName, FontSize).Width;
-            int cursorPosition = (int)GraphicsHelper.GetStringSize(gr, new string(chars.Take(numberOfCharWithCursor).ToArray()), fontName, FontSize).Width;
-
-            int textHeight = (int)GraphicsHelper.GetStringSize(gr, "1", fontName, FontSize).Height;
-
-            Point textAreaRectPos = new Point(mousePosition.X - relativeMouseStartPos.X, mousePosition.Y - relativeMouseStartPos.Y);
-
-            textAreaRect = new Rectangle(textAreaRectPos, new Size(0, textHeight * 2));
-            textAreaRect.Width = leftPaddingText + textWidth + rightPaddingText;
-
-            textCursorUp = textAreaRect.Location;
-            textCursorUp.X += leftPaddingText + cursorPosition - (int)overWidth;
-            textCursorUp.Y += topPaddingText;
-            textCursorDown = textCursorUp;
-            textCursorDown.Y += textHeight;
-        }
-
+        
         private void CursorTimer_Tick(object sender, EventArgs e)
         {
             textCursorVisible = !textCursorVisible;
-            Updated?.Invoke(this, new EventArgs());
+            Updated?.Invoke(this, EventArgs.Empty);
         }
 
 
@@ -197,7 +189,7 @@ namespace CaptureImage.Common.Tools
                             numberOfCharWithCursor -= 1;
                         }
 
-                        Updated?.Invoke(this, new EventArgs());
+                        Updated?.Invoke(this, EventArgs.Empty);
                     }
 
                     break;
@@ -220,7 +212,7 @@ namespace CaptureImage.Common.Tools
                             chars.RemoveAt(numberOfCharWithCursor);
                         }
 
-                        Updated?.Invoke(this, new EventArgs());
+                        Updated?.Invoke(this, EventArgs.Empty);
                     }
 
                     break;
@@ -242,7 +234,7 @@ namespace CaptureImage.Common.Tools
                             numberOfCharWithCursor -= 1;
                     }
 
-                    Updated?.Invoke(this, new EventArgs());
+                    Updated?.Invoke(this, EventArgs.Empty);
 
                     break;
 
@@ -264,7 +256,7 @@ namespace CaptureImage.Common.Tools
                             numberOfCharWithCursor += 1;
                     }
 
-                    Updated?.Invoke(this, new EventArgs());
+                    Updated?.Invoke(this, EventArgs.Empty);
 
                     break;
             }
@@ -294,6 +286,12 @@ namespace CaptureImage.Common.Tools
 
 
         #endregion
+
+        public void Dispose()
+        {
+            cursorTimer?.Stop();
+            cursorTimer?.Dispose();
+        }
     }
 
 }

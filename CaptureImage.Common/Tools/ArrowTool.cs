@@ -35,7 +35,7 @@ namespace CaptureImage.Common.Tools
                     arrow = new Arrow(mouseStartPos, mouse, endCap);
                     
                 DrawingContext.RenderDrawing(arrow, needRemember: false);
-                MarkerDrawingHelper.DrawMarker(DrawingContext);
+                MarkerDrawingHelper.DrawMarker(DrawingContext, mouse);
                 mousePreviousPos = mouse;
             }
         }

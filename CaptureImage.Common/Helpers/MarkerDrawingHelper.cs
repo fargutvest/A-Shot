@@ -1,5 +1,6 @@
 ﻿using CaptureImage.Common.DrawingContext;
 using CaptureImage.Common.Drawings;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -28,26 +29,26 @@ namespace CaptureImage.Common.Helpers
                 diameter = diameter - 1;
         }
 
-        public static void ReDrawMarker(DrawingContext.DrawingContext drawingContext)
+        public static void ReDrawMarker(DrawingContext.DrawingContext drawingContext, Point location)
         {
             if (marker != null)
                 drawingContext.Erase(marker.Erase, DrawingTarget.Canvas);
 
-            DrawMarkerInternal(drawingContext);
+            DrawMarkerInternal(drawingContext, location);
         }
 
-        public static void DrawMarker(DrawingContext.DrawingContext drawingContext) 
+        public static void DrawMarker(DrawingContext.DrawingContext drawingContext, Point location) 
         {
-            DrawMarkerInternal(drawingContext);
+            DrawMarkerInternal(drawingContext, location);
         }
         
         #region private
         
-        private static void DrawMarkerInternal(DrawingContext.DrawingContext drawingContext)
+        private static void DrawMarkerInternal(DrawingContext.DrawingContext drawingContext, Point location)
         {
             drawingContext.Draw((gr, pen) =>
             {
-                marker = GetMarker(Cursor.Position);
+                marker = GetMarker(location);
                 marker.Paint(gr, markerPen);
             }, DrawingTarget.Canvas);
         }

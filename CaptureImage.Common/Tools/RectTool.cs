@@ -41,7 +41,7 @@ namespace CaptureImage.Common.Tools
                     rect = new Rect(GetRectangle(mouseStartPos, mouse));
 
                 DrawingContext.RenderDrawing(rect, needRemember: false);
-                MarkerDrawingHelper.DrawMarker(DrawingContext);
+                MarkerDrawingHelper.DrawMarker(DrawingContext, mouse);
             }
         }
 

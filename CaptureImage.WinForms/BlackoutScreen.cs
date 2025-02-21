@@ -5,6 +5,8 @@ using CaptureImage.Common.Extensions;
 using System.Linq;
 using CaptureImage.Common;
 using CaptureImage.Common.DrawingContext;
+using CaptureImage.Common.Helpers.HotKeys;
+using CaptureImage.Common.Helpers;
 
 namespace CaptureImage.WinForms
 {
@@ -15,7 +17,9 @@ namespace CaptureImage.WinForms
         private readonly SelectingTool selectingTool;
         private ITool drawingTool;
         private readonly AppContext appContext;
-        
+        private readonly MouseHookHelper mouseHookHelper;
+        private Point mousePosition;
+
         public Mode Mode { get; set; }
 
         public BlackoutScreen(AppContext appContext)
@@ -29,6 +33,9 @@ namespace CaptureImage.WinForms
             ControlStyles.UserPaint |
             ControlStyles.OptimizedDoubleBuffer, true);
             UpdateStyles();
+
+            mouseHookHelper = new MouseHookHelper();
+            mouseHookHelper.MouseWheel += MouseHookHelper_MouseWheel;
 
             this.appContext = appContext;
             this.appContext.DrawingContextChanged += AppContext_DrawingContextChanged;
@@ -55,6 +62,17 @@ namespace CaptureImage.WinForms
             }
 
             this.Controls.AddRange(thumb.Components);
+        }
+
+        private void MouseHookHelper_MouseWheel(object sender, int e)
+        {
+            if (e > 0)
+                MarkerDrawingHelper.DecreaseMarkerDiameter();
+
+            else if (e < 0)
+                MarkerDrawingHelper.IncreaseMarkerDiameter();
+
+            MarkerDrawingHelper.ReDrawMarker(appContext.DrawingContext, mousePosition);
         }
 
         private void AppContext_DrawingContextChanged(object sender, System.EventArgs e)
@@ -159,6 +177,7 @@ namespace CaptureImage.WinForms
 
         private void BlackoutScreen_MouseMove(object sender, MouseEventArgs e)
         {
+            mousePosition = e.Location;
             MouseMoveEvent(e.Location);
         }
 

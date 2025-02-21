@@ -15,7 +15,6 @@ namespace CaptureImage.WinForms
     {
         private readonly NotifyIcon trayIcon;
         private readonly HotKeysHelper hotKeysHelper;
-        public MouseHookHelper mouseHookHelper { get; }
         private readonly BlackoutScreen blackoutScreen;
         private bool isSessionOn;
         private Bitmap screenShot;
@@ -45,8 +44,7 @@ namespace CaptureImage.WinForms
             hotKeysHelper.RegisterHotKey(Keys.Control, Keys.X, EndSession);
             hotKeysHelper.RegisterHotKey(Keys.Escape, OnEscape);
 
-            mouseHookHelper = new MouseHookHelper();
-            mouseHookHelper.MouseWheel += MouseHookHelper_MouseWheel;
+
 
             trayIcon = new NotifyIcon()
             {
@@ -60,16 +58,7 @@ namespace CaptureImage.WinForms
             blackoutScreen = new BlackoutScreen(this);
         }
 
-        private void MouseHookHelper_MouseWheel(object sender, int e)
-        {
-            if (e > 0)
-                MarkerDrawingHelper.DecreaseMarkerDiameter();
-            
-            else if (e < 0)
-                MarkerDrawingHelper.IncreaseMarkerDiameter();
-
-            MarkerDrawingHelper.ReDrawMarker(DrawingContext);
-        }
+ 
 
         public void UndoDrawing()
         {

@@ -43,7 +43,7 @@ namespace CaptureImage.Common.Tools
                     line = new Line(mouseStartPos, mouse);
 
                 DrawingContext.RenderDrawing(line, needRemember: false);
-                MarkerDrawingHelper.DrawMarker(DrawingContext);
+                MarkerDrawingHelper.DrawMarker(DrawingContext, mouse);
                 mousePreviousPos = mouse;
             }
         }

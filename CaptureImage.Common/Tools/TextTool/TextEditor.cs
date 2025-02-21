@@ -109,8 +109,7 @@ namespace CaptureImage.Common.Tools
         {
             if (specialKeyDown == null)
             {
-                chars.Insert(numberOfCharWithCursor, e.KeyChar);
-                numberOfCharWithCursor += 1;
+                ProcessKeyPress(e);
                 Updated?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -122,8 +121,7 @@ namespace CaptureImage.Common.Tools
                 numberOfCharWithCursorShift = numberOfCharWithCursor;
                 shiftPressed = true;
             }
-
-
+            
             if (IsSpecialKey(e.KeyCode))
             {
                 specialKeyDown = e;
@@ -260,7 +258,23 @@ namespace CaptureImage.Common.Tools
 
                     break;
             }
+        }
 
+        private void ProcessKeyPress(KeyPressEventArgs e)
+        {
+            if (numberOfCharWithCursorShift != -1)
+            {
+                if (chars.Count > 0)
+                {
+                    GetShiftSelection(out int start, out int length);
+                    chars.RemoveRange(start, length);
+                    numberOfCharWithCursor = start;
+                    numberOfCharWithCursorShift = -1;
+                }
+            }
+
+            chars.Insert(numberOfCharWithCursor, e.KeyChar);
+            numberOfCharWithCursor += 1;
         }
 
         private void GetShiftSelection(out int start, out int length)

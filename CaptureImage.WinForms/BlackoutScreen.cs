@@ -17,7 +17,6 @@ namespace CaptureImage.WinForms
         private readonly SelectingTool selectingTool;
         private ITool drawingTool;
         private readonly AppContext appContext;
-        private readonly MouseHookHelper mouseHookHelper;
         private Point mousePosition;
 
         public Mode Mode { get; set; }
@@ -32,10 +31,7 @@ namespace CaptureImage.WinForms
             SetStyle(ControlStyles.AllPaintingInWmPaint |
             ControlStyles.UserPaint |
             ControlStyles.OptimizedDoubleBuffer, true);
-            UpdateStyles();
-
-            mouseHookHelper = new MouseHookHelper();
-            mouseHookHelper.MouseWheel += MouseHookHelper_MouseWheel;
+            UpdateStyles();;
 
             this.appContext = appContext;
             this.appContext.DrawingContextChanged += AppContext_DrawingContextChanged;
@@ -62,17 +58,6 @@ namespace CaptureImage.WinForms
             }
 
             this.Controls.AddRange(thumb.Components);
-        }
-
-        private void MouseHookHelper_MouseWheel(object sender, int e)
-        {
-            if (e > 0)
-                MarkerDrawingHelper.DecreaseMarkerDiameter();
-
-            else if (e < 0)
-                MarkerDrawingHelper.IncreaseMarkerDiameter();
-
-            MarkerDrawingHelper.ReDrawMarker(appContext.DrawingContext, mousePosition);
         }
 
         private void AppContext_DrawingContextChanged(object sender, System.EventArgs e)
@@ -186,6 +171,14 @@ namespace CaptureImage.WinForms
         {
             if (drawingTool is IKeyInputReceiver textTool)
                 textTool.MouseWheel(e);
+
+            if (e.Delta > 0)
+                MarkerDrawingHelper.DecreaseMarkerDiameter();
+
+            else if (e.Delta < 0)
+                MarkerDrawingHelper.IncreaseMarkerDiameter();
+
+            MarkerDrawingHelper.ReDrawMarker(appContext.DrawingContext, mousePosition);
         }
 
         private void MouseMoveEvent(Point mouse)

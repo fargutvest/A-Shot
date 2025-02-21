@@ -15,7 +15,7 @@ namespace CaptureImage.Common.Tools
         private readonly string fontName = "Veranda";
         private int numberOfCharWithCursor = 0;
         private int numberOfCharWithCursorShift = -1;
-        private KeyEventArgs specialKeyDown = null;
+        private Keys specialKeyCodeDown  = Keys.None;
         private readonly Color colorOfCursor = Color.DarkRed;
         private readonly Timer cursorTimer;
         private Point textCursorTop = Point.Empty;
@@ -107,7 +107,7 @@ namespace CaptureImage.Common.Tools
         
         public void KeyPress(KeyPressEventArgs e)
         {
-            if (specialKeyDown == null)
+            if (specialKeyCodeDown == Keys.None)
             {
                 ProcessKeyPress(e);
                 Updated?.Invoke(this, EventArgs.Empty);
@@ -124,7 +124,7 @@ namespace CaptureImage.Common.Tools
             
             if (IsSpecialKey(e.KeyCode))
             {
-                specialKeyDown = e;
+                specialKeyCodeDown = e.KeyCode;
             }
         }
 
@@ -135,9 +135,9 @@ namespace CaptureImage.Common.Tools
 
             if (IsSpecialKey(e.KeyCode))
             {
-                if (e.KeyData == specialKeyDown?.KeyData)
+                if (e.KeyCode == specialKeyCodeDown)
                 {
-                    specialKeyDown = null;
+                    specialKeyCodeDown = Keys.None;
                 }
 
                 ProcessSpecialKeyUp(e);

@@ -162,6 +162,12 @@ namespace CaptureImage.WinForms
 
         private void BlackoutScreen_MouseMove(object sender, MouseEventArgs e)
         {
+            if (sender is Control && sender is Thumb.Thumb == false && sender != this)
+                MarkerDrawingHelper.IsMarkerEnabled = false;
+            else
+                MarkerDrawingHelper.IsMarkerEnabled = true;
+
+
             mousePosition = e.Location;
             MouseMoveEvent(e.Location);
         }

@@ -12,6 +12,8 @@ namespace CaptureImage.Common.Helpers
         private static int diameter = 2;
         private static IDrawing marker;
 
+        public static bool IsMarkerEnabled { get; set; }
+
         public static int GetPenDiameter()
         {
             return diameter;
@@ -46,11 +48,14 @@ namespace CaptureImage.Common.Helpers
         
         private static void DrawMarkerInternal(DrawingContext.DrawingContext drawingContext, Point location)
         {
-            drawingContext.Draw((gr, pen) =>
+            if (IsMarkerEnabled)
             {
-                marker = GetMarker(location);
-                marker.Paint(gr, markerPen);
-            }, DrawingTarget.Canvas);
+                drawingContext.Draw((gr, pen) =>
+                {
+                    marker = GetMarker(location);
+                    marker.Paint(gr, markerPen);
+                }, DrawingTarget.Canvas);
+            }
         }
 
         private static IDrawing GetMarker(Point location) => new Circle(diameter,

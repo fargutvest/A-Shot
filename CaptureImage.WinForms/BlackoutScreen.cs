@@ -5,15 +5,15 @@ using CaptureImage.Common.Extensions;
 using System.Linq;
 using CaptureImage.Common;
 using CaptureImage.Common.DrawingContext;
-using CaptureImage.Common.Helpers.HotKeys;
 using CaptureImage.Common.Helpers;
+using CaptureImage.Common.Thumb;
 
 namespace CaptureImage.WinForms
 {
     public partial class BlackoutScreen : Form, ICanvas
     {
         private bool isInit = true;
-        private readonly Thumb.Thumb thumb;
+        private readonly IThumb thumb;
         private readonly SelectingTool selectingTool;
         private ITool drawingTool;
         private readonly AppContext appContext;
@@ -44,15 +44,16 @@ namespace CaptureImage.WinForms
 
             Mode = Mode.Selecting;
 
+            //this.thumb = new Thumb.ThumbNew(appContext, this);
             this.thumb = new Thumb.Thumb(appContext);
-            this.thumb.Size = new Size(0, 0);
+            this.thumb.Bounds = Rectangle.Empty;
             this.thumb.MouseDown += (sender, e) => BlackoutScreen_MouseDown(sender, e.Offset(thumb.Location));
             this.thumb.MouseUp += (sender, e) => BlackoutScreen_MouseUp(sender, e.Offset(thumb.Location));
             this.thumb.MouseMove += (sender, e) => BlackoutScreen_MouseMove(sender, e.Offset(thumb.Location));
             this.thumb.StateChanged += Thumb_StateChanged;
             this.thumb.ActionCalled += Thumb_ActionCalled;
 
-            foreach (Control control in thumb.Components.Except(new Control[] { this.thumb }))
+            foreach (Control control in thumb.Components.Except(new[] { this.thumb as Control }))
             {
                 control.MouseMove += BlackoutScreen_MouseMove;
             }
@@ -84,29 +85,29 @@ namespace CaptureImage.WinForms
             selectingTool.Select(Rectangle.Empty);
         }
 
-        private void Thumb_ActionCalled(object sender, Thumb.ThumbAction e)
+        private void Thumb_ActionCalled(object sender, ThumbAction e)
         {
             switch (e)
             {
-                case Thumb.ThumbAction.Copy:
+                case ThumbAction.Copy:
                     appContext.MakeScreenShot();
                     break;
 
-                case Thumb.ThumbAction.Undo:
+                case ThumbAction.Undo:
                     appContext.UndoDrawing();
                     if (appContext.DrawingContext.IsClean)
                         SwitchToSelectingMode();
                     break;
 
-                case Thumb.ThumbAction.Save:
+                case ThumbAction.Save:
                     appContext.SaveScreenShot();
                     break;
 
-                case Thumb.ThumbAction.Close:
+                case ThumbAction.Close:
                     appContext.EndSession();
                     break;
 
-                case Thumb.ThumbAction.Color:
+                case ThumbAction.Color:
                     appContext.SelectColor();
                     break;
             }
@@ -162,7 +163,7 @@ namespace CaptureImage.WinForms
 
         private void BlackoutScreen_MouseMove(object sender, MouseEventArgs e)
         {
-            if (sender is Control && sender is Thumb.Thumb == false && sender != this)
+            if (sender is Control && sender is IThumb == false && sender != this)
                 MarkerDrawingHelper.IsMarkerEnabled = false;
             else
                 MarkerDrawingHelper.IsMarkerEnabled = true;

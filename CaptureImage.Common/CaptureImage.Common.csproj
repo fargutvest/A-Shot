@@ -71,12 +71,14 @@
     <Compile Include="Helpers\SafeHelper.cs" />
     <Compile Include="Helpers\ScreensHelper.cs" />
     <Compile Include="ICanvas.cs" />
-    <Compile Include="IThumb.cs" />
+    <Compile Include="Thumb\IThumb.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScreenInfo.cs" />
     <Compile Include="DrawingContext\DrawingContext.cs" />
     <Compile Include="Drawings\Curve.cs" />
     <Compile Include="Drawings\IDrawing.cs" />
+    <Compile Include="Thumb\ThumbAction.cs" />
+    <Compile Include="Thumb\ThumbState.cs" />
     <Compile Include="Tools\ArrowTool.cs" />
     <Compile Include="Tools\Misc\DrawingState.cs" />
     <Compile Include="Tools\ITool.cs" />
@@ -93,5 +95,6 @@
     <Compile Include="WinAPi.cs" />
     <Compile Include="Helpers\HotKeys\WinApi\WinAPI.Hook.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

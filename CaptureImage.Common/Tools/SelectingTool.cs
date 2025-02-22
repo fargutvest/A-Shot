@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using CaptureImage.Common.Thumb;
 using CaptureImage.Common.Tools.Misc;
 
 

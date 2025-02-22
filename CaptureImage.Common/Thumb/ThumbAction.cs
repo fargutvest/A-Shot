@@ -1,4 +1,4 @@
-﻿namespace CaptureImage.WinForms.Thumb
+﻿namespace CaptureImage.Common.Thumb
 {
     public enum ThumbAction
     {

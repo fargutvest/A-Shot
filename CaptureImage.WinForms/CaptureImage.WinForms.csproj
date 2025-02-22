@@ -67,12 +67,10 @@
     <Compile Include="Thumb\Thumb.Designer.cs">
       <DependentUpon>Thumb.cs</DependentUpon>
     </Compile>
-    <Compile Include="Thumb\ThumbAction.cs" />
     <Compile Include="Thumb\ThumbNew.cs" />
     <Compile Include="Thumb\ThumbNew.Designer.cs">
       <DependentUpon>ThumbNew.cs</DependentUpon>
     </Compile>
-    <Compile Include="Thumb\ThumbState.cs" />
     <Compile Include="WinAPi.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

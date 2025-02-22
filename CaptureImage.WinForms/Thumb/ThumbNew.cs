@@ -4,28 +4,34 @@ using System.Windows.Forms;
 using CaptureImage.Common;
 using System;
 using CaptureImage.Common.DrawingContext;
+using CaptureImage.Common.Thumb;
 
 namespace CaptureImage.WinForms.Thumb
 {
-    internal partial class ThumbNew
+    internal partial class ThumbNew : IThumb
     {
         private readonly AppContext appContext;
+        private readonly ICanvas canvas;
 
         public Rectangle[] HandleRectangles { get; private set; }
 
         public Control[] Components { get; }
+
+        public event MouseEventHandler MouseDown;
+        public event MouseEventHandler MouseUp;
+        public event MouseEventHandler MouseMove;
 
         public event EventHandler<ThumbState> StateChanged;
 
         public event EventHandler<ThumbAction> ActionCalled;
 
         public Rectangle Bounds { get; set; }
+        public Point Location => Bounds.Location;
 
-        public Rectangle ClientRectangle { get; set; }
-
-        public ThumbNew(AppContext appContext)
+        public ThumbNew(AppContext appContext, ICanvas canvas)
         {
             this.appContext = appContext;
+            this.canvas = canvas;
             appContext.DrawingContextChanged += DrawingContextsKeeper_DrawingContextChanged;
 
             InitializeComponent();
@@ -61,15 +67,15 @@ namespace CaptureImage.WinForms.Thumb
             ActionCalled?.Invoke(this, action);
         }
 
-        private void Thumb_Paint(object sender, PaintEventArgs e)
+        private void Paint(Graphics gr)
         {
             if (this.Bounds.Width > 0 && this.Bounds.Height > 0)
             {
-                e.Graphics.DrawImage(appContext.DrawingContext.GetImage(), ClientRectangle, this.Bounds,
+                gr.DrawImage(appContext.DrawingContext.GetImage(), this.Bounds, this.Bounds,
                     GraphicsUnit.Pixel);
             }
 
-            DrawBorder(e.Graphics);
+            DrawBorder(gr);
 
             // displaySizeLabel
             displaySizeLabel.Text = $"{this.Bounds.Size.Width}x{this.Bounds.Size.Height}";
@@ -89,7 +95,7 @@ namespace CaptureImage.WinForms.Thumb
         {
             int handleSize = 5;
             int padding = 2;
-            Rectangle rect = new Rectangle(handleSize / 2 + padding, handleSize / 2 + padding,
+            Rectangle rect = new Rectangle(this.Bounds.X + handleSize / 2 + padding, this.Bounds.Y + handleSize / 2 + padding,
                 this.Bounds.Size.Width - handleSize - padding * 2, this.Bounds.Size.Height - handleSize - padding * 2);
 
             HandleRectangles = GraphicsHelper.DrawBorderWithHandles(gr, rect, handleSize);
@@ -104,6 +110,11 @@ namespace CaptureImage.WinForms.Thumb
         {
             this.Bounds = bounds;
             this.displaySizeLabel.Visible = this.Bounds.Size.Width > 0 && this.Bounds.Size.Height > 0;
+
+            OnGraphics((gr, rect) =>
+            {
+                Paint(gr);
+            });
         }
 
         public void ShowPanels()
@@ -111,7 +122,7 @@ namespace CaptureImage.WinForms.Thumb
             this.panelX.Visible = true;
             this.panelY.Visible = true;
         }
-
+        
         public void HidePanels()
         {
             this.panelX.Visible = false;
@@ -120,10 +131,10 @@ namespace CaptureImage.WinForms.Thumb
 
         public void OnGraphics(DrawingContext.OnGraphicsDelegate toDo)
         {
-            //using (Graphics gr = this.CreateGraphics())
-            //{
-            //    toDo?.Invoke(gr, this.ClientRectangle);
-            //}
+            this.canvas.OnGraphics((gr, rect) =>
+            {
+                toDo?.Invoke(gr, this.Bounds);
+            });
         }
 
         public void TranslateTransform(Graphics gr)
@@ -133,7 +144,7 @@ namespace CaptureImage.WinForms.Thumb
 
         public void DrawBackgroundImage(Graphics gr, Image image)
         {
-            gr.DrawImage(image, ClientRectangle, this.Bounds, GraphicsUnit.Pixel);
+            gr.DrawImage(image, this.Bounds, this.Bounds, GraphicsUnit.Pixel);
         }
     }
 }

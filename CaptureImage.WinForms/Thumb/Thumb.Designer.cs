@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using CaptureImage.Common.Extensions;
 using CaptureImage.WinForms.Properties;
 using CaptureImage.Common.DrawingContext;
+using CaptureImage.Common.Thumb;
 
 namespace CaptureImage.WinForms.Thumb
 {

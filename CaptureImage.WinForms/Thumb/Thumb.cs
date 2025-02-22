@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using CaptureImage.Common;
 using System;
 using CaptureImage.Common.DrawingContext;
+using CaptureImage.Common.Thumb;
 
 namespace CaptureImage.WinForms.Thumb
 {
@@ -23,7 +24,6 @@ namespace CaptureImage.WinForms.Thumb
         {
             this.appContext = appContext;
             appContext.DrawingContextChanged += DrawingContextsKeeper_DrawingContextChanged;
-
             InitializeComponent();
 
             this.DoubleBuffered = true;

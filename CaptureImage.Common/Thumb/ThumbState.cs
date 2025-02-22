@@ -1,6 +1,6 @@
 ﻿
 
-namespace CaptureImage.WinForms
+namespace CaptureImage.Common.Thumb
 {
     public enum ThumbState
     {

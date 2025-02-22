@@ -6,7 +6,7 @@ namespace CaptureImage.Common.Thumb
 {
     public interface IThumb
     {
-        void Refresh(Rectangle bounds);
+        void Refresh();
         Rectangle[] HandleRectangles { get; }
         Rectangle Bounds { get; set; }
         Point Location { get; }

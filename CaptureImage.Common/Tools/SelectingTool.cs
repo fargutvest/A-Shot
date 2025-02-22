@@ -82,7 +82,8 @@ namespace CaptureImage.Common.Tools
             if (isActive)
             {
                 handleRectangles = selector.HandleRectangles;
-                selector.Refresh(selectingRect);
+                selector.Bounds = selectingRect;
+                selector.Refresh();
                 
                 switch (state)
                 {

@@ -54,6 +54,7 @@
     <Compile Include="Drawings\Circle.cs" />
     <Compile Include="Drawings\Rect.cs" />
     <Compile Include="Drawings\Text.cs" />
+    <Compile Include="Drawings\ThumbDrawing.cs" />
     <Compile Include="Extensions\ControlExt.cs" />
     <Compile Include="Extensions\GraphicsExt.cs" />
     <Compile Include="Extensions\MouseEventArgsExt.cs" />

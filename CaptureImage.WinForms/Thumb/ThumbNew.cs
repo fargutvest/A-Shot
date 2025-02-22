@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using CaptureImage.Common;
 using System;
 using CaptureImage.Common.DrawingContext;
+using CaptureImage.Common.Drawings;
 using CaptureImage.Common.Thumb;
 
 namespace CaptureImage.WinForms.Thumb
@@ -22,7 +23,6 @@ namespace CaptureImage.WinForms.Thumb
         public event MouseEventHandler MouseMove;
 
         public event EventHandler<ThumbState> StateChanged;
-
         public event EventHandler<ThumbAction> ActionCalled;
 
         public Rectangle Bounds { get; set; }
@@ -69,6 +69,8 @@ namespace CaptureImage.WinForms.Thumb
 
         private void Paint(Graphics gr)
         {
+            IDrawing drawing = GetDrawing();
+
             if (this.Bounds.Width > 0 && this.Bounds.Height > 0)
             {
                 gr.DrawImage(appContext.DrawingContext.GetImage(), this.Bounds, this.Bounds,
@@ -106,9 +108,8 @@ namespace CaptureImage.WinForms.Thumb
             }
         }
 
-        public void Refresh(Rectangle bounds)
+        public void Refresh()
         {
-            this.Bounds = bounds;
             this.displaySizeLabel.Visible = this.Bounds.Size.Width > 0 && this.Bounds.Size.Height > 0;
 
             OnGraphics((gr, rect) =>
@@ -145,6 +146,13 @@ namespace CaptureImage.WinForms.Thumb
         public void DrawBackgroundImage(Graphics gr, Image image)
         {
             gr.DrawImage(image, this.Bounds, this.Bounds, GraphicsUnit.Pixel);
+        }
+
+        private IDrawing GetDrawing()
+        {
+            ThumbDrawing drawing = new ThumbDrawing();
+
+            return drawing;
         }
     }
 }

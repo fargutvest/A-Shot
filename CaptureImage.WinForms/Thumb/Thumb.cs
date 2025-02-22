@@ -104,10 +104,9 @@ namespace CaptureImage.WinForms.Thumb
             }
         }
 
-        public void Refresh(Rectangle bounds)
+        public void Refresh()
         {
             this.Visible = false;
-            this.Bounds = bounds;
             this.displaySizeLabel.Visible = this.Size.Width > 0 && this.Size.Height > 0;
             this.Visible = true;
         }

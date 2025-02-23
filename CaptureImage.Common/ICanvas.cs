@@ -13,5 +13,7 @@ namespace CaptureImage.Common
         void DrawBackgroundImage(Graphics gr, Image image);
 
         Cursor Cursor { get; set; }
+
+        void Refresh();
     }
 }

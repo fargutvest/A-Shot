@@ -41,7 +41,6 @@ namespace CaptureImage.WinForms
             TopMost = true;
 #endif
             
-            //this.thumb = new Thumb.ThumbNew(appContext, this);
             this.thumb = new Thumb.Thumb(appContext, this);
             this.thumb.Bounds = Rectangle.Empty;
             this.thumb.MouseDown += (sender, e) => BlackoutScreen_MouseDown(sender, e.Offset(thumb.Location));

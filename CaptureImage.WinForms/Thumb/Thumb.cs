@@ -69,18 +69,10 @@ namespace CaptureImage.WinForms.Thumb
 
         protected override void OnPaint(PaintEventArgs e)
         {
-           CalculateBeforePaint();   
-           base.OnPaint(e);
-        }
-
-        private void Thumb_Paint(object sender, PaintEventArgs e)
-        {
-            if (this.Width > 0 && this.Height > 0)
-            {
-                e.Graphics.DrawImage(appContext.DrawingContext.GetImage(), ClientRectangle, this.Bounds, GraphicsUnit.Pixel);
-            }
-
+            CalculateBeforePaint();
+            DrawImage(e.Graphics);
             DrawBorder(e.Graphics);
+            base.OnPaint(e);
         }
 
         private void CalculateBeforePaint()
@@ -98,6 +90,14 @@ namespace CaptureImage.WinForms.Thumb
             // panelY
             panelY.Location = new Point(this.Location.X + this.Width, this.Location.Y + this.Height - panelY.Height);
             panelY.Refresh();
+        }
+
+        private void DrawImage(Graphics gr)
+        {
+            if (this.Width > 0 && this.Height > 0)
+            {
+                gr.DrawImage(appContext.DrawingContext.GetImage(), ClientRectangle, this.Bounds, GraphicsUnit.Pixel);
+            }
         }
 
         public void DrawBorder(Graphics gr)

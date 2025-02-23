@@ -101,6 +101,7 @@ namespace CaptureImage.Common.Tools
                         else
                         {
                             selector.Refresh();
+                            canvas.Refresh();
                         }
 
                         break;

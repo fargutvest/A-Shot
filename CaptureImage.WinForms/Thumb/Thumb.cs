@@ -11,6 +11,7 @@ namespace CaptureImage.WinForms.Thumb
     public partial class Thumb : Control, IThumb
     {
         private readonly AppContext appContext;
+        private ICanvas canvas;
 
         public Rectangle[] HandleRectangles { get; private set; }
 
@@ -20,9 +21,10 @@ namespace CaptureImage.WinForms.Thumb
 
         public event EventHandler<ThumbAction> ActionCalled;
 
-        public Thumb(AppContext appContext)
+        public Thumb(AppContext appContext, ICanvas canvas)
         {
             this.appContext = appContext;
+            this.canvas = canvas;
             appContext.DrawingContextChanged += DrawingContextsKeeper_DrawingContextChanged;
             InitializeComponent();
 
@@ -65,16 +67,24 @@ namespace CaptureImage.WinForms.Thumb
             ActionCalled?.Invoke(this, action);
         }
 
+        protected override void OnPaint(PaintEventArgs e)
+        {
+           CalculateBeforePaint();   
+           base.OnPaint(e);
+        }
+
         private void Thumb_Paint(object sender, PaintEventArgs e)
         {
             if (this.Width > 0 && this.Height > 0)
             {
-                e.Graphics.DrawImage(appContext.DrawingContext.GetImage(), ClientRectangle, this.Bounds,
-                    GraphicsUnit.Pixel);
+                e.Graphics.DrawImage(appContext.DrawingContext.GetImage(), ClientRectangle, this.Bounds, GraphicsUnit.Pixel);
             }
 
             DrawBorder(e.Graphics);
+        }
 
+        private void CalculateBeforePaint()
+        {
             // displaySizeLabel
             displaySizeLabel.Visible = this.Size.Width > 0 && this.Size.Height > 0;
             displaySizeLabel.Text = $"{Size.Width}x{Size.Height}";

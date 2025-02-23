@@ -19,7 +19,6 @@ namespace CaptureImage.WinForms
         private ITool drawingTool;
         private readonly AppContext appContext;
         private Point mousePosition;
-        private MouseHookHelper hookHelper;
 
         public Mode Mode { get; set; }
 
@@ -33,9 +32,7 @@ namespace CaptureImage.WinForms
             SetStyle(ControlStyles.AllPaintingInWmPaint |
             ControlStyles.UserPaint |
             ControlStyles.OptimizedDoubleBuffer, true);
-            UpdateStyles();;
-
-            hookHelper = new MouseHookHelper();
+            UpdateStyles();
 
             this.appContext = appContext;
             this.appContext.DrawingContextChanged += AppContext_DrawingContextChanged;
@@ -45,7 +42,7 @@ namespace CaptureImage.WinForms
 #endif
             
             //this.thumb = new Thumb.ThumbNew(appContext, this);
-            this.thumb = new Thumb.Thumb(appContext);
+            this.thumb = new Thumb.Thumb(appContext, this);
             this.thumb.Bounds = Rectangle.Empty;
             this.thumb.MouseDown += (sender, e) => BlackoutScreen_MouseDown(sender, e.Offset(thumb.Location));
             this.thumb.MouseUp += (sender, e) => BlackoutScreen_MouseUp(sender, e.Offset(thumb.Location));

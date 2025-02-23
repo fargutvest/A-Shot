@@ -8,7 +8,7 @@ using CaptureImage.Common.Thumb;
 
 namespace CaptureImage.WinForms.Thumb
 {
-    public partial class Thumb : UserControl, IThumb
+    public partial class Thumb : Control, IThumb
     {
         private readonly AppContext appContext;
 
@@ -76,6 +76,7 @@ namespace CaptureImage.WinForms.Thumb
             DrawBorder(e.Graphics);
 
             // displaySizeLabel
+            displaySizeLabel.Visible = this.Size.Width > 0 && this.Size.Height > 0;
             displaySizeLabel.Text = $"{Size.Width}x{Size.Height}";
             displaySizeLabel.Location = new Point(this.Location.X, this.Location.Y - displaySizeLabel.Height);
             displaySizeLabel.Refresh();
@@ -103,14 +104,7 @@ namespace CaptureImage.WinForms.Thumb
                 HandleRectangles[i].Offset(this.Location);
             }
         }
-
-        public void Refresh()
-        {
-            this.Visible = false;
-            this.displaySizeLabel.Visible = this.Size.Width > 0 && this.Size.Height > 0;
-            this.Visible = true;
-        }
-
+        
         public void ShowPanels()
         {
             this.panelX.Visible = true;

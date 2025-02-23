@@ -81,9 +81,8 @@ namespace CaptureImage.Common.Tools
         {
             if (isActive)
             {
-                handleRectangles = selector.HandleRectangles;
-                selector.Bounds = selectingRect;
-                selector.Refresh();
+                if (selectingRect.Size == Size.Empty)
+                    return;
                 
                 switch (state)
                 {
@@ -91,6 +90,19 @@ namespace CaptureImage.Common.Tools
                     case SelectingState.Moving:
                     case SelectingState.Resizing:
                         selector.HidePanels();
+                        handleRectangles = selector.HandleRectangles;
+
+                        selector.Location = selectingRect.Location;
+
+                        if (selector.Size != selectingRect.Size)
+                        {
+                            selector.Size = selectingRect.Size;
+                        }
+                        else
+                        {
+                            selector.Refresh();
+                        }
+
                         break;
                     case SelectingState.None:
                         if (selectingRect.Width > 0 && selectingRect.Height > 0)

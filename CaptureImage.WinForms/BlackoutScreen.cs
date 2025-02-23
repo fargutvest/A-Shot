@@ -6,6 +6,7 @@ using System.Linq;
 using CaptureImage.Common;
 using CaptureImage.Common.DrawingContext;
 using CaptureImage.Common.Helpers;
+using CaptureImage.Common.Helpers.HotKeys;
 using CaptureImage.Common.Thumb;
 
 namespace CaptureImage.WinForms
@@ -18,6 +19,7 @@ namespace CaptureImage.WinForms
         private ITool drawingTool;
         private readonly AppContext appContext;
         private Point mousePosition;
+        private MouseHookHelper hookHelper;
 
         public Mode Mode { get; set; }
 
@@ -33,17 +35,15 @@ namespace CaptureImage.WinForms
             ControlStyles.OptimizedDoubleBuffer, true);
             UpdateStyles();;
 
+            hookHelper = new MouseHookHelper();
+
             this.appContext = appContext;
             this.appContext.DrawingContextChanged += AppContext_DrawingContextChanged;
 
 #if RELEASE
             TopMost = true;
 #endif
-            selectingTool = new SelectingTool(this);
-            selectingTool.Activate();
-
-            Mode = Mode.Selecting;
-
+            
             //this.thumb = new Thumb.ThumbNew(appContext, this);
             this.thumb = new Thumb.Thumb(appContext);
             this.thumb.Bounds = Rectangle.Empty;
@@ -59,6 +59,11 @@ namespace CaptureImage.WinForms
             }
 
             this.Controls.AddRange(thumb.Components);
+
+            selectingTool = new SelectingTool(this);
+            selectingTool.Activate();
+
+            Mode = Mode.Selecting;
         }
 
         private void AppContext_DrawingContextChanged(object sender, System.EventArgs e)

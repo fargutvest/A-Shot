@@ -25,8 +25,25 @@ namespace CaptureImage.WinForms.Thumb
         public event EventHandler<ThumbState> StateChanged;
         public event EventHandler<ThumbAction> ActionCalled;
 
-        public Rectangle Bounds { get; set; }
-        public Point Location => Bounds.Location;
+        private Rectangle bounds;
+        public Rectangle Bounds 
+        {
+            get => bounds;
+            set => bounds = value;
+        }
+    
+
+        public Point Location
+        {
+            get => bounds.Location;
+            set => bounds.Location = value;
+        }
+
+        public Size Size
+        {
+            get => bounds.Size;
+            set => bounds.Size = value;
+        }
 
         public ThumbNew(AppContext appContext, ICanvas canvas)
         {

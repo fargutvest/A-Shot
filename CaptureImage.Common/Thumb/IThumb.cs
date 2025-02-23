@@ -9,7 +9,8 @@ namespace CaptureImage.Common.Thumb
         void Refresh();
         Rectangle[] HandleRectangles { get; }
         Rectangle Bounds { get; set; }
-        Point Location { get; }
+        Point Location { get; set;  }
+        Size Size { get; set; }
         void HidePanels();
         void ShowPanels();
         void DrawBorder(Graphics gr);
